@@ -42,7 +42,7 @@ Verificación: abrir `http://localhost:8000/api/docs/` debe mostrar la documenta
 | Variable | Uso | Valor MVP |
 |---|---|---|
 | `DEBUG` | Activa mensajes de error detallados y sirve `media/` directamente | `True` (cambiar a `False` en producción) |
-| `SECRET_KEY` | Firma de sesiones/tokens | Clave de desarrollo incluida — **regenerar antes de producción** |
+| `SECRET_KEY` | Firma de sesiones/tokens | Se lee de la variable de entorno `DJANGO_SECRET_KEY` (ver `backend/.env.example`). Sin ella, en desarrollo se usa una clave insegura solo para local; con `DJANGO_DEBUG=False` el servidor **no arranca** si falta |
 | `DATABASES` | Motor de base de datos | SQLite (cambiar a PostgreSQL en producción) |
 | `CORS_ALLOWED_ORIGINS` | Orígenes permitidos para el frontend | `localhost:8100` / `localhost:4200` — agregar el dominio real en producción |
 | `SIMPLE_JWT` | Duración de tokens de acceso/refresco | 8h / 1 día |
@@ -54,7 +54,7 @@ Verificación: abrir `http://localhost:8000/api/docs/` debe mostrar la documenta
 | Módulo | Archivo a modificar | Qué cambiar |
 |---|---|---|
 | Correo real | `settings.py` → `MAILERS` | Backend SMTP real (Gmail con contraseña de aplicación, SendGrid, Mailgun, AWS SES, Resend, etc.) |
-| Chatbot con LLM real | `chatbot/llm.py` | Reemplazar `MockLLMClient` por una llamada real a la API de un proveedor (ej. Anthropic), manteniendo la misma firma `responder(historial, mensaje_nuevo)` y las mismas funciones "tool" ya construidas |
+| Chatbot con LLM real | `chatbot/llm.py` | Reemplazar `MockLLMClient` por una llamada real a la API de un proveedor (ej. Anthropic), manteniendo la misma firma `responder(conversacion, mensaje_nuevo) -> dict` y las mismas funciones "tool" ya construidas |
 | Pagos reales | `payments/provider.py` | Reemplazar `MockPaymentProvider` por un cliente real de Wompi/PayU/Stripe, manteniendo la misma firma `procesar(pago)` |
 
 ## 3. Instalación del frontend (Ionic + Angular)
@@ -98,9 +98,9 @@ Ver tabla completa en el [README.md](../README.md) principal. Resumen: `admin/ad
 
 Este MVP corre en modo desarrollo (`runserver` de Django + servidor de desarrollo de Angular). Para un despliegue real:
 
-1. **Backend**: servir con un servidor WSGI de producción (ej. `gunicorn` o `waitress`) detrás de un proxy (Nginx). Cambiar `DEBUG=False`, definir `ALLOWED_HOSTS`, migrar a PostgreSQL, y servir `media/` desde almacenamiento persistente (o un bucket tipo S3).
+1. **Backend**: servir con un servidor **ASGI** de producción (ej. `daphne cmedriver.asgi:application` o `uvicorn`) detrás de un proxy (Nginx) que reenvíe también `/ws/` con las cabeceras `Upgrade`/`Connection`. Un servidor WSGI (`gunicorn` clásico, `waitress`) **no** sirve los WebSockets del tracking y el chat. Cambiar `DEBUG=False`, definir `ALLOWED_HOSTS`, migrar a PostgreSQL, y servir `media/` desde almacenamiento persistente (o un bucket tipo S3).
 2. **Frontend**: generar el build (`npm run build`) y servir los archivos estáticos resultantes desde el mismo Nginx o un CDN.
-3. **Variables sensibles**: mover `SECRET_KEY` y credenciales de base de datos a variables de entorno (no versionarlas en el repositorio).
+3. **Variables sensibles**: `SECRET_KEY` ya se lee de la variable de entorno `DJANGO_SECRET_KEY` (junto con `DJANGO_DEBUG`, `DJANGO_ALLOWED_HOSTS`, `CORS_ALLOWED_ORIGINS`, `FRONTEND_URL`, `EMAIL_BACKEND` y `DEFAULT_FROM_EMAIL`; ver `backend/.env.example`). Falta hacer lo mismo con las credenciales de base de datos (no versionarlas en el repositorio).
 4. **HTTPS**: obligatorio en producción, tanto para la API como para el frontend (los navegadores restringen geolocalización y cámara en sitios sin HTTPS).
 5. **Contenedores (opcional, recomendado a futuro)**: empaquetar backend y frontend en imágenes Docker separadas + un `docker-compose.yml` con PostgreSQL, para reproducibilidad del entorno. No incluido en el MVP por tiempo, pero es el siguiente paso natural (ver [07-roadmap-futuro.md](07-roadmap-futuro.md)).
 

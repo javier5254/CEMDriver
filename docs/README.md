@@ -20,6 +20,21 @@
 | 16 | [Plan de pruebas](16-plan-pruebas.md) | Casos de prueba y cómo ejecutar la suite automatizada |
 | 17 | [Manual de herramientas](17-manual-herramientas.md) | Todo el stack, modelos de arquitectura y herramientas de diseño usados, con justificación |
 
+## Entrega final (docs/entrega/)
+
+Documentos consolidados de la entrega final, verificados contra el código. Prevalecen sobre los documentos históricos de la tabla anterior cuando hay diferencias.
+
+| # | Documento | Contenido |
+|---|---|---|
+| 01 | [Requerimientos](entrega/01-requerimientos.md) | Problema, objetivos, actores, RF, RNF, reglas de negocio (RN), restricciones (RES) y hallazgos H-01…H-12 |
+| 02 | [Stack tecnológico](entrega/02-stack-tecnologico.md) | Tecnologías usadas con su justificación y las alternativas descartadas |
+| 03 | [Arquitectura](entrega/03-arquitectura.md) | Estilo arquitectónico, diagrama general, componentes, seguridad, despliegue actual y propuesto |
+| 04 | [Modelo entidad-relación](entrega/04-mer.md) | MER, diccionario de datos, relaciones y restricciones |
+| 05 | [BPMN](entrega/05-bpmn.md) | Modelado de los procesos de negocio |
+| 06 | [Modelo C4](entrega/06-c4.md) | Contexto, contenedores, componentes y código |
+| 07 | [Matriz de trazabilidad](entrega/07-trazabilidad.md) | Relación entre requerimientos, reglas, componentes y pruebas |
+| 08 | [Limitaciones y mejoras](entrega/08-limitaciones-y-mejoras.md) | Limitaciones conocidas LIM-01…LIM-38, servicios simulados y hoja de ruta |
+
 ## Otros archivos de este directorio
 - [diagrams/](diagrams/) — fuentes Mermaid/SVG (`src/`) e imágenes renderizadas (`img/`) de todos los diagramas
 - [mockups/](mockups/) — fuentes editables de los mockups (`.dc.html`)
