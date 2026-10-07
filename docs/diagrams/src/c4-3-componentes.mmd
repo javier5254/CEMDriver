@@ -1,0 +1,103 @@
+%%{init: {"flowchart": {"wrappingWidth": 300, "nodeSpacing": 35, "rankSpacing": 70}}}%%
+flowchart TB
+    %% C4 - Nivel 3: Componentes de la API REST CMEDriver y del Servicio de tiempo real
+    %% (docs/entrega/06-c4.md). Dependencias verificadas con grep de imports del backend.
+
+    APP["<b>App CMEDriver</b><br/>[Contenedor: Ionic 9 + Angular 22]"]
+    INT["<b>Sistema integrador externo</b><br/>[Sistema externo]"]
+
+    subgraph API["API REST CMEDriver [Contenedor: Django 6.1 + DRF 3.18]"]
+        direction TB
+        subgraph SEG["Autenticación y autorización (DEFAULT_AUTHENTICATION_CLASSES / permission_classes)"]
+            direction LR
+            JWTA["<b>Autenticación JWT</b><br/>[Componente: SimpleJWT JWTAuthentication]<br/>Valida Authorization: Bearer"]
+            AKA["<b>Autenticación por API Key</b><br/>[Componente: integrations.authentication.ApiKeyAuthentication]<br/>Valida X-API-Key, actúa como ALISTADOR"]
+            RBAC["<b>Permisos RBAC</b><br/>[Componente: accounts/permissions.py]<br/>IsAdmin, IsAlistador, IsMotorizado, IsCliente"]
+        end
+
+        subgraph APPS["Apps de dominio (cmedriver/urls.py monta las 9 bajo /api/)"]
+            direction TB
+            CHAT["<b>chatbot</b><br/>[Componente: app Django]<br/>MensajeChatbotView, MockLLMClient (tools)"]
+            OPT["<b>optimization</b><br/>[Componente: app Django]<br/>OptimizarRutaView, heurística vecino más cercano"]
+            TRK["<b>tracking</b><br/>[Componente: app Django]<br/>ReportarPosicionView, UltimaPosicionView, DestinoView"]
+            SRV["<b>services</b><br/>[Componente: app Django]<br/>ServicioViewSet, RutaViewSet - ciclo de vida del servicio"]
+            PAYA["<b>payments</b><br/>[Componente: app Django]<br/>PagoDetailView, PaymentProvider"]
+            COV["<b>coverage</b><br/>[Componente: app Django]<br/>CoberturaViewSet, AgendaDisponibleView"]
+            INV["<b>inventory</b><br/>[Componente: app Django]<br/>ProductoViewSet, productos para chatbot"]
+            ACC["<b>accounts</b><br/>[Componente: app Django]<br/>Usuario, LoginView, MeView, reset de contraseña"]
+            INTG["<b>integrations</b><br/>[Componente: app Django]<br/>ApiKeyViewSet, WebhookEndpointViewSet, entregas"]
+        end
+
+        GEO["<b>Cliente de geocodificación</b><br/>[Componente: optimization/geocoding.py]<br/>geocodificar(direccion), urllib, 1 req/s"]
+        WHD["<b>Despachador de webhooks</b><br/>[Componente: integrations/services.py]<br/>disparar_webhook(evento, payload), firmar()"]
+    end
+
+    subgraph RT["Servicio de tiempo real [Contenedor: Django Channels 4.3]"]
+        direction LR
+        WSM["<b>Middleware JWT de WebSocket</b><br/>[Componente: cmedriver/ws_auth.py]<br/>JWTAuthMiddleware, ?token= a scope user"]
+        TC["<b>TrackingConsumer</b><br/>[Componente: tracking/consumers.py]<br/>/ws/tracking/{id}/ - solo lectura"]
+        CC["<b>ChatConsumer</b><br/>[Componente: services/consumers.py]<br/>/ws/chat/{id}/ - bidireccional"]
+    end
+
+    CL["<b>Capa de canales</b><br/>[Contenedor: InMemoryChannelLayer / Redis]"]
+    DB[("<b>Base de datos</b><br/>[Contenedor: SQLite / PostgreSQL]")]
+    MEDIA[("<b>Almacenamiento de evidencias</b><br/>[Contenedor: media/evidencias/]")]
+    NOM["<b>Nominatim (OpenStreetMap)</b><br/>[Sistema externo]"]
+    WH["<b>Receptor de webhooks</b><br/>[Sistema externo]"]
+    SMTP["<b>Servidor SMTP</b><br/>[Sistema externo]"]
+    PAY["<b>Proveedor de pagos (simulado)</b><br/>[Sistema externo]"]
+    LLM["<b>Proveedor LLM (simulado)</b><br/>[Sistema externo]"]
+
+    %% Entradas
+    APP -->|"Peticiones /api/*<br/>[HTTPS REST + JWT Bearer]"| JWTA
+    INT -->|"Peticiones /api/servicios/<br/>[HTTPS REST + X-API-Key]"| AKA
+    APP -->|"Abre socket<br/>[WSS ?token=JWT]"| WSM
+    JWTA -->|"Usuario autenticado"| RBAC
+    AKA -->|"Usuario actua_como"| RBAC
+    AKA -->|"ApiKey.autenticar()"| INTG
+    RBAC -->|"Autoriza por rol<br/>[Python]"| APPS
+
+    %% Dependencias entre apps (imports reales)
+    CHAT -->|"tool_crear_recoleccion<br/>ServicioViewSet.planificar"| SRV
+    CHAT -->|"tool_consultar_agenda<br/>AgendaDisponibleView"| COV
+    CHAT -->|"tool_listar_productos<br/>Producto"| INV
+    CHAT -->|"tool_crear_compra<br/>obtener_proveedor_pago"| PAYA
+    OPT -->|"Ruta, Servicio"| SRV
+    OPT -->|"geocodificar()"| GEO
+    TRK -->|"Servicio, TipoServicio"| SRV
+    TRK -->|"geocodificar() y PuntoGeocodificado<br/>(DestinoView)"| OPT
+    SRV -->|"Cobertura, DIAS_ORDEN"| COV
+    SRV -->|"Producto, ProductoSerializer"| INV
+    SRV -->|"UsuarioResumenSerializer"| ACC
+    SRV -->|"_notificar(): disparar_webhook()"| WHD
+    WHD -->|"WebhookEndpoint, WebhookDelivery"| INTG
+
+    %% Tiempo real
+    WSM -->|"Enruta por URLRouter"| TC
+    WSM -->|"Enruta por URLRouter"| CC
+    TRK -->|"group_send tracking_id<br/>[Channels, en proceso]"| CL
+    SRV -->|"group_send chat_id<br/>[Channels, en proceso]"| CL
+    TC -->|"group_add tracking_id,<br/>recibe tracking_update"| CL
+    CC -->|"group_add chat_id,<br/>group_send chat_message"| CL
+    CC -->|"MensajeChat, MensajeChatSerializer"| SRV
+
+    %% Salidas
+    APPS -->|"Lee y escribe<br/>[SQL, ORM Django]"| DB
+    RT -->|"Verifica acceso / guarda chat<br/>[SQL, ORM]"| DB
+    SRV -->|"Evidencia foto y firma<br/>[E/S de archivos]"| MEDIA
+    GEO -->|"GET /search<br/>[HTTPS]"| NOM
+    WHD -->|"POST firmado HMAC-SHA256<br/>[HTTPS]"| WH
+    ACC -->|"send_mail reset<br/>[SMTP]"| SMTP
+    PAYA -.->|"MockPaymentProvider.procesar()<br/>[en proceso]"| PAY
+    CHAT -.->|"MockLLMClient.responder()<br/>[en proceso]"| LLM
+
+    classDef contenedor fill:#438dd5,stroke:#2e6295,color:#ffffff;
+    classDef componente fill:#85bbf0,stroke:#5d82a8,color:#000000;
+    classDef externo fill:#999999,stroke:#6b6b6b,color:#ffffff;
+    class APP,CL,DB,MEDIA contenedor;
+    class JWTA,AKA,RBAC,CHAT,OPT,TRK,SRV,PAYA,COV,INV,ACC,INTG,GEO,WHD,WSM,TC,CC componente;
+    class INT,NOM,WH,SMTP,PAY,LLM externo;
+    style API fill:#ffffff,stroke:#438dd5,stroke-width:2px,stroke-dasharray:6 4,color:#2e6295
+    style RT fill:#ffffff,stroke:#438dd5,stroke-width:2px,stroke-dasharray:6 4,color:#2e6295
+    style SEG fill:#f4f8fd,stroke:#85bbf0,stroke-dasharray:3 3,color:#2e6295
+    style APPS fill:#f4f8fd,stroke:#85bbf0,stroke-dasharray:3 3,color:#2e6295

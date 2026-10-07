@@ -1,0 +1,71 @@
+%%{init: {"flowchart": {"wrappingWidth": 330, "nodeSpacing": 45, "rankSpacing": 75}}}%%
+flowchart TB
+    %% C4 - Nivel 2: Contenedores (docs/entrega/06-c4.md)
+    %% Nombres canonicos: docs/entrega/03-arquitectura.md seccion 9
+
+    ADM["<b>Administrador</b><br/>[Persona]"]
+    ALI["<b>Alistador</b><br/>[Persona]"]
+    MOT["<b>Motorizado</b><br/>[Persona]"]
+    CLI["<b>Cliente</b><br/>[Persona]"]
+    INT["<b>Sistema integrador externo</b><br/>[Sistema externo]<br/>ERP / e-commerce"]
+
+    subgraph CME["Plataforma CMEDriver [Sistema]"]
+        APP["<b>App CMEDriver</b><br/>[Contenedor: Ionic 9 + Angular 22, Capacitor 8]<br/>SPA web / app móvil con las áreas de los 4 roles;<br/>guarda el JWT y lo adjunta con un interceptor"]
+
+        subgraph DAPHNE["Servidor ASGI Daphne [Nodo de ejecución: Daphne 4.2 + ProtocolTypeRouter]"]
+            API["<b>API REST CMEDriver</b><br/>[Contenedor: Django 6.1 + DRF 3.18 + SimpleJWT]<br/>/api/* - lógica de negocio, máquina de estados,<br/>JWT + API Key + RBAC, 9 apps de dominio"]
+            RT["<b>Servicio de tiempo real</b><br/>[Contenedor: Django Channels 4.3]<br/>/ws/tracking/{id}/ y /ws/chat/{id}/<br/>con JWTAuthMiddleware"]
+            DOCS["<b>Documentación API</b><br/>[Contenedor: drf-spectacular 0.30]<br/>/api/schema/ (OpenAPI 3) y /api/docs/ (Swagger UI)"]
+            ADMINP["<b>Panel de administración Django</b><br/>[Contenedor: django.contrib.admin]<br/>/admin/ - gestión directa de datos"]
+            CL["<b>Capa de canales</b><br/>[Contenedor: InMemoryChannelLayer (dev) / Redis (propuesta)]<br/>Grupos tracking_&lt;id&gt; y chat_&lt;id&gt;"]
+        end
+
+        DB[("<b>Base de datos</b><br/>[Contenedor: SQLite (dev) / PostgreSQL (propuesta)]<br/>Usuarios, servicios, rutas, GPS, chat,<br/>chatbot, pagos, API keys, webhooks")]
+        MEDIA[("<b>Almacenamiento de evidencias</b><br/>[Contenedor: sistema de archivos media/evidencias/]<br/>Fotos y firmas de recolección")]
+    end
+
+    OSM["<b>Teselas OpenStreetMap</b><br/>[Sistema externo]"]
+    NOM["<b>Nominatim (OpenStreetMap)</b><br/>[Sistema externo]"]
+    SMTP["<b>Servidor SMTP</b><br/>[Sistema externo]"]
+    WH["<b>Receptor de webhooks</b><br/>[Sistema externo]"]
+    PAY["<b>Proveedor de pagos (simulado)</b><br/>[Sistema externo]<br/>MockPaymentProvider"]
+    LLM["<b>Proveedor LLM (simulado)</b><br/>[Sistema externo]<br/>MockLLMClient"]
+
+    ADM -->|"Usa<br/>[HTTPS]"| APP
+    ALI -->|"Usa<br/>[HTTPS]"| APP
+    MOT -->|"Usa (cámara, firma, GPS)<br/>[HTTPS]"| APP
+    CLI -->|"Usa<br/>[HTTPS]"| APP
+    ADM -->|"Gestiona datos<br/>[HTTPS, sesión Django]"| ADMINP
+    INT -->|"Crea y consulta servicios<br/>[HTTPS REST/JSON + X-API-Key]"| API
+    INT -.->|"Lee el contrato<br/>[HTTPS GET]"| DOCS
+
+    APP -->|"Llama a la API<br/>[HTTPS REST/JSON + JWT Bearer,<br/>multipart para foto/firma]"| API
+    APP <-->|"Recibe posiciones y mensajes<br/>[WSS JSON, ?token=JWT]"| RT
+    APP -->|"Descarga mapa base<br/>[HTTPS GET teselas]"| OSM
+    APP -.->|"Muestra fotos/firmas<br/>[HTTPS GET /media/]"| MEDIA
+
+    API -->|"Publica eventos<br/>[group_send, en proceso]"| CL
+    CL -->|"Difunde al grupo<br/>[group_add / group_send]"| RT
+    DOCS -.->|"Introspecciona vistas y serializers<br/>[Python, en proceso]"| API
+
+    API -->|"Lee y escribe<br/>[SQL, ORM Django]"| DB
+    RT -->|"Verifica acceso y guarda chat<br/>[SQL, ORM Django]"| DB
+    ADMINP -->|"Lee y escribe<br/>[SQL, ORM Django]"| DB
+    API -->|"Guarda y lee evidencias<br/>[E/S de archivos]"| MEDIA
+
+    API -->|"Geocodifica direcciones<br/>[HTTPS GET /search, 1 req/s]"| NOM
+    API -->|"Envía correo de reset<br/>[SMTP+TLS prod / consola dev]"| SMTP
+    API -->|"Notifica servicio.*<br/>[HTTPS POST + X-CMEDriver-Signature]"| WH
+    API -.->|"Procesa pago<br/>[en proceso hoy / HTTPS a futuro]"| PAY
+    API -.->|"Interpreta mensaje<br/>[en proceso hoy / HTTPS a futuro]"| LLM
+
+    classDef persona fill:#08427b,stroke:#052e56,color:#ffffff;
+    classDef contenedor fill:#438dd5,stroke:#2e6295,color:#ffffff;
+    classDef almacen fill:#438dd5,stroke:#2e6295,color:#ffffff;
+    classDef externo fill:#999999,stroke:#6b6b6b,color:#ffffff;
+    class ADM,ALI,MOT,CLI persona;
+    class APP,API,RT,DOCS,ADMINP,CL contenedor;
+    class DB,MEDIA almacen;
+    class INT,OSM,NOM,SMTP,WH,PAY,LLM externo;
+    style CME fill:#ffffff,stroke:#1168bd,stroke-width:2px,stroke-dasharray:6 4,color:#1168bd
+    style DAPHNE fill:#f4f8fd,stroke:#438dd5,stroke-width:1px,stroke-dasharray:3 3,color:#2e6295

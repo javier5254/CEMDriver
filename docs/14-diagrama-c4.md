@@ -1,5 +1,7 @@
 # Diagrama C4 — CMEDriver
 
+> **Nota (versión vigente):** el modelo C4 actualizado y completo (niveles 1 Contexto, 2 Contenedores, 3 Componentes y 4 Código), coherente con la arquitectura y el MER de la entrega, está en [entrega/06-c4.md](entrega/06-c4.md) (fuentes en `diagrams/src/c4-*.mmd`, imágenes en `diagrams/img/c4-*.png`). El contenido de abajo es **histórico** (4 contenedores, 5 apps) y se conserva solo como referencia.
+
 Modelo C4 (Contexto + Contenedores), dibujado a mano en SVG (sin auto-layout) para un resultado limpio y listo para imprimir/pegar en el informe. Fuentes editables: [diagrams/c4-contexto.svg](diagrams/c4-contexto.svg) y [diagrams/c4-contenedores.svg](diagrams/c4-contenedores.svg).
 
 ## Nivel 1 — Contexto (C1)

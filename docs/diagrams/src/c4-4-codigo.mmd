@@ -1,0 +1,227 @@
+classDiagram
+    direction LR
+    %% C4 - Nivel 4: Codigo del componente "services" (ciclo de vida del servicio)
+    %% Fuente: backend/services/{models,serializers,views,consumers}.py
+
+    namespace services_views {
+        class ServicioViewSet {
+            <<ModelViewSet>>
+            +queryset Servicio.objects.all()
+            +get_serializer_class()
+            +get_permissions()
+            +get_queryset()
+            +perform_create(serializer)
+            +create(request) POST /servicios/
+            -_motorizado_autorizado(servicio, user)
+            -_notificar(evento, servicio)
+            +asignar_ruta(request, pk) POST asignar-ruta
+            +productos(request, pk) PUT productos
+            +recibir_en_centro(request, pk) POST recibir-en-centro
+            +iniciar_transito(request, pk) POST iniciar-transito
+            +cerrar(request, pk) POST cerrar
+            +novedad(request, pk) POST novedad
+            +planificar(request) POST planificar
+            +mensajes(request, pk) GET|POST mensajes
+        }
+        class RutaViewSet {
+            <<ModelViewSet>>
+            +serializer_class RutaSerializer
+            +get_permissions()
+            +get_queryset()
+        }
+        class ChatConsumer {
+            <<AsyncWebsocketConsumer>>
+            +servicio_id
+            +group_name chat_id
+            +connect()
+            +disconnect(close_code)
+            +receive(text_data)
+            +chat_message(event)
+            -_usuario_autorizado() bool
+            -_guardar_mensaje(texto) dict
+        }
+    }
+
+    namespace services_serializers {
+        class ServicioSerializer {
+            <<ModelSerializer>>
+            +cliente_detalle
+            +producto_detalle
+            +evidencia
+            +novedades
+            +productos_detalle
+            +read_only_fields estado, creado_en
+        }
+        class ServicioCreateSerializer {
+            <<ModelSerializer>>
+            +validate(attrs) RN-13
+        }
+        class AsignarRutaSerializer {
+            <<Serializer>>
+            +ruta_id PrimaryKeyRelatedField
+        }
+        class CerrarServicioSerializer {
+            <<Serializer>>
+            +foto ImageField
+            +firma ImageField
+            +validate(attrs) RN-02
+        }
+        class NovedadCreateSerializer {
+            <<ModelSerializer>>
+            +tipo
+            +detalle
+            +accion
+        }
+        class PlanificarRecoleccionSerializer {
+            <<ModelSerializer>>
+            +producto
+            +zona
+            +direccion_origen
+            +fecha_agenda
+        }
+        class ServicioProductoItemSerializer {
+            <<Serializer>>
+            +producto
+            +cantidad min 1
+        }
+        class MensajeChatSerializer {
+            <<ModelSerializer>>
+            +autor_detalle
+        }
+        class RutaSerializer {
+            <<ModelSerializer>>
+            +motorizado_detalle
+        }
+    }
+
+    namespace services_models {
+        class Servicio {
+            <<Model>>
+            +tipo TipoServicio
+            +cliente FK Usuario
+            +producto FK Producto
+            +zona
+            +direccion_origen
+            +direccion_destino
+            +fecha_agenda date
+            +estado EstadoServicio
+            +ruta FK Ruta
+            +creado_en datetime
+            +creado_por FK Usuario
+        }
+        class Ruta {
+            <<Model>>
+            +motorizado FK Usuario
+            +fecha date
+            +estado EstadoRuta
+        }
+        class ServicioProducto {
+            <<Model>>
+            +servicio FK
+            +producto FK Producto
+            +cantidad int
+        }
+        class Evidencia {
+            <<Model>>
+            +servicio OneToOne
+            +foto ImageField
+            +firma ImageField
+            +capturado_en datetime
+        }
+        class Novedad {
+            <<Model>>
+            +servicio FK
+            +tipo
+            +detalle
+            +accion Accion
+            +creado_en datetime
+        }
+        class MensajeChat {
+            <<Model>>
+            +servicio FK
+            +autor FK Usuario
+            +texto max 1000
+            +enviado_en datetime
+        }
+        class EstadoServicio {
+            <<enumeration>>
+            CREADO
+            ASIGNADO
+            RECIBIDO_CENTRO
+            EN_TRANSITO
+            ENTREGADO
+            RECOLECTADO
+            NOVEDAD
+            DEVUELTO
+        }
+        class TipoServicio {
+            <<enumeration>>
+            ENTREGA
+            RECOLECCION
+        }
+    }
+
+    namespace dependencias_externas {
+        class Usuario {
+            <<accounts.models>>
+            +rol ADMIN|ALISTADOR|MOTORIZADO|CLIENTE
+            +email unico
+        }
+        class PermisosRBAC {
+            <<accounts.permissions>>
+            IsAlistador
+            IsMotorizado
+            IsCliente
+            +has_permission(request, view)
+        }
+        class Cobertura {
+            <<coverage.models>>
+            +leadtime_dias
+            +dias_codigos()
+        }
+        class Producto {
+            <<inventory.models>>
+        }
+        class DespachadorWebhooks {
+            <<integrations.services>>
+            +disparar_webhook(evento, payload)
+            +firmar(payload_bytes, secret)
+        }
+        class CapaDeCanales {
+            <<channels.layers>>
+            +get_channel_layer()
+            +group_send(grupo, mensaje)
+        }
+    }
+
+    ServicioViewSet ..> ServicioSerializer : serializa respuesta
+    ServicioViewSet ..> ServicioCreateSerializer : create
+    ServicioViewSet ..> AsignarRutaSerializer : asignar_ruta
+    ServicioViewSet ..> CerrarServicioSerializer : cerrar
+    ServicioViewSet ..> NovedadCreateSerializer : novedad
+    ServicioViewSet ..> PlanificarRecoleccionSerializer : planificar
+    ServicioViewSet ..> ServicioProductoItemSerializer : productos
+    ServicioViewSet ..> MensajeChatSerializer : mensajes
+    RutaViewSet ..> RutaSerializer
+    ChatConsumer ..> MensajeChatSerializer
+    ChatConsumer ..> MensajeChat : crea
+
+    ServicioViewSet ..> PermisosRBAC : get_permissions()
+    RutaViewSet ..> PermisosRBAC : IsAlistador
+    ServicioViewSet ..> DespachadorWebhooks : _notificar()
+    ServicioViewSet ..> CapaDeCanales : group_send chat_id
+    ChatConsumer ..> CapaDeCanales : group_add / group_send
+    ServicioViewSet ..> Cobertura : planificar() RN-03
+
+    Ruta "0..1" <-- "*" Servicio : ruta
+    Servicio "1" *-- "*" ServicioProducto : productos_detalle
+    Servicio "1" *-- "0..1" Evidencia : evidencia
+    Servicio "1" *-- "*" Novedad : novedades
+    Servicio "1" *-- "*" MensajeChat : mensajes
+    Servicio --> EstadoServicio
+    Servicio --> TipoServicio
+    Servicio "*" --> "1" Usuario : cliente
+    Ruta "*" --> "1" Usuario : motorizado
+    MensajeChat "*" --> "1" Usuario : autor
+    ServicioProducto "*" --> "1" Producto
+    Servicio "*" --> "0..1" Producto : producto

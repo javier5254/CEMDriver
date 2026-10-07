@@ -1,0 +1,40 @@
+%%{init: {"flowchart": {"wrappingWidth": 330, "nodeSpacing": 40, "rankSpacing": 70}}}%%
+flowchart TB
+    %% C4 - Nivel 1: Contexto del sistema (docs/entrega/06-c4.md)
+    %% Nombres canonicos: docs/entrega/03-arquitectura.md seccion 9
+
+    ADM["<b>Administrador</b><br/>[Persona]<br/>Gestiona usuarios, cobertura,<br/>inventario, API Keys y webhooks"]
+    ALI["<b>Alistador</b><br/>[Persona]<br/>Crea servicios y rutas,<br/>asigna y optimiza rutas"]
+    MOT["<b>Motorizado</b><br/>[Persona]<br/>Ejecuta servicios, captura<br/>evidencia y reporta GPS"]
+    CLI["<b>Cliente</b><br/>[Persona]<br/>Planifica recolecciones, sigue el<br/>tracking, chatea y compra por chatbot"]
+
+    INT["<b>Sistema integrador externo</b><br/>[Sistema externo]<br/>ERP / e-commerce"]
+
+    CME["<b>Plataforma CMEDriver</b><br/>[Sistema]<br/>Gestión de mensajería: servicios de entrega<br/>y recolección, rutas, evidencias, tracking<br/>en tiempo real, chat, chatbot e integraciones"]
+
+    WH["<b>Receptor de webhooks</b><br/>[Sistema externo]<br/>URL del integrador"]
+    NOM["<b>Nominatim (OpenStreetMap)</b><br/>[Sistema externo]<br/>Geocodificación"]
+    OSM["<b>Teselas OpenStreetMap</b><br/>[Sistema externo]<br/>Mapa base"]
+    SMTP["<b>Servidor SMTP</b><br/>[Sistema externo]<br/>Correo saliente"]
+    PAY["<b>Proveedor de pagos (simulado)</b><br/>[Sistema externo]<br/>MockPaymentProvider"]
+    LLM["<b>Proveedor LLM (simulado)</b><br/>[Sistema externo]<br/>MockLLMClient"]
+
+    ADM -->|"Administra la plataforma<br/>[HTTPS]"| CME
+    ALI -->|"Crea servicios y rutas<br/>[HTTPS]"| CME
+    MOT -->|"Opera servicios, envía evidencia y GPS<br/>[HTTPS / WSS]"| CME
+    CLI -->|"Planifica, sigue tracking, chatea<br/>[HTTPS / WSS]"| CME
+    INT -->|"Crea y consulta servicios<br/>[HTTPS REST + X-API-Key]"| CME
+
+    CME -->|"Notifica eventos servicio.*<br/>[HTTPS POST + HMAC-SHA256]"| WH
+    CME -->|"Geocodifica direcciones<br/>[HTTPS GET /search]"| NOM
+    CME -->|"Carga el mapa base<br/>[HTTPS GET teselas]"| OSM
+    CME -->|"Envía correo de restablecimiento<br/>[SMTP]"| SMTP
+    CME -.->|"Procesa pagos del chatbot<br/>[llamada en proceso]"| PAY
+    CME -.->|"Interpreta texto libre<br/>[llamada en proceso]"| LLM
+
+    classDef persona fill:#08427b,stroke:#052e56,color:#ffffff;
+    classDef sistema fill:#1168bd,stroke:#0b4884,color:#ffffff;
+    classDef externo fill:#999999,stroke:#6b6b6b,color:#ffffff;
+    class ADM,ALI,MOT,CLI persona;
+    class CME sistema;
+    class INT,WH,NOM,OSM,SMTP,PAY,LLM externo;
