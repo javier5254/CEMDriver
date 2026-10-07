@@ -29,7 +29,7 @@ Patrones de apoyo: **máquina de estados** para el ciclo de vida del `Servicio`,
 | **Evidencia** obligatoria de recolección (foto + firma) | Envío `multipart/form-data` a la API, validación en servidor (RN-02: sin ambos archivos responde 400) y almacenamiento en el **Almacenamiento de evidencias** separado de la base de datos (la BD guarda solo la ruta del archivo). |
 | **Integraciones con terceros** (ERP/e-commerce que crean servicios y quieren enterarse de los cambios) | La misma API REST, autenticada con **API Key** (que actúa como un ALISTADOR, RN-08), y **webhooks salientes** firmados con HMAC-SHA256 para cada evento `servicio.*` (RF-24, RF-25, RNF-11). |
 | **Dependencias externas no disponibles** (LLM, pasarela de pagos) | Interfaces intercambiables (`MockLLMClient.responder`, `PaymentProvider.procesar`) que aíslan el proveedor: conectar uno real cambia un solo archivo (RNF-13). |
-| **Equipo pequeño y plazo académico** | Monolito modular en lugar de microservicios: un solo despliegue, una sola base de datos, transacciones locales, y aun así fronteras de dominio claras por app que permiten extraer módulos más adelante. |
+| **Un único desarrollador y plazo académico** | Monolito modular en lugar de microservicios: un solo despliegue, una sola base de datos, transacciones locales, y aun así fronteras de dominio claras por app que permiten extraer módulos más adelante. |
 
 ---
 
@@ -135,7 +135,7 @@ Notas de lectura:
 | Componente | Responsabilidad | Tecnología | Se comunica con |
 |---|---|---|---|
 | **App CMEDriver** | Interfaz de los 4 roles: dashboard e inventario (Administrador), creación y asignación de servicios y rutas (Alistador), ejecución de servicios, evidencia y GPS (Motorizado), planificación, tracking, chat y chatbot (Cliente). Guarda el JWT y lo adjunta con un interceptor HTTP | Ionic 9 + Angular 22 + TypeScript; Leaflet; signature_pad; WebSocket nativo; Capacitor 8 para Android/iOS | API REST CMEDriver (HTTPS/REST + JWT), Servicio de tiempo real (WSS), Teselas OpenStreetMap (HTTPS) |
-| **API REST CMEDriver** | Lógica de negocio, validaciones (RN-01..RN-08), máquina de estados del servicio, autenticación (JWT y API Key) y autorización RBAC; publica eventos de tiempo real y dispara webhooks | Django 6.1 + DRF 3.18 + SimpleJWT 5.5 | App CMEDriver, Sistema integrador externo, Capa de canales, Base de datos, Almacenamiento de evidencias, Nominatim, Servidor SMTP, Receptor de webhooks, Proveedor de pagos, Proveedor LLM |
+| **API REST CMEDriver** | Lógica de negocio, validaciones (RN-01..RN-19), máquina de estados del servicio, autenticación (JWT y API Key) y autorización RBAC; publica en la Capa de canales las posiciones GPS (`tracking`) y los mensajes de chat (`services`) y dispara webhooks | Django 6.1 + DRF 3.18 + SimpleJWT 5.5 | App CMEDriver, Sistema integrador externo, Capa de canales, Base de datos, Almacenamiento de evidencias, Nominatim, Servidor SMTP, Receptor de webhooks, Proveedor de pagos, Proveedor LLM |
 | **Servicio de tiempo real** | Aceptar conexiones WebSocket autenticadas por JWT, verificar acceso al servicio concreto y difundir posiciones (`TrackingConsumer`) y mensajes de chat (`ChatConsumer`) | Django Channels 4.3 (`AsyncWebsocketConsumer`) + `JWTAuthMiddleware` | App CMEDriver (WSS), Capa de canales, Base de datos |
 | **Capa de canales** | Bus publicar/suscribir entre la API y los consumers: grupos `tracking_<id>` y `chat_<id>` | `InMemoryChannelLayer` (dev, un solo proceso); propuesta `channels-redis` + Redis 7 (prod, varios procesos) | API REST CMEDriver, Servicio de tiempo real |
 | **Servidor ASGI Daphne** | Proceso servidor que aloja la API, el tiempo real, la documentación y el admin; enruta por protocolo (`http` / `websocket`) | Daphne 4.2 + `ProtocolTypeRouter` | App CMEDriver, Sistema integrador externo (y Nginx en la propuesta de despliegue) |
@@ -143,7 +143,7 @@ Notas de lectura:
 | **Almacenamiento de evidencias** | Archivos de foto (`evidencias/fotos/`) y firma (`evidencias/firmas/`) de las recolecciones | Sistema de archivos local `backend/media/` (dev); propuesta volumen persistente o bucket S3 con `django-storages` | API REST CMEDriver (escritura/lectura); App CMEDriver los descarga por URL `/media/...` |
 | **Documentación API** | Esquema OpenAPI 3 (`/api/schema/`) y Swagger UI (`/api/docs/`) generados desde el código | drf-spectacular 0.30 | API REST CMEDriver (introspección); consultada por desarrolladores e integradores |
 | **Panel de administración Django** | Gestión directa de datos para soporte y demo (`/admin/`) | `django.contrib.admin` | Base de datos; usado por el Administrador (técnico) |
-| **Nominatim (OpenStreetMap)** | Geocodificar direcciones para sugerir el orden de una ruta (RF-21) | API pública HTTP, cliente `urllib` con caché `PuntoGeocodificado` y 1 req/s | API REST CMEDriver (app `optimization`) |
+| **Nominatim (OpenStreetMap)** | Geocodificar direcciones para sugerir el orden de una ruta (RF-21) y ubicar el destino en el mapa (RF-28) | API pública HTTP, cliente `urllib` con caché `PuntoGeocodificado` y 1 req/s | API REST CMEDriver (app `optimization`, y `tracking` a través de `DestinoView` para el destino en el mapa, RF-28) |
 | **Teselas OpenStreetMap** | Imágenes del mapa base para el tracking | `tile.openstreetmap.org` vía Leaflet | App CMEDriver |
 | **Servidor SMTP** | Entregar el correo de restablecimiento de contraseña (RF-20) | `django.core.mail`; backend de consola en dev, SMTP real por `EMAIL_BACKEND` en prod | API REST CMEDriver (app `accounts`) |
 | **Proveedor de pagos** (simulado) | Aprobar o rechazar el pago de una compra hecha por el chatbot (RF-23) | `PaymentProvider` / `MockPaymentProvider` (en proceso) | API REST CMEDriver (apps `chatbot`, `payments`) |
@@ -160,7 +160,7 @@ Notas de lectura:
 | **accounts** | Usuario personalizado `Usuario` con rol (ADMIN, ALISTADOR, MOTORIZADO, CLIENTE) y correo único; login JWT por usuario o correo; refresh; perfil; restablecimiento de contraseña por correo; clases de permiso RBAC (`permissions.py`); comando `seed_data` | `/api/auth/login/`, `/api/auth/refresh/`, `/api/auth/me/`, `/api/auth/password-reset/`, `/api/auth/password-reset/confirm/`, `/api/usuarios/` | RF-01, RF-19, RF-20, RNF-01, RNF-02, RNF-07, RNF-09 |
 | **coverage** | Matriz de cobertura por zona (leadtime, días/horas de agenda) y cálculo de fechas válidas | `/api/cobertura/`, `/api/cobertura/agenda-disponible/` | RF-02, RN-03 |
 | **inventory** | Catálogo de productos, stock por centro de mensajería y flag de disponibilidad en chatbot | `/api/productos/`, `/api/productos/disponibles-chatbot/` | RF-04, RN-04 |
-| **services** | Núcleo del dominio: `Servicio`, `Ruta`, `Novedad`, `Evidencia`, `MensajeChat`, `ServicioProducto`; transiciones de estado (asignar, recibir en centro, iniciar tránsito, cerrar, novedad), planificación por el cliente, chat; `ChatConsumer`; dispara webhooks y eventos de tiempo real | `/api/servicios/` (+ acciones), `/api/rutas/`, `/ws/chat/{id}/` | RF-03, RF-05..RF-13, RF-16, RF-17, RF-26, RN-01, RN-02, RN-05, RN-06 |
+| **services** | Núcleo del dominio: `Servicio`, `Ruta`, `Novedad`, `Evidencia`, `MensajeChat`, `ServicioProducto`; transiciones de estado (asignar, recibir en centro, iniciar tránsito, cerrar, novedad), planificación por el cliente, chat; `ChatConsumer`; dispara webhooks y publica en tiempo real **solo** los mensajes de chat (las posiciones GPS las publica `tracking`) | `/api/servicios/` (+ acciones), `/api/rutas/`, `/ws/chat/{id}/` | RF-03, RF-05..RF-13, RF-16, RF-17, RF-26, RN-01, RN-02, RN-05, RN-06 |
 | **tracking** | Posiciones GPS reportadas por el motorizado, última posición, destino; `TrackingConsumer` para difusión en vivo | `/api/tracking/posicion/`, `/api/tracking/ultima-posicion/`, `/api/tracking/destino/`, `/ws/tracking/{id}/` | RF-14, RF-15, RF-27, RNF-06, RNF-10 |
 | **optimization** | Geocodificación con caché (`PuntoGeocodificado`) vía Nominatim y heurística de vecino más cercano (haversine) para sugerir el orden de una ruta | `/api/optimizacion/rutas/{ruta_id}/` | RF-21 |
 | **chatbot** | Conversaciones y mensajes del asistente; `MockLLMClient` con tool-calling real sobre inventario, cobertura, servicios y pagos; estado de conversación (slot-filling) | `/api/chatbot/mensaje/`, `/api/chatbot/conversaciones/{id}/mensajes/` | RF-18, RF-22 |
@@ -203,9 +203,9 @@ Riesgos conocidos y mitigación propuesta: el token en la query string del WebSo
 
 | Nodo | Qué corre | Puerto |
 |---|---|---|
-| Equipo del desarrollador | `manage.py runserver` → **Servidor ASGI Daphne** (API REST + tiempo real + admin + docs), Capa de canales en memoria | `:8000` (`http://`, `ws://`) |
-| Equipo del desarrollador | `ng serve` / `ionic serve` → **App CMEDriver** | `:4200` / `:8100` |
-| Equipo del desarrollador | `backend/db.sqlite3` y `backend/media/` | — |
+| Máquina del desarrollador | `manage.py runserver` → **Servidor ASGI Daphne** (API REST + tiempo real + admin + docs), Capa de canales en memoria | `:8000` (`http://`, `ws://`) |
+| Máquina del desarrollador | `ng serve` / `ionic serve` → **App CMEDriver** | `:4200` / `:8100` |
+| Máquina del desarrollador | `backend/db.sqlite3` y `backend/media/` | — |
 | Internet | Nominatim y teselas OSM | HTTPS |
 
 No existe despliegue público ni pipeline de CI en el repositorio.
@@ -258,7 +258,7 @@ Cambios de código necesarios para concretar la propuesta (no implementados): a�
 
 | Decisión | Alternativa | Motivo |
 |---|---|---|
-| Monolito modular (9 apps Django) | Microservicios | Un solo despliegue y BD para un equipo pequeño; fronteras de dominio preparadas para extraer módulos (RNF-08) |
+| Monolito modular (9 apps Django) | Microservicios | Un solo despliegue y BD, manejable por un único desarrollador; fronteras de dominio preparadas para extraer módulos (RNF-08) |
 | WebSocket con Channels en el mismo proceso ASGI | Polling REST / servidor Node aparte | Tiempo real real reutilizando modelos y autorización de Django; polling solo como respaldo (RNF-10) |
 | API REST única para app e integradores | API separada para terceros | Mismas validaciones y un solo contrato documentado (RF-06, RNF-03) |
 | JWT + API Key | Sesiones de cookie / OAuth2 | JWT sirve a SPA, app nativa y WebSocket; API Key es simple para integradores |

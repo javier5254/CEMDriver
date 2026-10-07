@@ -63,7 +63,7 @@ CEMDriver/                       (producto: CMEDriver)
 │   ├── src/environments/        URL de la API (dev / prod)
 │   └── android/                 proyecto nativo Capacitor
 ├── docs/                        documentación (índice en docs/README.md)
-│   ├── entrega/                 entregables finales 01..08
+│   ├── entrega/                 entregables finales 00..08 (00 = guía de la entrega)
 │   ├── diagrams/                fuentes (src/) e imágenes (img/) de los diagramas
 │   ├── mockups/                 mockups editables
 │   └── v1/                      snapshot histórico del MVP v1
@@ -221,6 +221,7 @@ Antes de concretarla hay que hacer cambios de código: leer `DATABASES` y `CHANN
 
 | # | Entregable | Punto de la consigna que cubre |
 |---|---|---|
+| 00 | [Guía de la entrega](docs/entrega/00-guia-de-entrega.md) | Mapa de cada punto de la consigna al documento y la sección donde se cumple; recorrido para la sustentación |
 | 01 | [Requerimientos](docs/entrega/01-requerimientos.md) | Problema, objetivos, actores, requerimientos funcionales y no funcionales, reglas de negocio y restricciones |
 | 02 | [Stack tecnológico](docs/entrega/02-stack-tecnologico.md) | Tecnologías (frontend, backend, BD, servicios externos, nube, despliegue, control de versiones) con su justificación |
 | 03 | [Arquitectura](docs/entrega/03-arquitectura.md) | Arquitectura propuesta: estilo, diagrama general, componentes, seguridad y vista de despliegue |

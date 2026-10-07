@@ -26,6 +26,7 @@ Documentos consolidados de la entrega final, verificados contra el código. Prev
 
 | # | Documento | Contenido |
 |---|---|---|
+| 00 | [Guía de la entrega](entrega/00-guia-de-entrega.md) | Mapa consigna → documento y sección; recorrido sugerido para la sustentación; pendientes del autor |
 | 01 | [Requerimientos](entrega/01-requerimientos.md) | Problema, objetivos, actores, RF, RNF, reglas de negocio (RN), restricciones (RES) y hallazgos H-01…H-12 |
 | 02 | [Stack tecnológico](entrega/02-stack-tecnologico.md) | Tecnologías usadas con su justificación y las alternativas descartadas |
 | 03 | [Arquitectura](entrega/03-arquitectura.md) | Estilo arquitectónico, diagrama general, componentes, seguridad, despliegue actual y propuesto |

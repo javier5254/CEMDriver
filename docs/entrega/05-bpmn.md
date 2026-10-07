@@ -13,7 +13,7 @@ El proceso **"Ciclo de vida de un servicio de mensajería"** describe cómo un s
 - Es la razón de ser del sistema: los problemas del §1 de [01-requerimientos.md](01-requerimientos.md) (asignación informal, cliente sin visibilidad, falta de evidencia) se resuelven aquí.
 - Atraviesa los **cuatro roles** (Cliente, Alistador/Administrador, Motorizado) y los **dos sistemas externos reales** (sistema integrador por API Key/webhooks y Nominatim).
 - Concentra las reglas de negocio más críticas: RN-01, RN-02, RN-03, RN-05, RN-09 a RN-13 y RN-17.
-- La mayoría de los RF de operación (RF-05 a RF-17, RF-21 a RF-23, RF-25, RF-27, RF-28) son pasos de este proceso.
+- 16 de los 29 RF son actividades de este proceso (RF-05, RF-06, RF-07, RF-09 a RF-14, RF-17, RF-18, RF-21, RF-22, RF-23, RF-25, RF-27); RF-15, RF-16 y RF-28 aparecen como anotación de comunicación (§7). Los demás son configuración, autenticación o consulta y quedan fuera del proceso modelado (ver [07-trazabilidad.md](07-trazabilidad.md) §g.1).
 
 **Alcance:** desde que se solicita el servicio —por el Cliente (app o chatbot), por el Alistador manualmente o por un sistema integrador vía `X-API-Key`— hasta un estado terminal real del código: **`ENTREGADO`**, **`RECOLECTADO`** o **`DEVUELTO`**, más los rechazos de la solicitud (HTTP 400/401). **No existe un estado `CANCELADO`** en `EstadoServicio`: la única forma de terminar un servicio sin completarlo es la novedad `DEVOLVER_A_CENTRO` (estado `DEVUELTO`).
 
@@ -173,5 +173,10 @@ Comunicación **dentro** del pool (no son flujos de mensaje porque Cliente, Moto
 Para regenerar la imagen desde la línea de comandos:
 
 ```bash
-npx -y bpmn-to-image docs/diagrams/src/bpmn-ciclo-servicio.bpmn:docs/diagrams/img/bpmn-ciclo-servicio.png
+# Linux / macOS (separador ":")
+npx -y bpmn-to-image --no-footer docs/diagrams/src/bpmn-ciclo-servicio.bpmn:docs/diagrams/img/bpmn-ciclo-servicio.png,docs/diagrams/img/bpmn-ciclo-servicio.svg
+# Windows (separador ";", entre comillas)
+npx -y bpmn-to-image --no-footer "docs/diagrams/src/bpmn-ciclo-servicio.bpmn;docs/diagrams/img/bpmn-ciclo-servicio.png,docs/diagrams/img/bpmn-ciclo-servicio.svg"
 ```
+
+`bpmn-to-image` usa Puppeteer; si no descarga Chromium, se puede indicar uno instalado con la variable `PUPPETEER_EXECUTABLE_PATH`.

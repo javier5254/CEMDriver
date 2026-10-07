@@ -2,7 +2,7 @@
 
 > **Fuente de verdad:** los `models.py` de las 9 apps del backend (`accounts`, `coverage`, `inventory`, `services`, `tracking`, `optimization`, `chatbot`, `payments`, `integrations`) y sus migraciones (`0001_initial` de cada app, más `accounts/0002_alter_usuario_email` y `services/0002_servicioproducto`). El diagrama y el diccionario reflejan el estado actual del código, no el diseño inicial.
 >
-> **Referencias de requerimientos:** al momento de redactar este documento `docs/entrega/01-requerimientos.md` aún no existía, por lo que los IDs RF-xx / RNF-xx / RN-xx usados aquí corresponden a la numeración de [docs/13-rf-rnf-completos.md](../13-rf-rnf-completos.md). Si la fase de requerimientos renumera, se debe actualizar la columna "Requerimiento que la justifica".
+> **Referencias de requerimientos:** los IDs RF-xx / RNF-xx / RN-xx usados aquí son los de [01-requerimientos.md](01-requerimientos.md), que conserva sin renumerar los de [docs/13-rf-rnf-completos.md](../13-rf-rnf-completos.md) (RF-01…RF-27, RNF-01…RNF-13, RN-01…RN-08) y añade los nuevos al final (RF-28, RF-29, RNF-14…RNF-20, RN-09…RN-19). La relación entidad ↔ RF completa está en [07-trazabilidad.md](07-trazabilidad.md) §c (17/17 entidades usadas por al menos un RF).
 
 ## 4.1 Diagrama
 
@@ -284,7 +284,7 @@ Todas las entidades tienen `id` como PK autoincremental (`BigAutoField`). Column
 
 ### SERVICIO (`services.Servicio`) — entidad central
 
-**Requerimiento que la justifica:** RF-03, RF-05, RF-06, RF-07, RF-08, RF-10, RF-12, RF-13, RF-17.
+**Requerimiento que la justifica:** RF-03, RF-05, RF-06, RF-07, RF-08, RF-09, RF-10, RF-11, RF-12, RF-13, RF-17, RF-23 (la compra por chatbot crea una ENTREGA).
 
 | Atributo | Tipo | PK/FK/UK | Nulo | Descripción |
 |---|---|---|---|---|
@@ -364,7 +364,7 @@ Todas las entidades tienen `id` como PK autoincremental (`BigAutoField`). Column
 
 ### PUNTO_GEOCODIFICADO (`optimization.PuntoGeocodificado`)
 
-**Requerimiento que la justifica:** RF-21 (sugerir orden de ruta) y RF-15 (destino en el mapa de tracking). Es una caché que evita repetir llamadas a Nominatim.
+**Requerimiento que la justifica:** RF-21 (sugerir orden de ruta) y RF-28 (destino y ETA en el mapa de tracking). Es una caché que evita repetir llamadas a Nominatim.
 
 | Atributo | Tipo | PK/FK/UK | Nulo | Descripción |
 |---|---|---|---|---|
@@ -447,7 +447,7 @@ Todas las entidades tienen `id` como PK autoincremental (`BigAutoField`). Column
 
 ### WEBHOOK_DELIVERY (`integrations.WebhookDelivery`)
 
-**Requerimiento que la justifica:** RF-25, RNF-11 (bitácora de entregas best-effort).
+**Requerimiento que la justifica:** RF-25, RF-29 (consultar bitácora de webhooks), RNF-11 (bitácora de entregas best-effort).
 
 | Atributo | Tipo | PK/FK/UK | Nulo | Descripción |
 |---|---|---|---|---|
@@ -518,10 +518,10 @@ No hay `CheckConstraint` ni `Meta.constraints` declarados; las reglas de negocio
 | `iniciar-transito` | Motorizado asignado | RECOLECCION | `ASIGNADO` o `NOVEDAD` | `EN_TRANSITO` | |
 | `cerrar` | Motorizado asignado | ENTREGA | `EN_TRANSITO` | `ENTREGADO` (final) | |
 | `cerrar` | Motorizado asignado | RECOLECCION | `EN_TRANSITO` | `RECOLECTADO` (final) | Exige `foto` y `firma`; crea/actualiza EVIDENCIA |
-| `novedad` con `accion=REINTENTAR` | Motorizado asignado | ambos | cualquier estado no final | `NOVEDAD` | Crea NOVEDAD; luego se puede volver a `iniciar-transito` |
-| `novedad` con `accion=DEVOLVER_A_CENTRO` | Motorizado asignado | ambos | cualquier estado no final | `DEVUELTO` (final) | Crea NOVEDAD |
+| `novedad` con `accion=REINTENTAR` | Motorizado asignado | ambos | cualquier estado no final con ruta asignada (`ASIGNADO`, `RECIBIDO_CENTRO`, `EN_TRANSITO`, `NOVEDAD`) | `NOVEDAD` | Crea NOVEDAD; luego se puede volver a `iniciar-transito` |
+| `novedad` con `accion=DEVOLVER_A_CENTRO` | Motorizado asignado | ambos | ídem | `DEVUELTO` (final) | Crea NOVEDAD |
 
-Estados finales: `ENTREGADO`, `RECOLECTADO`, `DEVUELTO` (no admiten novedades ni más transiciones). Cada transición relevante dispara un webhook (`servicio.creado`, `servicio.asignado`, `servicio.entregado`, `servicio.recolectado`, `servicio.novedad`, `servicio.devuelto`).
+Estados finales: `ENTREGADO`, `RECOLECTADO`, `DEVUELTO` (no admiten novedades ni más transiciones). Disparan webhook la creación (`servicio.creado`, salvo la compra por chatbot), la asignación (`servicio.asignado`), el cierre (`servicio.entregado` / `servicio.recolectado`) y la novedad (`servicio.novedad` y, si se devuelve, también `servicio.devuelto`). `recibir-en-centro` e `iniciar-transito` **no** disparan evento (H-09, LIM-12).
 
 ```
 ENTREGA:     CREADO → ASIGNADO → RECIBIDO_CENTRO → EN_TRANSITO → ENTREGADO
@@ -570,10 +570,10 @@ Django `limit_choices_to` (aplicado en formularios/admin) y validaciones de seri
 
 ### 4.4.6 Observaciones de integridad detectadas
 
-- **Cobertura ↔ Servicio no tiene FK:** la relación es lógica por el texto `zona`. Además, la creación manual (`POST /servicios/`) no valida la zona contra COBERTURA; solo lo hacen `planificar` y el chatbot.
-- **El stock no se descuenta** al comprar por chatbot ni al crear líneas de SERVICIO_PRODUCTO; `stock` solo se usa como filtro de disponibilidad.
-- **RUTA.estado** no tiene transiciones implementadas (siempre `PLANEADA`).
-- **Servicio.producto y SERVICIO_PRODUCTO coexisten:** el primero es el producto principal del flujo simple; la tabla intermedia es la extensión multi-producto (RF-26). Pueden coexistir sin restricción de coherencia entre ambos.
+- **Cobertura ↔ Servicio no tiene FK:** la relación es lógica por el texto `zona` (LIM-18). Además, la creación manual (`POST /servicios/`) no valida la zona contra COBERTURA; solo lo hacen `planificar` y el chatbot (H-04, LIM-08).
+- **El stock no se descuenta** al comprar por chatbot ni al crear líneas de SERVICIO_PRODUCTO; `stock` solo se usa como filtro de disponibilidad (H-09, LIM-10).
+- **RUTA.estado** no tiene transiciones implementadas (siempre `PLANEADA`) (LIM-14).
+- **Servicio.producto y SERVICIO_PRODUCTO coexisten:** el primero es el producto principal del flujo simple; la tabla intermedia es la extensión multi-producto (RF-26). Pueden coexistir sin restricción de coherencia entre ambos (LIM-18).
 
 ## 4.5 Diferencias con el diagrama ER anterior (`docs/diagrams/src/er.mmd`)
 

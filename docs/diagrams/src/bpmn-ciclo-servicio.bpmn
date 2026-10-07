@@ -469,7 +469,7 @@
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">accion == REINTENTAR</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:textAnnotation id="TA_Compra">
-      <bpmn:text>H-09: la compra por chatbot crea la ENTREGA sin disparar servicio.creado ni descontar stock; el servicio queda CREADO aunque el pago sea RECHAZADO.</bpmn:text>
+      <bpmn:text>H-09 y H-12: la compra por chatbot crea la ENTREGA sin disparar servicio.creado ni descontar stock (H-09) y la deja en CREADO aunque el pago sea RECHAZADO (H-12).</bpmn:text>
     </bpmn:textAnnotation>
     <bpmn:association id="Assoc_TA_Compra" sourceRef="TA_Compra" targetRef="ST_CrearCompra" associationDirection="None" />
     <bpmn:textAnnotation id="TA_H04">
@@ -488,7 +488,7 @@
       <bpmn:text>Mientras el servicio está EN_TRANSITO, el Cliente ve la posición del motorizado en su mapa por WebSocket ws/tracking/{id}/ (polling cada 8 s si el socket falla) y el destino geocodificado [RF-15, RF-27, RF-28]; además puede chatear con el motorizado [RF-16].</bpmn:text>
     </bpmn:textAnnotation>
     <bpmn:textAnnotation id="TA_Reintentar">
-      <bpmn:text>Observación O-01: el backend permite NOVEDAD → EN_TRANSITO, pero la app del motorizado no muestra "Iniciar tránsito" ni "Novedad" para un servicio en NOVEDAD.</bpmn:text>
+      <bpmn:text>Hallazgo H-11: el backend permite NOVEDAD → EN_TRANSITO, pero la app del motorizado no muestra "Iniciar tránsito" ni "Novedad" para un servicio en NOVEDAD.</bpmn:text>
     </bpmn:textAnnotation>
     <bpmn:textAnnotation id="TA_Novedad">
       <bpmn:text>El backend también acepta novedades desde ASIGNADO y RECIBIDO_CENTRO (RN-09); aquí se modela el caso típico: falla la visita.</bpmn:text>
@@ -711,7 +711,7 @@
         <dc:Bounds x="6594" y="982" width="36" height="36" />
         <bpmndi:BPMNLabel><dc:Bounds x="6562" y="1022" width="100" height="27" /></bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="TA_Compra_di" bpmnElement="TA_Compra"><dc:Bounds x="1236" y="780" width="250" height="84" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TA_Compra_di" bpmnElement="TA_Compra"><dc:Bounds x="1236" y="766" width="250" height="98" /></bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="TA_H04_di" bpmnElement="TA_H04"><dc:Bounds x="648" y="1190" width="230" height="56" /></bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="TA_H09b_di" bpmnElement="TA_H09b"><dc:Bounds x="3108" y="1190" width="230" height="56" /></bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="TA_H02_di" bpmnElement="TA_H02"><dc:Bounds x="3456" y="1190" width="270" height="70" /></bpmndi:BPMNShape>
