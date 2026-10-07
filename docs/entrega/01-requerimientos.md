@@ -241,6 +241,8 @@ Detectadas al verificar este documento. No se modificó código; se registran pa
 | H-08 | RF-08 (reasignar) no implementado; RF-04 sin pantalla en el frontend; la desactivación de usuarios en el frontend hace `DELETE` y la creación sin contraseña usa `make_random_password()` (eliminado en Django 5.1). | ver notas 1–3 de la sección 4 | RF-01, RF-04, RF-08 |
 | H-09 | La compra por chatbot no descuenta stock y no dispara el webhook `servicio.creado`; `recibir-en-centro` e `iniciar-transito` tampoco disparan eventos (no existen en `EVENTOS_WEBHOOK`). | `backend/chatbot/llm.py`, `backend/services/views.py`, `backend/integrations/models.py` | RF-23, RF-25 |
 | H-10 | El charter (§5) menciona "Login con 3 roles + vista de Cliente", pero el sistema tiene 4 roles con login propio (incluido CLIENTE). | `docs/01-project-charter.md` vs `backend/accounts/models.py` | Actores |
+| H-11 | El backend permite `NOVEDAD → EN_TRANSITO` (`iniciar_transito` acepta `NOVEDAD` para ambos tipos), pero la app del motorizado oculta "Iniciar tránsito" y "Novedad" cuando el servicio está en `NOVEDAD`: `puedeIniciarTransito()` solo devuelve verdadero en `RECIBIDO_CENTRO` (Entrega) o `ASIGNADO` (Recolección), y `puedeRegistrarNovedad()` solo en `ASIGNADO`, `RECIBIDO_CENTRO` o `EN_TRANSITO`. Un servicio con novedad `REINTENTAR` queda detenido desde la app. | `frontend/src/app/features/motorizado/servicio-detail.page.ts` vs `backend/services/views.py` (`iniciar_transito`) | RF-13, RN-05, RN-09 |
+| H-12 | La compra por chatbot crea la ENTREGA en estado `CREADO` **antes** de procesar el pago y no la revierte (ni la marca) si el pago queda `RECHAZADO`: el servicio sigue su ciclo normal aunque no se haya cobrado. | `backend/chatbot/llm.py` (`tool_crear_compra`) | RF-23, RN-16 |
 
 ---
 
@@ -284,6 +286,9 @@ RNF-01 JWT · RNF-02 RBAC · RNF-03 API documentada · RNF-04 Auditoría · RNF-
 
 ### Reglas de negocio
 RN-01 Entrega inicia en centro · RN-02 Evidencia obligatoria en Recolección · RN-03 Leadtime y días hábiles · RN-04 Producto visible en chatbot · RN-05 Novedad con acción · RN-06 Producto protegido · RN-07 Webhook por suscripción · RN-08 API Key actúa como Alistador · RN-09 Ciclo de vida del servicio · RN-10 Asignación solo desde CREADO · RN-11 Solo el motorizado asignado opera · RN-12 Estados terminales · RN-13 Dirección según tipo · RN-14 Visibilidad por propietario · RN-15 Zona con cobertura · RN-16 Resultado de pago · RN-17 Una evidencia por servicio · RN-18 Correo único · RN-19 Reset sin enumeración.
+
+### Hallazgos
+H-01 Servicio editable/borrable por cualquier autenticado · H-02 Entrega puede saltarse el centro · H-03 T-INV-02 contradice el código · H-04 Sin validación de cobertura al crear · H-05 Conteo de pruebas desactualizado · H-06 Sin auditoría de transiciones · H-07 Media sin autenticación · H-08 Reasignar, pantalla de inventario y desactivación de usuarios · H-09 Eventos y stock faltantes · H-10 Charter con 3 roles · H-11 App no reanuda un servicio en NOVEDAD · H-12 Compra no revierte la entrega con pago rechazado.
 
 ### Restricciones
 RES-01 Stack tecnológico · RES-02 SQLite · RES-03 Canales en memoria · RES-04 Configuración de despliegue · RES-05 Límite de Nominatim · RES-06 LLM simulado · RES-07 Pagos simulados · RES-08 Correo en consola · RES-09 Teselas OSM · RES-10 GPS y cámara · RES-11 Ley 1581 de 2012 · RES-12 Firma electrónica simple · RES-13 Alcance de la optimización · RES-14 Build nativo no verificado · RES-15 Tiempo y equipo académico.
