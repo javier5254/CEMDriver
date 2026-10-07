@@ -1,0 +1,189 @@
+erDiagram
+    USUARIO {
+        int id PK
+        varchar username UK "150, login"
+        varchar email UK "254, login alterno RF-19"
+        varchar password "hash PBKDF2"
+        varchar rol "ADMIN | ALISTADOR | MOTORIZADO | CLIENTE"
+        varchar nombre "150, opcional"
+        varchar telefono "30, opcional"
+        boolean is_active "desactivacion logica"
+        datetime date_joined
+        datetime last_login "nulo"
+    }
+
+    COBERTURA {
+        int id PK
+        varchar zona UK "100"
+        int leadtime_dias "positivo, def 1"
+        varchar dias_disponibles "csv LUN..DOM"
+        time hora_inicio "def 08:00"
+        time hora_fin "def 18:00"
+    }
+
+    PRODUCTO {
+        int id PK
+        varchar sku UK "50"
+        varchar nombre "150"
+        text descripcion "opcional"
+        decimal precio "12,2"
+        int stock "positivo"
+        varchar centro_mensajeria "100"
+        boolean disponible_chatbot
+    }
+
+    RUTA {
+        int id PK
+        int motorizado_id FK "Usuario rol MOTORIZADO"
+        date fecha
+        varchar estado "PLANEADA | EN_CURSO | FINALIZADA"
+    }
+
+    SERVICIO {
+        int id PK
+        varchar tipo "ENTREGA | RECOLECCION"
+        int cliente_id FK "Usuario rol CLIENTE"
+        int producto_id FK "nulo"
+        int ruta_id FK "nulo"
+        int creado_por_id FK "nulo"
+        varchar zona "100, valida contra Cobertura"
+        varchar direccion_origen "obligatoria en RECOLECCION"
+        varchar direccion_destino "obligatoria en ENTREGA"
+        date fecha_agenda
+        varchar estado "8 estados, def CREADO"
+        datetime creado_en
+    }
+
+    SERVICIO_PRODUCTO {
+        int id PK
+        int servicio_id FK "UK compuesta"
+        int producto_id FK "UK compuesta"
+        int cantidad "positivo, def 1"
+    }
+
+    EVIDENCIA {
+        int id PK
+        int servicio_id FK,UK "OneToOne"
+        image foto "nulo"
+        image firma "nulo"
+        datetime capturado_en
+    }
+
+    NOVEDAD {
+        int id PK
+        int servicio_id FK
+        varchar tipo "100"
+        text detalle "opcional"
+        varchar accion "DEVOLVER_A_CENTRO | REINTENTAR"
+        datetime creado_en
+    }
+
+    MENSAJE_CHAT {
+        int id PK
+        int servicio_id FK
+        int autor_id FK
+        varchar texto "1000"
+        datetime enviado_en
+    }
+
+    POSICION_GPS {
+        int id PK
+        int servicio_id FK
+        int motorizado_id FK
+        decimal lat "9,6"
+        decimal lng "9,6"
+        datetime timestamp
+    }
+
+    PUNTO_GEOCODIFICADO {
+        int id PK
+        int servicio_id FK,UK "OneToOne"
+        decimal lat "9,6"
+        decimal lng "9,6"
+        varchar direccion_geocodificada "255"
+        datetime creado_en
+    }
+
+    CONVERSACION {
+        int id PK
+        int cliente_id FK "Usuario rol CLIENTE"
+        json contexto "slot-filling"
+        datetime creado_en
+    }
+
+    MENSAJE_BOT {
+        int id PK
+        int conversacion_id FK
+        varchar autor "CLIENTE | BOT"
+        text texto
+        json function_call "nulo, tool invocada"
+        datetime creado_en
+    }
+
+    PAGO {
+        int id PK
+        int cliente_id FK "Usuario rol CLIENTE"
+        int servicio_id FK "nulo"
+        int producto_id FK "nulo"
+        decimal monto "12,2"
+        varchar estado "PENDIENTE | APROBADO | RECHAZADO"
+        varchar proveedor "def MOCK"
+        varchar referencia UK "uuid4 hex"
+        datetime creado_en
+        datetime actualizado_en
+    }
+
+    API_KEY {
+        int id PK
+        varchar nombre "150"
+        varchar key_hash UK "SHA-256"
+        varchar prefix "8"
+        int actua_como_id FK "Usuario rol ALISTADOR"
+        boolean activa
+        datetime creado_en
+        datetime ultimo_uso "nulo"
+    }
+
+    WEBHOOK_ENDPOINT {
+        int id PK
+        varchar nombre "150"
+        varchar url
+        varchar secret "HMAC, autogenerado"
+        varchar eventos "csv de eventos"
+        boolean activo
+        datetime creado_en
+    }
+
+    WEBHOOK_DELIVERY {
+        int id PK
+        int endpoint_id FK
+        varchar evento "100"
+        json payload
+        int status_code "nulo"
+        boolean exito
+        text error "opcional"
+        datetime creado_en
+    }
+
+    USUARIO ||--o{ RUTA : "conduce"
+    USUARIO ||--o{ SERVICIO : "solicita"
+    USUARIO |o--o{ SERVICIO : "registra"
+    RUTA |o--o{ SERVICIO : "agrupa"
+    PRODUCTO |o--o{ SERVICIO : "es objeto de"
+    COBERTURA |o..o{ SERVICIO : "habilita zona (logica)"
+    SERVICIO ||--o{ SERVICIO_PRODUCTO : "se detalla en"
+    PRODUCTO ||--o{ SERVICIO_PRODUCTO : "aparece en"
+    SERVICIO ||--o| EVIDENCIA : "se respalda con"
+    SERVICIO ||--o{ NOVEDAD : "registra"
+    SERVICIO ||--o{ MENSAJE_CHAT : "contiene"
+    USUARIO ||--o{ MENSAJE_CHAT : "escribe"
+    SERVICIO ||--o{ POSICION_GPS : "se rastrea con"
+    USUARIO ||--o{ POSICION_GPS : "reporta"
+    SERVICIO ||--o| PUNTO_GEOCODIFICADO : "se ubica en"
+    USUARIO ||--o{ CONVERSACION : "inicia"
+    CONVERSACION ||--o{ MENSAJE_BOT : "contiene"
+    USUARIO ||--o{ PAGO : "realiza"
+    SERVICIO |o--o{ PAGO : "se cobra con"
+    PRODUCTO |o--o{ PAGO : "se paga en"
+    USUARIO ||--o{ API_KEY : "es representado por"
+    WEBHOOK_ENDPOINT ||--o{ WEBHOOK_DELIVERY : "registra intentos"
