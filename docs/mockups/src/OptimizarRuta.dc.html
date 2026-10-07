@@ -1,0 +1,107 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    :root{
+      --blue:#007AFF; --blue-dark:#0051D5; --blue-bg:#E8F2FF;
+      --bg:#F2F2F7; --surface:#FFFFFF; --border:#E2E5EA;
+      --text:#1C1C1E; --text-2:#8E8E93; --text-3:#9AA1AC;
+      --gray:#8E8E93; --amber:#FF9500; --amber-bg:#FFF3E0; --green:#34C759; --green-bg:#E8F9EC;
+    }
+    *{box-sizing:border-box;}
+    body{margin:0; font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,Helvetica,Arial,sans-serif;}
+    a{color:var(--blue);} a:hover{color:var(--blue-dark);}
+    .field-label{font-size:12px; font-weight:600; color:var(--text-2); margin-bottom:6px; text-transform:uppercase; letter-spacing:.3px;}
+    .field{border:1px solid var(--border); border-radius:9px; padding:11px 13px; font-size:14px; color:var(--text); background:#fff;}
+  </style>
+</helmet>
+
+<div style="width:1200px; height:800px; background:var(--bg); display:flex; flex-direction:column; overflow:hidden;">
+
+  <div style="background:var(--blue); padding:16px 28px; display:flex; align-items:center; justify-content:space-between; flex-shrink:0;">
+    <div style="display:flex; align-items:center; gap:10px;">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="13" height="10"/><path d="M16 10h3.2a1 1 0 0 1 .9.55L22 14v3h-6"/><circle cx="7.5" cy="18.5" r="1.6"/><circle cx="17.5" cy="18.5" r="1.6"/></svg>
+      <div style="color:#fff; font-size:17px; font-weight:700;">CMEDriver <span style="font-weight:400; opacity:.85;">&middot; Alistador</span></div>
+    </div>
+    <div style="display:flex; align-items:center; gap:14px;">
+      <div style="color:#fff; font-size:13px; opacity:.9;">Luis Alistador</div>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
+    </div>
+  </div>
+
+  <div style="background:var(--surface); border-bottom:1px solid var(--border); padding:0 28px; display:flex; gap:28px; flex-shrink:0;">
+    <div style="padding:14px 2px; font-size:14px; font-weight:500; color:var(--text-2);">Servicios</div>
+    <div style="padding:14px 2px; font-size:14px; font-weight:500; color:var(--text-2);">Nuevo servicio</div>
+    <div style="padding:14px 2px; font-size:14px; font-weight:500; color:var(--text-2);">Nueva ruta</div>
+    <div style="padding:14px 2px; font-size:14px; font-weight:600; color:var(--blue); border-bottom:2px solid var(--blue);">Optimizar ruta</div>
+  </div>
+
+  <div style="flex:1; padding:24px 28px; display:grid; grid-template-columns:340px 1fr; gap:22px; overflow:auto;">
+
+    <!-- Form -->
+    <div style="background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:22px; align-self:start;">
+      <div style="font-size:17px; font-weight:700; color:var(--text); margin-bottom:8px;">Optimizar ruta</div>
+      <div style="font-size:12.5px; color:var(--text-2); line-height:1.5; margin-bottom:18px;">
+        Sugiere un orden de visita eficiente para los servicios ya asignados a una ruta, a partir de las direcciones geocodificadas (Nominatim/OpenStreetMap). Es solo una sugerencia: no modifica la ruta ni los servicios.
+      </div>
+
+      <div class="field-label">ID de ruta</div>
+      <div class="field">2</div>
+
+      <div style="margin-top:18px; background:var(--blue); color:#fff; text-align:center; font-weight:700; font-size:14px; padding:12px; border-radius:9px;">Optimizar ruta</div>
+    </div>
+
+    <!-- Resultado -->
+    <div style="background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:22px; overflow:auto;">
+      <div style="font-size:17px; font-weight:700; color:var(--text); margin-bottom:14px;">Resultado sugerido</div>
+
+      <div style="background:var(--green-bg); border-radius:8px; padding:10px 14px; font-size:13px; color:#1a5c2e; margin-bottom:16px;">
+        Distancia total estimada: <strong>8.4 km</strong> (3 parada(s))
+      </div>
+
+      <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:18px;">
+
+        <div style="display:grid; grid-template-columns:28px 1fr; gap:14px; align-items:center; padding:12px 4px; border-bottom:1px solid var(--border);">
+          <div style="width:24px; height:24px; border-radius:50%; background:var(--blue); color:#fff; font-size:12px; font-weight:700; display:flex; align-items:center; justify-content:center;">1</div>
+          <div>
+            <div style="font-size:14px; font-weight:600; color:var(--text);">Servicio #7</div>
+            <div style="font-size:12px; color:var(--text-2);">Calle 80 # 12-30, Bogota &middot; 4.669, -74.055</div>
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:28px 1fr; gap:14px; align-items:center; padding:12px 4px; border-bottom:1px solid var(--border);">
+          <div style="width:24px; height:24px; border-radius:50%; background:var(--blue); color:#fff; font-size:12px; font-weight:700; display:flex; align-items:center; justify-content:center;">2</div>
+          <div>
+            <div style="font-size:14px; font-weight:600; color:var(--text);">Servicio #5</div>
+            <div style="font-size:12px; color:var(--text-2);">Carrera 7 # 45-10, Bogota &middot; 4.628, -74.065</div>
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:28px 1fr; gap:14px; align-items:center; padding:12px 4px;">
+          <div style="width:24px; height:24px; border-radius:50%; background:var(--blue); color:#fff; font-size:12px; font-weight:700; display:flex; align-items:center; justify-content:center;">3</div>
+          <div>
+            <div style="font-size:14px; font-weight:600; color:var(--text);">Servicio #4</div>
+            <div style="font-size:12px; color:var(--text-2);">Carrera 7 # 45-10, Bogota &middot; 4.628, -74.065</div>
+          </div>
+        </div>
+
+      </div>
+
+      <div style="font-size:13px; font-weight:600; color:var(--amber); margin-bottom:8px;">No se pudieron geocodificar (quedan fuera del orden sugerido)</div>
+      <div style="background:var(--amber-bg); border-radius:10px; padding:12px 14px;">
+        <div style="font-size:14px; font-weight:600; color:var(--text);">Servicio #9</div>
+        <div style="font-size:12px; color:var(--text-2);">Vereda El Retiro s/n, sin nomenclatura urbana</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

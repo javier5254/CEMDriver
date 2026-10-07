@@ -1,0 +1,127 @@
+<svg viewBox="0 0 1200 760" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, Arial, sans-serif">
+  <defs>
+    <marker id="arrowC2" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#666666"/>
+    </marker>
+  </defs>
+  <rect x="0" y="0" width="1200" height="760" fill="#ffffff"/>
+  <text x="600" y="28" text-anchor="middle" font-size="18" font-weight="700" fill="#1e293b">Diagrama de contenedores (C2) — CMEDriver</text>
+
+  <!-- ===== Person boxes (reutilizados del C1) ===== -->
+  <g font-size="13">
+    <rect x="64" y="40" width="220" height="110" rx="6" fill="#08427b" stroke="#052e56"/>
+    <circle cx="174" cy="62" r="10" fill="#ffffff"/><path d="M 160,86 a14,14 0 0 1 28,0 z" fill="#ffffff"/>
+    <text x="174" y="105" text-anchor="middle" font-weight="700" fill="#ffffff">Administrador</text>
+    <text x="174" y="122" text-anchor="middle" font-size="10.5" fill="#cfe0f2" font-style="italic">[Persona]</text>
+
+    <rect x="348" y="40" width="220" height="110" rx="6" fill="#08427b" stroke="#052e56"/>
+    <circle cx="458" cy="62" r="10" fill="#ffffff"/><path d="M 444,86 a14,14 0 0 1 28,0 z" fill="#ffffff"/>
+    <text x="458" y="105" text-anchor="middle" font-weight="700" fill="#ffffff">Alistador</text>
+    <text x="458" y="122" text-anchor="middle" font-size="10.5" fill="#cfe0f2" font-style="italic">[Persona]</text>
+
+    <rect x="632" y="40" width="220" height="110" rx="6" fill="#08427b" stroke="#052e56"/>
+    <circle cx="742" cy="62" r="10" fill="#ffffff"/><path d="M 728,86 a14,14 0 0 1 28,0 z" fill="#ffffff"/>
+    <text x="742" y="105" text-anchor="middle" font-weight="700" fill="#ffffff">Motorizado</text>
+    <text x="742" y="122" text-anchor="middle" font-size="10.5" fill="#cfe0f2" font-style="italic">[Persona]</text>
+
+    <rect x="916" y="40" width="220" height="110" rx="6" fill="#08427b" stroke="#052e56"/>
+    <circle cx="1026" cy="62" r="10" fill="#ffffff"/><path d="M 1012,86 a14,14 0 0 1 28,0 z" fill="#ffffff"/>
+    <text x="1026" y="105" text-anchor="middle" font-weight="700" fill="#ffffff">Cliente</text>
+    <text x="1026" y="122" text-anchor="middle" font-size="10.5" fill="#cfe0f2" font-style="italic">[Persona]</text>
+  </g>
+
+  <!-- ===== System boundary ===== -->
+  <rect x="40" y="230" width="1120" height="300" rx="8" fill="#fafbfc" stroke="#666666" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <text x="60" y="252" font-size="13" font-weight="700" fill="#334155">Plataforma CMEDriver [Limite del sistema]</text>
+
+  <!-- ===== Containers ===== -->
+  <g font-size="13">
+    <rect x="90" y="270" width="280" height="100" rx="5" fill="#438dd5" stroke="#2e6295"/>
+    <text x="230" y="298" text-anchor="middle" font-weight="700" fill="#ffffff">Frontend Web</text>
+    <text x="230" y="313" text-anchor="middle" font-size="10.5" font-style="italic" fill="#e4eefb">[Contenedor: Ionic + Angular]</text>
+    <text x="230" y="332" text-anchor="middle" font-size="11" fill="#eef4fb">SPA con areas para los 4 roles,</text>
+    <text x="230" y="346" text-anchor="middle" font-size="11" fill="#eef4fb">corre en el navegador</text>
+
+    <rect x="430" y="270" width="280" height="100" rx="5" fill="#438dd5" stroke="#2e6295"/>
+    <text x="570" y="298" text-anchor="middle" font-weight="700" fill="#ffffff">API REST</text>
+    <text x="570" y="313" text-anchor="middle" font-size="10.5" font-style="italic" fill="#e4eefb">[Contenedor: Django + DRF]</text>
+    <text x="570" y="332" text-anchor="middle" font-size="11" fill="#eef4fb">Logica de negocio, autenticacion</text>
+    <text x="570" y="346" text-anchor="middle" font-size="11" fill="#eef4fb">JWT, RBAC por rol</text>
+
+    <rect x="290" y="420" width="260" height="100" rx="5" fill="#438dd5" stroke="#2e6295"/>
+    <text x="420" y="448" text-anchor="middle" font-weight="700" fill="#ffffff">Base de datos</text>
+    <text x="420" y="463" text-anchor="middle" font-size="10.5" font-style="italic" fill="#e4eefb">[Contenedor: SQLite / PostgreSQL]</text>
+    <text x="420" y="482" text-anchor="middle" font-size="11" fill="#eef4fb">Usuarios, servicios, cobertura,</text>
+    <text x="420" y="496" text-anchor="middle" font-size="11" fill="#eef4fb">inventario, tracking, chat</text>
+
+    <rect x="590" y="420" width="260" height="100" rx="5" fill="#438dd5" stroke="#2e6295"/>
+    <text x="720" y="448" text-anchor="middle" font-weight="700" fill="#ffffff">Almacenamiento de medios</text>
+    <text x="720" y="463" text-anchor="middle" font-size="10.5" font-style="italic" fill="#e4eefb">[Contenedor: Filesystem / Object storage]</text>
+    <text x="720" y="482" text-anchor="middle" font-size="11" fill="#eef4fb">Fotos y firmas de evidencia</text>
+    <text x="720" y="496" text-anchor="middle" font-size="11" fill="#eef4fb">de recoleccion</text>
+  </g>
+
+  <!-- ===== External systems ===== -->
+  <g font-size="13">
+    <rect x="90" y="608" width="280" height="100" rx="6" fill="#8a8a8a" stroke="#666666"/>
+    <text x="230" y="636" text-anchor="middle" font-weight="700" fill="#ffffff">OpenStreetMap</text>
+    <text x="230" y="651" text-anchor="middle" font-size="10.5" font-style="italic" fill="#eeeeee">[Sistema de software - Externo]</text>
+    <text x="230" y="670" text-anchor="middle" font-size="11" fill="#f3f3f3">Servicio de mapas</text>
+    <text x="230" y="684" text-anchor="middle" font-size="11" fill="#f3f3f3">(tiles)</text>
+
+    <rect x="430" y="608" width="280" height="100" rx="6" fill="#8a8a8a" stroke="#666666"/>
+    <text x="570" y="636" text-anchor="middle" font-weight="700" fill="#ffffff">Sistema externo</text>
+    <text x="570" y="651" text-anchor="middle" font-size="10.5" font-style="italic" fill="#eeeeee">[Sistema de software - Externo]</text>
+    <text x="570" y="670" text-anchor="middle" font-size="11" fill="#f3f3f3">E-commerce / ERP que</text>
+    <text x="570" y="684" text-anchor="middle" font-size="11" fill="#f3f3f3">crea servicios via API</text>
+  </g>
+
+  <!-- ===== Relationship lines (dibujadas al final, sobre las cajas) ===== -->
+  <g stroke="#666666" stroke-width="1.5" fill="none" marker-end="url(#arrowC2)">
+    <path d="M174,160 L 150,268"/>
+    <path d="M458,160 L 205,268"/>
+    <path d="M742,160 L 285,268"/>
+    <path d="M1026,160 L 340,268"/>
+
+    <path d="M372,320 L 428,320"/>
+    <path d="M500,372 L 435,418"/>
+    <path d="M640,372 L 705,418"/>
+
+    <path d="M230,522 L 230,606"/>
+    <path d="M570,606 L 570,522"/>
+  </g>
+  <g font-size="11.5" fill="#334155">
+    <rect x="60" y="195" width="90" height="15" fill="#ffffff"/>
+    <text x="105" y="206" text-anchor="middle">Usa [HTTPS]</text>
+    <rect x="230" y="210" width="90" height="15" fill="#ffffff"/>
+    <text x="275" y="221" text-anchor="middle">Usa [HTTPS]</text>
+    <rect x="540" y="225" width="90" height="15" fill="#ffffff"/>
+    <text x="585" y="236" text-anchor="middle">Usa [HTTPS]</text>
+    <rect x="870" y="240" width="90" height="15" fill="#ffffff"/>
+    <text x="915" y="251" text-anchor="middle">Usa [HTTPS]</text>
+
+    <rect x="378" y="311" width="112" height="15" fill="#fdf6e3" opacity="0.95"/>
+    <text x="434" y="322" text-anchor="middle" font-size="10">Llama [JSON/HTTPS]</text>
+
+    <rect x="420" y="394" width="100" height="14" fill="#fdf6e3" opacity="0.95"/>
+    <text x="470" y="404" text-anchor="middle" font-size="9.5">Lee/escribe [ORM]</text>
+
+    <rect x="648" y="394" width="105" height="14" fill="#fdf6e3" opacity="0.95"/>
+    <text x="700" y="404" text-anchor="middle" font-size="9.5">Guarda archivos</text>
+
+    <rect x="150" y="555" width="130" height="15" fill="#ffffff"/>
+    <text x="215" y="566" text-anchor="middle">Carga mapas [HTTPS]</text>
+    <rect x="490" y="555" width="160" height="15" fill="#ffffff"/>
+    <text x="570" y="566" text-anchor="middle">Crea servicios [API Key]</text>
+  </g>
+
+  <!-- ===== Legend ===== -->
+  <g font-size="11" fill="#334155">
+    <rect x="64" y="732" width="16" height="16" fill="#08427b"/>
+    <text x="86" y="744">Persona</text>
+    <rect x="160" y="732" width="16" height="16" fill="#438dd5"/>
+    <text x="182" y="744">Contenedor (en alcance)</text>
+    <rect x="360" y="732" width="16" height="16" fill="#8a8a8a"/>
+    <text x="382" y="744">Sistema externo</text>
+  </g>
+</svg>

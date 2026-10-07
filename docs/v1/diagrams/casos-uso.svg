@@ -1,0 +1,185 @@
+<svg viewBox="0 0 1320 800" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, Arial, sans-serif">
+  <rect x="0" y="0" width="1320" height="800" fill="#ffffff"/>
+
+  <!-- System boundary -->
+  <rect x="220" y="40" width="860" height="650" rx="10" fill="#fafbfc" stroke="#334155" stroke-width="2"/>
+  <text x="650" y="68" text-anchor="middle" font-size="20" font-weight="600" fill="#1e293b">Sistema CMEDriver</text>
+
+  <!-- ================= ASSOCIATION LINES (actor - use case) ================= -->
+  <g stroke="#475569" stroke-width="1.5" fill="none">
+    <!-- Administrador -->
+    <line x1="140" y1="190" x2="380" y2="110"/>
+    <line x1="140" y1="190" x2="380" y2="190"/>
+    <line x1="140" y1="190" x2="380" y2="270"/>
+    <!-- Alistador -->
+    <line x1="140" y1="400" x2="380" y2="360"/>
+    <line x1="140" y1="400" x2="380" y2="440"/>
+    <!-- Motorizado -->
+    <line x1="1150" y1="310" x2="860" y2="150"/>
+    <line x1="1150" y1="310" x2="860" y2="230"/>
+    <line x1="1150" y1="310" x2="860" y2="390"/>
+    <line x1="1150" y1="310" x2="860" y2="470"/>
+    <!-- Cliente -->
+    <line x1="1150" y1="560" x2="620" y2="480"/>
+    <line x1="1150" y1="560" x2="620" y2="560"/>
+    <line x1="1150" y1="560" x2="860" y2="560"/>
+    <line x1="1150" y1="560" x2="620" y2="640"/>
+  </g>
+  <!-- Sistema Externo (secondary actor) -->
+  <line x1="140" y1="600" x2="380" y2="360" stroke="#475569" stroke-width="1.5" stroke-dasharray="2 4"/>
+
+  <!-- ================= INCLUDE / EXTEND DEPENDENCIES ================= -->
+  <g fill="none" stroke="#b91c1c" stroke-width="1.5" marker-end="url(#arrow)">
+    <!-- Crear servicio -> Validar cobertura/leadtime (include) -->
+    <path d="M 480,368 C 560,330 560,410 570,405"/>
+    <!-- Planificar recoleccion -> Validar cobertura/leadtime (include) -->
+    <path d="M 620,450 C 620,430 615,415 610,408"/>
+    <!-- Ejecutar servicio -> Capturar evidencia (include) -->
+    <path d="M 860,260 C 860,280 860,290 860,298"/>
+    <!-- Usar chatbot -> Crear servicio (extend) -->
+    <path d="M 560,632 C 420,560 380,470 380,398"/>
+    <!-- Usar chatbot -> Planificar recoleccion (extend) -->
+    <path d="M 610,620 C 615,570 618,520 619,492"/>
+  </g>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#b91c1c"/>
+    </marker>
+  </defs>
+  <text x="565" y="345" font-size="12" fill="#b91c1c" font-style="italic">«include»</text>
+  <text x="500" y="440" font-size="12" fill="#b91c1c" font-style="italic">«include»</text>
+  <text x="880" y="285" font-size="12" fill="#b91c1c" font-style="italic">«include»</text>
+  <text x="420" y="520" font-size="12" fill="#b91c1c" font-style="italic">«extend»</text>
+  <text x="628" y="555" font-size="12" fill="#b91c1c" font-style="italic">«extend»</text>
+
+  <!-- ================= USE CASES (ovals) ================= -->
+  <g font-size="13" fill="#0f172a">
+    <!-- Administrador -->
+    <ellipse cx="380" cy="110" rx="105" ry="32" fill="#e0f2fe" stroke="#0369a1" stroke-width="1.5"/>
+    <text x="380" y="115" text-anchor="middle">Gestionar usuarios</text>
+
+    <ellipse cx="380" cy="190" rx="105" ry="32" fill="#e0f2fe" stroke="#0369a1" stroke-width="1.5"/>
+    <text x="380" y="185" text-anchor="middle">Configurar matriz</text>
+    <text x="380" y="200" text-anchor="middle">de cobertura</text>
+
+    <ellipse cx="380" cy="270" rx="105" ry="32" fill="#e0f2fe" stroke="#0369a1" stroke-width="1.5"/>
+    <text x="380" y="275" text-anchor="middle">Gestionar inventario</text>
+
+    <!-- Alistador -->
+    <ellipse cx="380" cy="360" rx="105" ry="32" fill="#fef3c7" stroke="#b45309" stroke-width="1.5"/>
+    <text x="380" y="365" text-anchor="middle">Crear servicio</text>
+
+    <ellipse cx="380" cy="440" rx="105" ry="32" fill="#fef3c7" stroke="#b45309" stroke-width="1.5"/>
+    <text x="380" y="435" text-anchor="middle">Asignar servicio</text>
+    <text x="380" y="450" text-anchor="middle">a ruta</text>
+
+    <!-- Shared -->
+    <ellipse cx="620" cy="400" rx="110" ry="34" fill="#f1f5f9" stroke="#334155" stroke-width="1.5"/>
+    <text x="620" y="396" text-anchor="middle">Validar cobertura</text>
+    <text x="620" y="411" text-anchor="middle">y leadtime</text>
+
+    <!-- Motorizado -->
+    <ellipse cx="860" cy="150" rx="105" ry="32" fill="#dcfce7" stroke="#15803d" stroke-width="1.5"/>
+    <text x="860" y="146" text-anchor="middle">Ver servicios</text>
+    <text x="860" y="161" text-anchor="middle">asignados</text>
+
+    <ellipse cx="860" cy="230" rx="105" ry="32" fill="#dcfce7" stroke="#15803d" stroke-width="1.5"/>
+    <text x="860" y="226" text-anchor="middle">Ejecutar servicio</text>
+    <text x="860" y="241" text-anchor="middle">(recibir/transitar/cerrar)</text>
+
+    <ellipse cx="860" cy="330" rx="110" ry="32" fill="#f1f5f9" stroke="#334155" stroke-width="1.5"/>
+    <text x="860" y="326" text-anchor="middle">Capturar evidencia</text>
+    <text x="860" y="341" text-anchor="middle">(foto + firma)</text>
+
+    <ellipse cx="860" cy="410" rx="105" ry="32" fill="#dcfce7" stroke="#15803d" stroke-width="1.5"/>
+    <text x="860" y="406" text-anchor="middle">Registrar novedad</text>
+    <text x="860" y="421" text-anchor="middle">(reintentar/devolver)</text>
+
+    <ellipse cx="860" cy="490" rx="105" ry="32" fill="#dcfce7" stroke="#15803d" stroke-width="1.5"/>
+    <text x="860" y="486" text-anchor="middle">Reportar posicion</text>
+    <text x="860" y="501" text-anchor="middle">GPS</text>
+
+    <!-- Cliente -->
+    <ellipse cx="620" cy="480" rx="105" ry="32" fill="#fce7f3" stroke="#a21caf" stroke-width="1.5"/>
+    <text x="620" y="476" text-anchor="middle">Planificar</text>
+    <text x="620" y="491" text-anchor="middle">recoleccion</text>
+
+    <ellipse cx="620" cy="560" rx="105" ry="32" fill="#fce7f3" stroke="#a21caf" stroke-width="1.5"/>
+    <text x="620" y="556" text-anchor="middle">Ver tracking en</text>
+    <text x="620" y="571" text-anchor="middle">tiempo real</text>
+
+    <ellipse cx="860" cy="570" rx="105" ry="32" fill="#fce7f3" stroke="#a21caf" stroke-width="1.5"/>
+    <text x="860" y="566" text-anchor="middle">Chatear con</text>
+    <text x="860" y="581" text-anchor="middle">motorizado</text>
+
+    <ellipse cx="620" cy="655" rx="105" ry="32" fill="#fce7f3" stroke="#a21caf" stroke-width="1.5"/>
+    <text x="620" y="651" text-anchor="middle">Usar chatbot</text>
+    <text x="620" y="666" text-anchor="middle">guiado</text>
+  </g>
+
+  <!-- ================= ACTORS ================= -->
+  <g stroke="#0f172a" stroke-width="2" fill="none">
+    <!-- Administrador -->
+    <circle cx="140" cy="150" r="13" fill="#ffffff"/>
+    <line x1="140" y1="163" x2="140" y2="200"/>
+    <line x1="118" y1="175" x2="162" y2="175"/>
+    <line x1="140" y1="200" x2="122" y2="230"/>
+    <line x1="140" y1="200" x2="158" y2="230"/>
+  </g>
+  <text x="140" y="250" text-anchor="middle" font-size="13" font-weight="600" fill="#0f172a">Administrador</text>
+
+  <g stroke="#0f172a" stroke-width="2" fill="none">
+    <!-- Alistador -->
+    <circle cx="140" cy="360" r="13" fill="#ffffff"/>
+    <line x1="140" y1="373" x2="140" y2="410"/>
+    <line x1="118" y1="385" x2="162" y2="385"/>
+    <line x1="140" y1="410" x2="122" y2="440"/>
+    <line x1="140" y1="410" x2="158" y2="440"/>
+  </g>
+  <text x="140" y="460" text-anchor="middle" font-size="13" font-weight="600" fill="#0f172a">Alistador</text>
+
+  <g stroke="#64748b" stroke-width="2" fill="none" stroke-dasharray="3 3">
+    <!-- Sistema Externo -->
+    <circle cx="140" cy="560" r="13" fill="#ffffff"/>
+    <line x1="140" y1="573" x2="140" y2="610"/>
+    <line x1="118" y1="585" x2="162" y2="585"/>
+    <line x1="140" y1="610" x2="122" y2="640"/>
+    <line x1="140" y1="610" x2="158" y2="640"/>
+  </g>
+  <text x="140" y="660" text-anchor="middle" font-size="12" font-weight="600" fill="#64748b">Sistema externo</text>
+  <text x="140" y="675" text-anchor="middle" font-size="11" fill="#64748b">(via API)</text>
+
+  <g stroke="#0f172a" stroke-width="2" fill="none">
+    <!-- Motorizado -->
+    <circle cx="1160" cy="270" r="13" fill="#ffffff"/>
+    <line x1="1160" y1="283" x2="1160" y2="320"/>
+    <line x1="1138" y1="295" x2="1182" y2="295"/>
+    <line x1="1160" y1="320" x2="1142" y2="350"/>
+    <line x1="1160" y1="320" x2="1178" y2="350"/>
+  </g>
+  <text x="1160" y="370" text-anchor="middle" font-size="13" font-weight="600" fill="#0f172a">Motorizado</text>
+
+  <g stroke="#0f172a" stroke-width="2" fill="none">
+    <!-- Cliente -->
+    <circle cx="1160" cy="520" r="13" fill="#ffffff"/>
+    <line x1="1160" y1="533" x2="1160" y2="570"/>
+    <line x1="1138" y1="545" x2="1182" y2="545"/>
+    <line x1="1160" y1="570" x2="1142" y2="600"/>
+    <line x1="1160" y1="570" x2="1178" y2="600"/>
+  </g>
+  <text x="1160" y="620" text-anchor="middle" font-size="13" font-weight="600" fill="#0f172a">Cliente</text>
+
+  <!-- Legend -->
+  <g font-size="12" fill="#0f172a">
+    <rect x="240" y="710" width="16" height="16" fill="#e0f2fe" stroke="#0369a1"/>
+    <text x="262" y="723">Casos de uso - Administrador</text>
+    <rect x="470" y="710" width="16" height="16" fill="#fef3c7" stroke="#b45309"/>
+    <text x="492" y="723">Alistador</text>
+    <rect x="600" y="710" width="16" height="16" fill="#dcfce7" stroke="#15803d"/>
+    <text x="622" y="723">Motorizado</text>
+    <rect x="740" y="710" width="16" height="16" fill="#fce7f3" stroke="#a21caf"/>
+    <text x="762" y="723">Cliente</text>
+    <rect x="870" y="710" width="16" height="16" fill="#f1f5f9" stroke="#334155"/>
+    <text x="892" y="723">Compartido / interno</text>
+  </g>
+</svg>

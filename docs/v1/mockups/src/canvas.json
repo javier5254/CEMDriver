@@ -1,0 +1,12 @@
+{
+  "artboards": [
+    { "file": "Main.dc.html", "x": 0, "y": 880, "w": 390, "h": 844, "title": "Login" },
+    { "file": "AdminDashboard.dc.html", "x": 0, "y": 0, "w": 1200, "h": 800, "title": "Admin - Dashboard" },
+    { "file": "AlistadorCrearServicio.dc.html", "x": 1320, "y": 0, "w": 1200, "h": 800, "title": "Alistador - Crear servicio" },
+    { "file": "MotorizadoLista.dc.html", "x": 470, "y": 880, "w": 390, "h": 844, "title": "Motorizado - Mis servicios" },
+    { "file": "MotorizadoDetalle.dc.html", "x": 940, "y": 880, "w": 390, "h": 844, "title": "Motorizado - Cerrar recoleccion" },
+    { "file": "ClienteTracking.dc.html", "x": 1410, "y": 880, "w": 390, "h": 844, "title": "Cliente - Tracking y chat" },
+    { "file": "ClienteChatbot.dc.html", "x": 1880, "y": 880, "w": 390, "h": 844, "title": "Cliente - Chatbot guiado" }
+  ],
+  "launch": { "view": "canvas" }
+}

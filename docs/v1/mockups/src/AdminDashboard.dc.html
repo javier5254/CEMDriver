@@ -1,0 +1,109 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    :root{
+      --blue:#1D4ED8; --blue-dark:#1E3A8A; --blue-bg:#EFF4FF;
+      --bg:#F4F6F9; --surface:#FFFFFF; --border:#E2E5EA;
+      --text:#14171F; --text-2:#6B7280; --text-3:#9AA1AC;
+      --gray:#6B7280; --violet:#7C3AED; --amber:#D97706; --green:#16A34A; --red:#DC2626; --stone:#57534E;
+    }
+    *{box-sizing:border-box;}
+    body{margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;}
+    a{color:var(--blue);} a:hover{color:var(--blue-dark);}
+  </style>
+</helmet>
+
+<div style="width:1200px; height:800px; background:var(--bg); display:flex; flex-direction:column; overflow:hidden;">
+
+  <!-- Top bar -->
+  <div style="background:var(--blue); padding:16px 28px; display:flex; align-items:center; justify-content:space-between; flex-shrink:0;">
+    <div style="display:flex; align-items:center; gap:10px;">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="13" height="10"/><path d="M16 10h3.2a1 1 0 0 1 .9.55L22 14v3h-6"/><circle cx="7.5" cy="18.5" r="1.6"/><circle cx="17.5" cy="18.5" r="1.6"/></svg>
+      <div style="color:#fff; font-size:17px; font-weight:700;">CMEDriver <span style="font-weight:400; opacity:.85;">&middot; Admin</span></div>
+    </div>
+    <div style="display:flex; align-items:center; gap:14px;">
+      <div style="color:#fff; font-size:13px; opacity:.9;">Ana Administradora</div>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
+    </div>
+  </div>
+
+  <!-- Sub nav -->
+  <div style="background:var(--surface); border-bottom:1px solid var(--border); padding:0 28px; display:flex; gap:28px; flex-shrink:0;">
+    <div style="padding:14px 2px; font-size:14px; font-weight:600; color:var(--blue); border-bottom:2px solid var(--blue);">Dashboard</div>
+    <div style="padding:14px 2px; font-size:14px; font-weight:500; color:var(--text-2);">Usuarios</div>
+    <div style="padding:14px 2px; font-size:14px; font-weight:500; color:var(--text-2);">Cobertura</div>
+  </div>
+
+  <!-- Content -->
+  <div style="flex:1; padding:26px 28px; overflow:auto;">
+    <div style="font-size:22px; font-weight:700; color:var(--text); margin-bottom:2px;">Panel de servicios</div>
+    <div style="font-size:13px; color:var(--text-2); margin-bottom:22px;">Estado actual de todos los servicios de mensajeria</div>
+
+    <div style="display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:16px;">
+
+      <div style="background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:18px; position:relative; overflow:hidden;">
+        <div style="position:absolute; top:0; left:0; right:0; height:4px; background:var(--gray);"></div>
+        <div style="font-size:12px; font-weight:600; color:var(--text-2); text-transform:uppercase; letter-spacing:.3px;">Creado</div>
+        <div style="font-size:32px; font-weight:700; color:var(--text); margin-top:6px;">3</div>
+      </div>
+
+      <div style="background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:18px; position:relative; overflow:hidden;">
+        <div style="position:absolute; top:0; left:0; right:0; height:4px; background:var(--blue);"></div>
+        <div style="font-size:12px; font-weight:600; color:var(--text-2); text-transform:uppercase; letter-spacing:.3px;">Asignado</div>
+        <div style="font-size:32px; font-weight:700; color:var(--text); margin-top:6px;">2</div>
+      </div>
+
+      <div style="background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:18px; position:relative; overflow:hidden;">
+        <div style="position:absolute; top:0; left:0; right:0; height:4px; background:var(--violet);"></div>
+        <div style="font-size:12px; font-weight:600; color:var(--text-2); text-transform:uppercase; letter-spacing:.3px;">Recibido en centro</div>
+        <div style="font-size:32px; font-weight:700; color:var(--text); margin-top:6px;">0</div>
+      </div>
+
+      <div style="background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:18px; position:relative; overflow:hidden;">
+        <div style="position:absolute; top:0; left:0; right:0; height:4px; background:var(--amber);"></div>
+        <div style="font-size:12px; font-weight:600; color:var(--text-2); text-transform:uppercase; letter-spacing:.3px;">En transito</div>
+        <div style="font-size:32px; font-weight:700; color:var(--text); margin-top:6px;">1</div>
+      </div>
+
+      <div style="background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:18px; position:relative; overflow:hidden;">
+        <div style="position:absolute; top:0; left:0; right:0; height:4px; background:var(--green);"></div>
+        <div style="font-size:12px; font-weight:600; color:var(--text-2); text-transform:uppercase; letter-spacing:.3px;">Entregado</div>
+        <div style="font-size:32px; font-weight:700; color:var(--text); margin-top:6px;">2</div>
+      </div>
+
+      <div style="background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:18px; position:relative; overflow:hidden;">
+        <div style="position:absolute; top:0; left:0; right:0; height:4px; background:var(--green);"></div>
+        <div style="font-size:12px; font-weight:600; color:var(--text-2); text-transform:uppercase; letter-spacing:.3px;">Recolectado</div>
+        <div style="font-size:32px; font-weight:700; color:var(--text); margin-top:6px;">2</div>
+      </div>
+
+      <div style="background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:18px; position:relative; overflow:hidden;">
+        <div style="position:absolute; top:0; left:0; right:0; height:4px; background:var(--red);"></div>
+        <div style="font-size:12px; font-weight:600; color:var(--text-2); text-transform:uppercase; letter-spacing:.3px;">Novedad</div>
+        <div style="font-size:32px; font-weight:700; color:var(--text); margin-top:6px;">1</div>
+      </div>
+
+      <div style="background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:18px; position:relative; overflow:hidden;">
+        <div style="position:absolute; top:0; left:0; right:0; height:4px; background:var(--stone);"></div>
+        <div style="font-size:12px; font-weight:600; color:var(--text-2); text-transform:uppercase; letter-spacing:.3px;">Devuelto</div>
+        <div style="font-size:32px; font-weight:700; color:var(--text); margin-top:6px;">1</div>
+      </div>
+
+    </div>
+
+    <div style="margin-top:22px; background:var(--blue-bg); border-radius:10px; padding:14px 18px; display:inline-flex; gap:8px; align-items:baseline;">
+      <span style="font-size:13px; color:var(--text-2);">Total servicios</span>
+      <span style="font-size:20px; font-weight:700; color:var(--blue-dark);">12</span>
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

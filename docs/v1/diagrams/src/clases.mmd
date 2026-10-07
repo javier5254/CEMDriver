@@ -1,0 +1,126 @@
+classDiagram
+    class Usuario {
+        +int id
+        +string username
+        +string password_hash
+        +string nombre
+        +string rol
+        +string telefono
+        +string email
+        +bool is_active
+        +set_password(password)
+        +check_password(password)
+    }
+
+    class Cobertura {
+        +int id
+        +string zona
+        +int leadtime_dias
+        +string dias_disponibles
+        +time hora_inicio
+        +time hora_fin
+        +dias_codigos() List~string~
+    }
+
+    class Producto {
+        +int id
+        +string sku
+        +string nombre
+        +string descripcion
+        +decimal precio
+        +int stock
+        +string centro_mensajeria
+        +bool disponible_chatbot
+    }
+
+    class Ruta {
+        +int id
+        +date fecha
+        +string estado
+    }
+
+    class Servicio {
+        +int id
+        +string tipo
+        +string zona
+        +string direccion_origen
+        +string direccion_destino
+        +date fecha_agenda
+        +string estado
+        +datetime creado_en
+        +asignarRuta(ruta)
+        +recibirEnCentro()
+        +iniciarTransito()
+        +cerrar(foto, firma)
+        +registrarNovedad(tipo, detalle, accion)
+    }
+
+    class Evidencia {
+        +int id
+        +file foto
+        +file firma
+        +datetime capturado_en
+    }
+
+    class Novedad {
+        +int id
+        +string tipo
+        +string detalle
+        +string accion
+        +datetime creado_en
+    }
+
+    class MensajeChat {
+        +int id
+        +string texto
+        +datetime enviado_en
+    }
+
+    class PosicionGPS {
+        +int id
+        +decimal lat
+        +decimal lng
+        +datetime timestamp
+    }
+
+    class Rol {
+        <<enumeration>>
+        ADMIN
+        ALISTADOR
+        MOTORIZADO
+        CLIENTE
+    }
+
+    class TipoServicio {
+        <<enumeration>>
+        ENTREGA
+        RECOLECCION
+    }
+
+    class EstadoServicio {
+        <<enumeration>>
+        CREADO
+        ASIGNADO
+        RECIBIDO_CENTRO
+        EN_TRANSITO
+        ENTREGADO
+        RECOLECTADO
+        NOVEDAD
+        DEVUELTO
+    }
+
+    Usuario "1" --> "1" Rol : tiene
+    Usuario "1" --> "0..*" Ruta : conduce (motorizado)
+    Usuario "1" --> "0..*" Servicio : solicita (cliente)
+    Usuario "1" --> "0..*" MensajeChat : autor
+    Usuario "1" --> "0..*" PosicionGPS : reporta (motorizado)
+
+    Ruta "1" --> "0..*" Servicio : agrupa
+    Servicio "1" --> "1" TipoServicio : tiene
+    Servicio "1" --> "1" EstadoServicio : tiene
+    Servicio "1" --> "0..1" Evidencia : genera
+    Servicio "1" --> "0..*" Novedad : registra
+    Servicio "1" --> "0..*" MensajeChat : contiene
+    Servicio "1" --> "0..*" PosicionGPS : trackea
+    Servicio "0..*" --> "0..1" Producto : referencia
+    Servicio "0..*" --> "1" Cobertura : valida contra

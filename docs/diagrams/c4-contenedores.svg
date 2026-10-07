@@ -1,0 +1,135 @@
+<svg viewBox="0 0 1200 760" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arrowC2" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#8E8E93"/>
+    </marker>
+    <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#1C1C1E" flood-opacity="0.18"/>
+    </filter>
+  </defs>
+  <rect x="0" y="0" width="1200" height="760" fill="#ffffff"/>
+  <rect x="30" y="34" width="6" height="30" rx="3" fill="#007AFF"/>
+  <text x="48" y="58" font-size="19" font-weight="700" fill="#1C1C1E">Diagrama de contenedores (C2) — CMEDriver (v2)</text>
+
+  <!-- ===== Person boxes (reutilizados del C1) ===== -->
+  <g font-size="13">
+    <rect x="64" y="40" width="220" height="110" rx="14" fill="#0051D5" stroke="#003C9E" filter="url(#shadow)"/>
+    <circle cx="174" cy="62" r="10" fill="#ffffff"/><path d="M 160,86 a14,14 0 0 1 28,0 z" fill="#ffffff"/>
+    <text x="174" y="105" text-anchor="middle" font-weight="700" fill="#ffffff">Administrador</text>
+    <text x="174" y="122" text-anchor="middle" font-size="10.5" fill="#cfe0f2" font-style="italic">[Persona]</text>
+
+    <rect x="348" y="40" width="220" height="110" rx="14" fill="#0051D5" stroke="#003C9E" filter="url(#shadow)"/>
+    <circle cx="458" cy="62" r="10" fill="#ffffff"/><path d="M 444,86 a14,14 0 0 1 28,0 z" fill="#ffffff"/>
+    <text x="458" y="105" text-anchor="middle" font-weight="700" fill="#ffffff">Alistador</text>
+    <text x="458" y="122" text-anchor="middle" font-size="10.5" fill="#cfe0f2" font-style="italic">[Persona]</text>
+
+    <rect x="632" y="40" width="220" height="110" rx="14" fill="#0051D5" stroke="#003C9E" filter="url(#shadow)"/>
+    <circle cx="742" cy="62" r="10" fill="#ffffff"/><path d="M 728,86 a14,14 0 0 1 28,0 z" fill="#ffffff"/>
+    <text x="742" y="105" text-anchor="middle" font-weight="700" fill="#ffffff">Motorizado</text>
+    <text x="742" y="122" text-anchor="middle" font-size="10.5" fill="#cfe0f2" font-style="italic">[Persona]</text>
+
+    <rect x="916" y="40" width="220" height="110" rx="14" fill="#0051D5" stroke="#003C9E" filter="url(#shadow)"/>
+    <circle cx="1026" cy="62" r="10" fill="#ffffff"/><path d="M 1012,86 a14,14 0 0 1 28,0 z" fill="#ffffff"/>
+    <text x="1026" y="105" text-anchor="middle" font-weight="700" fill="#ffffff">Cliente</text>
+    <text x="1026" y="122" text-anchor="middle" font-size="10.5" fill="#cfe0f2" font-style="italic">[Persona]</text>
+  </g>
+
+  <!-- ===== System boundary ===== -->
+  <rect x="40" y="230" width="1120" height="300" rx="18" fill="#FAFBFC" stroke="#8E8E93" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <text x="60" y="252" font-size="13" font-weight="700" fill="#1C1C1E">Plataforma CMEDriver [Limite del sistema]</text>
+
+  <!-- ===== Containers ===== -->
+  <g font-size="13">
+    <rect x="90" y="270" width="280" height="100" rx="14" fill="#007AFF" stroke="#0051D5" filter="url(#shadow)"/>
+    <text x="230" y="298" text-anchor="middle" font-weight="700" fill="#ffffff">Frontend Web</text>
+    <text x="230" y="313" text-anchor="middle" font-size="10.5" font-style="italic" fill="#e4eefb">[Contenedor: Ionic + Angular, tema iOS]</text>
+    <text x="230" y="332" text-anchor="middle" font-size="11" fill="#eef4fb">SPA con areas para los 4 roles,</text>
+    <text x="230" y="346" text-anchor="middle" font-size="11" fill="#eef4fb">navegador o empacada (Capacitor)</text>
+
+    <rect x="430" y="270" width="280" height="100" rx="14" fill="#007AFF" stroke="#0051D5" filter="url(#shadow)"/>
+    <text x="570" y="292" text-anchor="middle" font-weight="700" fill="#ffffff">API REST + WebSockets</text>
+    <text x="570" y="306" text-anchor="middle" font-size="10.5" font-style="italic" fill="#e4eefb">[Contenedor: Django+DRF+Channels]</text>
+    <text x="570" y="325" text-anchor="middle" font-size="10.5" fill="#eef4fb">Auth JWT/API Key, RBAC, chatbot,</text>
+    <text x="570" y="339" text-anchor="middle" font-size="10.5" fill="#eef4fb">pagos, optimizacion, integraciones</text>
+    <text x="570" y="353" text-anchor="middle" font-size="10.5" fill="#eef4fb">(modulos simulados marcados aparte)</text>
+
+    <rect x="290" y="420" width="260" height="100" rx="14" fill="#007AFF" stroke="#0051D5" filter="url(#shadow)"/>
+    <text x="420" y="448" text-anchor="middle" font-weight="700" fill="#ffffff">Base de datos</text>
+    <text x="420" y="463" text-anchor="middle" font-size="10.5" font-style="italic" fill="#e4eefb">[Contenedor: SQLite / PostgreSQL]</text>
+    <text x="420" y="482" text-anchor="middle" font-size="10.5" fill="#eef4fb">Usuarios, servicios, cobertura, inventario,</text>
+    <text x="420" y="496" text-anchor="middle" font-size="10.5" fill="#eef4fb">tracking, chat, pagos, chatbot, API keys</text>
+
+    <rect x="590" y="420" width="260" height="100" rx="14" fill="#007AFF" stroke="#0051D5" filter="url(#shadow)"/>
+    <text x="720" y="448" text-anchor="middle" font-weight="700" fill="#ffffff">Almacenamiento de medios</text>
+    <text x="720" y="463" text-anchor="middle" font-size="10.5" font-style="italic" fill="#e4eefb">[Contenedor: Filesystem / Object storage]</text>
+    <text x="720" y="482" text-anchor="middle" font-size="11" fill="#eef4fb">Fotos y firmas de evidencia</text>
+    <text x="720" y="496" text-anchor="middle" font-size="11" fill="#eef4fb">de recoleccion</text>
+  </g>
+
+  <!-- ===== External systems ===== -->
+  <g font-size="13">
+    <rect x="90" y="608" width="280" height="100" rx="14" fill="#98989D" stroke="#7C7C80" filter="url(#shadow)"/>
+    <text x="230" y="632" text-anchor="middle" font-weight="700" fill="#ffffff">OpenStreetMap</text>
+    <text x="230" y="647" text-anchor="middle" font-size="10.5" font-style="italic" fill="#f0f0f1">[Sistema de software - Externo]</text>
+    <text x="230" y="665" text-anchor="middle" font-size="10.5" fill="#f7f7f8">Mapas (tiles) al frontend,</text>
+    <text x="230" y="679" text-anchor="middle" font-size="10.5" fill="#f7f7f8">geocoding (Nominatim) al backend</text>
+
+    <rect x="430" y="608" width="280" height="100" rx="14" fill="#98989D" stroke="#7C7C80" filter="url(#shadow)"/>
+    <text x="570" y="636" text-anchor="middle" font-weight="700" fill="#ffffff">Sistema externo</text>
+    <text x="570" y="651" text-anchor="middle" font-size="10.5" font-style="italic" fill="#f0f0f1">[Sistema de software - Externo]</text>
+    <text x="570" y="670" text-anchor="middle" font-size="11" fill="#f7f7f8">E-commerce / ERP que</text>
+    <text x="570" y="684" text-anchor="middle" font-size="11" fill="#f7f7f8">crea servicios via API</text>
+  </g>
+
+  <!-- ===== Relationship lines (dibujadas al final, sobre las cajas) ===== -->
+  <g stroke="#8E8E93" stroke-width="1.6" fill="none" marker-end="url(#arrowC2)">
+    <path d="M174,160 L 150,268"/>
+    <path d="M458,160 L 205,268"/>
+    <path d="M742,160 L 285,268"/>
+    <path d="M1026,160 L 340,268"/>
+
+    <path d="M372,320 L 428,320"/>
+    <path d="M500,372 L 435,418"/>
+    <path d="M640,372 L 705,418"/>
+
+    <path d="M230,522 L 230,606"/>
+    <path d="M570,606 L 570,522"/>
+    <path d="M430,340 C 300,340 250,470 250,606"/>
+  </g>
+  <g font-size="11.5" fill="#48484A">
+    <rect x="60" y="195" width="90" height="15" fill="#ffffff"/>
+    <text x="105" y="206" text-anchor="middle">Usa [HTTPS]</text>
+    <rect x="230" y="210" width="90" height="15" fill="#ffffff"/>
+    <text x="275" y="221" text-anchor="middle">Usa [HTTPS]</text>
+    <rect x="540" y="225" width="90" height="15" fill="#ffffff"/>
+    <text x="585" y="236" text-anchor="middle">Usa [HTTPS]</text>
+    <rect x="870" y="240" width="90" height="15" fill="#ffffff"/>
+    <text x="915" y="251" text-anchor="middle">Usa [HTTPS]</text>
+
+    <rect x="378" y="311" width="112" height="15" fill="#FFF7EA" opacity="0.95"/>
+    <text x="434" y="322" text-anchor="middle" font-size="10">Llama [JSON/HTTPS]</text>
+
+    <rect x="420" y="394" width="100" height="14" fill="#FFF7EA" opacity="0.95"/>
+    <text x="470" y="404" text-anchor="middle" font-size="9.5">Lee/escribe [ORM]</text>
+
+    <rect x="648" y="394" width="105" height="14" fill="#FFF7EA" opacity="0.95"/>
+    <text x="700" y="404" text-anchor="middle" font-size="9.5">Guarda archivos</text>
+
+    <rect x="150" y="555" width="130" height="15" fill="#ffffff"/>
+    <text x="215" y="566" text-anchor="middle">Carga mapas [HTTPS]</text>
+    <rect x="490" y="555" width="160" height="15" fill="#ffffff"/>
+    <text x="570" y="566" text-anchor="middle">Crea servicios [API Key]</text>
+    <rect x="145" y="463" width="105" height="14" fill="#ffffff"/>
+    <text x="197" y="473" text-anchor="middle" font-size="10">Geocoding [HTTPS]</text>
+  </g>
+
+  <!-- ===== Legend ===== -->
+  <g font-size="11" fill="#48484A">
+    <rect x="64" y="732" width="16" height="16" rx="4" fill="#0051D5"/>
+    <text x="86" y="744">Persona</text>
+    <rect x="160" y="732" width="16" height="16" rx="4" fill="#007AFF"/>
+    <text x="182" y="744">Contenedor (en alcance)</text>
+    <rect x="360" y="732" width="16" height="16" rx="4" fill="#98989D"/>
+    <text x="382" y="744">Sistema externo</text>
+  </g>
+</svg>

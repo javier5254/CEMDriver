@@ -1,0 +1,105 @@
+<svg viewBox="0 0 970 760" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <defs>
+    <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="1.5" stdDeviation="2.5" flood-color="#1C1C1E" flood-opacity="0.16"/>
+    </filter>
+    <filter id="shadowSoft" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="1" stdDeviation="4" flood-color="#1C1C1E" flood-opacity="0.10"/>
+    </filter>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="7" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#FF3B30"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="970" height="760" fill="#ffffff"/>
+
+  <!-- Header -->
+  <rect x="40" y="34" width="6" height="34" rx="3" fill="#AF52DE"/>
+  <text x="58" y="58" font-size="24" font-weight="700" fill="#1C1C1E">Casos de uso — Cliente</text>
+  <text x="58" y="78" font-size="13" fill="#8E8E93">CMEDriver v2 · solicitud, seguimiento y chatbot conversacional</text>
+
+  <!-- System boundary -->
+  <rect x="250" y="105" width="650" height="545" rx="18" fill="#FAFBFC" stroke="#E2E5EA" stroke-width="1.5" filter="url(#shadowSoft)"/>
+  <text x="272" y="133" font-size="14.5" font-weight="700" fill="#1C1C1E">Sistema CMEDriver</text>
+  <text x="272" y="150" font-size="11.5" fill="#9AA1AC">App del cliente + WebSockets + chatbot (LLM simulado)</text>
+
+  <!-- ================= ASSOCIATION LINES ================= -->
+  <g stroke="#AEAEB2" stroke-width="1.6" fill="none">
+    <line x1="120" y1="365" x2="305" y2="140"/>
+    <line x1="120" y1="365" x2="305" y2="230"/>
+    <line x1="120" y1="365" x2="305" y2="320"/>
+    <line x1="120" y1="365" x2="305" y2="410"/>
+    <line x1="120" y1="365" x2="305" y2="500"/>
+    <line x1="120" y1="365" x2="300" y2="590"/>
+  </g>
+
+  <!-- ================= INCLUDE / EXTEND ================= -->
+  <!-- include: Planificar recoleccion -> Validar cobertura y leadtime -->
+  <path d="M 555,140 C 590,140 600,140 630,140" stroke="#FF3B30" stroke-width="1.6" fill="none" marker-end="url(#arrow)"/>
+  <rect x="558" y="120" width="72" height="16" rx="8" fill="#ffffff"/>
+  <text x="594" y="132" text-anchor="middle" font-size="11" font-style="italic" fill="#FF3B30">«include»</text>
+
+  <!-- extend: Usar chatbot -> Comprar producto (adjacent rows, same column) -->
+  <path d="M 430,447 C 430,458 430,462 430,473" stroke="#FF3B30" stroke-width="1.6" fill="none" marker-end="url(#arrow)"/>
+  <rect x="446" y="452" width="66" height="16" rx="8" fill="#ffffff"/>
+  <text x="479" y="464" text-anchor="middle" font-size="11" font-style="italic" fill="#FF3B30">«extend»</text>
+
+  <!-- extend: Usar chatbot -> Planificar recoleccion (bows left through the margin, clear of column ellipses) -->
+  <path d="M 305,395 C 245,360 245,220 300,158" stroke="#FF3B30" stroke-width="1.6" fill="none" marker-end="url(#arrow)"/>
+  <rect x="203" y="255" width="66" height="16" rx="8" fill="#ffffff"/>
+  <text x="236" y="267" text-anchor="middle" font-size="11" font-style="italic" fill="#FF3B30">«extend»</text>
+
+  <!-- ================= USE CASES ================= -->
+  <g font-size="14" fill="#1C1C1E" font-weight="600">
+    <ellipse cx="430" cy="140" rx="125" ry="37" fill="#F5EAFC" stroke="#AF52DE" stroke-width="1.75" filter="url(#shadow)"/>
+    <text x="430" y="146" text-anchor="middle">Planificar recoleccion</text>
+
+    <ellipse cx="430" cy="230" rx="125" ry="37" fill="#F5EAFC" stroke="#AF52DE" stroke-width="1.75" filter="url(#shadow)"/>
+    <text x="430" y="225" text-anchor="middle">Ver tracking en</text>
+    <text x="430" y="243" text-anchor="middle">tiempo real</text>
+
+    <ellipse cx="430" cy="320" rx="125" ry="37" fill="#F5EAFC" stroke="#AF52DE" stroke-width="1.75" filter="url(#shadow)"/>
+    <text x="430" y="326" text-anchor="middle">Chatear con motorizado</text>
+
+    <ellipse cx="430" cy="410" rx="125" ry="37" fill="#F5EAFC" stroke="#AF52DE" stroke-width="1.75" filter="url(#shadow)"/>
+    <text x="430" y="405" text-anchor="middle">Usar chatbot</text>
+    <text x="430" y="423" text-anchor="middle" font-size="10.5" font-weight="500" fill="#8944AB">v2 · texto libre, IA simulada</text>
+
+    <ellipse cx="430" cy="500" rx="125" ry="37" fill="#F5EAFC" stroke="#AF52DE" stroke-width="1.75" filter="url(#shadow)"/>
+    <text x="430" y="495" text-anchor="middle">Comprar producto</text>
+    <text x="430" y="513" text-anchor="middle" font-size="10.5" font-weight="500" fill="#8944AB">(crea servicio de entrega)</text>
+
+    <!-- Shared -->
+    <ellipse cx="430" cy="590" rx="135" ry="39" fill="#F2F2F7" stroke="#C7C7CC" stroke-width="1.75" filter="url(#shadow)"/>
+    <text x="430" y="585" text-anchor="middle" fill="#48484A">Recuperar contrasena</text>
+    <text x="430" y="603" text-anchor="middle" font-size="10.5" font-weight="500" fill="#8E8E93">(compartido · los 4 roles)</text>
+
+    <ellipse cx="760" cy="140" rx="125" ry="38" fill="#F2F2F7" stroke="#C7C7CC" stroke-width="1.75" filter="url(#shadow)"/>
+    <text x="760" y="135" text-anchor="middle" fill="#48484A">Validar cobertura</text>
+    <text x="760" y="153" text-anchor="middle" fill="#48484A">y leadtime</text>
+  </g>
+
+  <!-- ================= ACTOR ================= -->
+  <circle cx="120" cy="365" r="46" fill="#F5EAFC" filter="url(#shadowSoft)"/>
+  <g stroke="#8944AB" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <circle cx="120" cy="337" r="13" fill="#ffffff"/>
+    <line x1="120" y1="350" x2="120" y2="381"/>
+    <line x1="99" y1="361" x2="141" y2="361"/>
+    <line x1="120" y1="381" x2="102" y2="407"/>
+    <line x1="120" y1="381" x2="138" y2="407"/>
+  </g>
+  <text x="120" y="437" text-anchor="middle" font-size="15" font-weight="700" fill="#8944AB">Cliente</text>
+  <text x="120" y="454" text-anchor="middle" font-size="11" fill="#8E8E93">(actor principal)</text>
+
+  <!-- ================= LEGEND ================= -->
+  <g font-size="12" fill="#1C1C1E">
+    <rect x="250" y="675" width="16" height="16" rx="4" fill="#F5EAFC" stroke="#AF52DE"/>
+    <text x="273" y="688">Casos de uso — Cliente</text>
+    <rect x="460" y="675" width="16" height="16" rx="4" fill="#F2F2F7" stroke="#C7C7CC"/>
+    <text x="483" y="688" fill="#48484A">Compartido / interno</text>
+    <line x1="660" y1="683" x2="692" y2="683" stroke="#FF3B30" stroke-width="1.6" stroke-dasharray="4 3" marker-end="url(#arrow)"/>
+    <text x="700" y="688" fill="#48484A">«include» / «extend»</text>
+  </g>
+
+  <text x="272" y="668" font-size="11" fill="#9AA1AC">Nota: "Comprar producto" reutiliza el mismo flujo que "Crear servicio" del Alistador, iniciado por el chatbot.</text>
+</svg>

@@ -1,0 +1,24 @@
+# Python / Django
+.venv/
+__pycache__/
+*.pyc
+backend/db.sqlite3
+backend/media/
+backend/staticfiles/
+*.log
+.env
+.env.*
+!.env.example
+
+# Node / Ionic
+node_modules/
+frontend/www/
+frontend/.angular/
+frontend/dist/
+
+# Herramientas locales
+.claude/
+.vscode/
+.idea/
+Thumbs.db
+.DS_Store

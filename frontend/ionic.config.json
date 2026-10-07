@@ -1,0 +1,7 @@
+{
+  "name": "cmedriver-tmp",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}

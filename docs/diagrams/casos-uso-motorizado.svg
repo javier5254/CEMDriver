@@ -1,0 +1,92 @@
+<svg viewBox="0 0 970 720" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <defs>
+    <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="1.5" stdDeviation="2.5" flood-color="#1C1C1E" flood-opacity="0.16"/>
+    </filter>
+    <filter id="shadowSoft" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="1" stdDeviation="4" flood-color="#1C1C1E" flood-opacity="0.10"/>
+    </filter>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="7" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#FF3B30"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="970" height="720" fill="#ffffff"/>
+
+  <!-- Header -->
+  <rect x="40" y="34" width="6" height="34" rx="3" fill="#34C759"/>
+  <text x="58" y="58" font-size="24" font-weight="700" fill="#1C1C1E">Casos de uso — Motorizado</text>
+  <text x="58" y="78" font-size="13" fill="#8E8E93">CMEDriver v2 · ejecucion de servicios en campo</text>
+
+  <!-- System boundary -->
+  <rect x="250" y="105" width="650" height="525" rx="18" fill="#FAFBFC" stroke="#E2E5EA" stroke-width="1.5" filter="url(#shadowSoft)"/>
+  <text x="272" y="133" font-size="14.5" font-weight="700" fill="#1C1C1E">Sistema CMEDriver</text>
+  <text x="272" y="150" font-size="11.5" fill="#9AA1AC">App movil del motorizado + WebSockets en vivo</text>
+
+  <!-- ================= ASSOCIATION LINES ================= -->
+  <g stroke="#AEAEB2" stroke-width="1.6" fill="none">
+    <line x1="120" y1="365" x2="305" y2="140"/>
+    <line x1="120" y1="365" x2="305" y2="230"/>
+    <line x1="120" y1="365" x2="305" y2="320"/>
+    <line x1="120" y1="365" x2="305" y2="410"/>
+    <line x1="120" y1="365" x2="305" y2="500"/>
+    <line x1="120" y1="365" x2="300" y2="590"/>
+  </g>
+
+  <!-- ================= INCLUDE ================= -->
+  <path d="M 555,230 C 590,230 600,230 630,230" stroke="#FF3B30" stroke-width="1.6" fill="none" marker-end="url(#arrow)"/>
+  <rect x="558" y="210" width="72" height="16" rx="8" fill="#ffffff"/>
+  <text x="594" y="222" text-anchor="middle" font-size="11" font-style="italic" fill="#FF3B30">«include»</text>
+
+  <!-- ================= USE CASES ================= -->
+  <g font-size="14" fill="#1C1C1E" font-weight="600">
+    <ellipse cx="430" cy="140" rx="125" ry="37" fill="#E8F9EC" stroke="#34C759" stroke-width="1.75" filter="url(#shadow)"/>
+    <text x="430" y="146" text-anchor="middle">Ver servicios asignados</text>
+
+    <ellipse cx="430" cy="230" rx="125" ry="37" fill="#E8F9EC" stroke="#34C759" stroke-width="1.75" filter="url(#shadow)"/>
+    <text x="430" y="225" text-anchor="middle">Ejecutar servicio</text>
+    <text x="430" y="243" text-anchor="middle" font-size="11">(recibir / transitar / cerrar)</text>
+
+    <ellipse cx="430" cy="320" rx="125" ry="37" fill="#E8F9EC" stroke="#34C759" stroke-width="1.75" filter="url(#shadow)"/>
+    <text x="430" y="315" text-anchor="middle">Registrar novedad</text>
+    <text x="430" y="333" text-anchor="middle" font-size="11">(reintentar / devolver)</text>
+
+    <ellipse cx="430" cy="410" rx="125" ry="37" fill="#E8F9EC" stroke="#34C759" stroke-width="1.75" filter="url(#shadow)"/>
+    <text x="430" y="405" text-anchor="middle">Reportar posicion GPS</text>
+    <text x="430" y="423" text-anchor="middle" font-size="10.5" font-weight="500" fill="#248A3D">en vivo · WebSocket</text>
+
+    <ellipse cx="430" cy="500" rx="125" ry="37" fill="#E8F9EC" stroke="#34C759" stroke-width="1.75" filter="url(#shadow)"/>
+    <text x="430" y="506" text-anchor="middle">Chatear con cliente</text>
+
+    <!-- Shared -->
+    <ellipse cx="430" cy="590" rx="135" ry="39" fill="#F2F2F7" stroke="#C7C7CC" stroke-width="1.75" filter="url(#shadow)"/>
+    <text x="430" y="585" text-anchor="middle" fill="#48484A">Recuperar contrasena</text>
+    <text x="430" y="603" text-anchor="middle" font-size="10.5" font-weight="500" fill="#8E8E93">(compartido · los 4 roles)</text>
+
+    <ellipse cx="760" cy="230" rx="125" ry="38" fill="#F2F2F7" stroke="#C7C7CC" stroke-width="1.75" filter="url(#shadow)"/>
+    <text x="760" y="225" text-anchor="middle" fill="#48484A">Capturar evidencia</text>
+    <text x="760" y="243" text-anchor="middle" fill="#48484A">(foto + firma)</text>
+  </g>
+
+  <!-- ================= ACTOR ================= -->
+  <circle cx="120" cy="365" r="46" fill="#E8F9EC" filter="url(#shadowSoft)"/>
+  <g stroke="#248A3D" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <circle cx="120" cy="337" r="13" fill="#ffffff"/>
+    <line x1="120" y1="350" x2="120" y2="381"/>
+    <line x1="99" y1="361" x2="141" y2="361"/>
+    <line x1="120" y1="381" x2="102" y2="407"/>
+    <line x1="120" y1="381" x2="138" y2="407"/>
+  </g>
+  <text x="120" y="437" text-anchor="middle" font-size="15" font-weight="700" fill="#248A3D">Motorizado</text>
+  <text x="120" y="454" text-anchor="middle" font-size="11" fill="#8E8E93">(actor principal)</text>
+
+  <!-- ================= LEGEND ================= -->
+  <g font-size="12" fill="#1C1C1E">
+    <rect x="250" y="657" width="16" height="16" rx="4" fill="#E8F9EC" stroke="#34C759"/>
+    <text x="273" y="670">Casos de uso — Motorizado</text>
+    <rect x="480" y="657" width="16" height="16" rx="4" fill="#F2F2F7" stroke="#C7C7CC"/>
+    <text x="503" y="670" fill="#48484A">Compartido / interno</text>
+    <line x1="680" y1="665" x2="712" y2="665" stroke="#FF3B30" stroke-width="1.6" stroke-dasharray="4 3" marker-end="url(#arrow)"/>
+    <text x="720" y="670" fill="#48484A">«include»</text>
+  </g>
+</svg>

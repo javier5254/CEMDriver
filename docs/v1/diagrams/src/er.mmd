@@ -1,0 +1,95 @@
+erDiagram
+    USUARIO {
+        int id PK
+        string username
+        string password_hash
+        string nombre
+        string rol
+        string telefono
+        boolean activo
+    }
+
+    COBERTURA {
+        int id PK
+        string zona
+        int leadtime_dias
+        string dias_disponibles
+        time hora_inicio
+        time hora_fin
+    }
+
+    PRODUCTO {
+        int id PK
+        string sku
+        string nombre
+        string descripcion
+        decimal precio
+        int stock
+        string centro_mensajeria
+        boolean disponible_chatbot
+    }
+
+    RUTA {
+        int id PK
+        int motorizado_id FK
+        date fecha
+        string estado
+    }
+
+    SERVICIO {
+        int id PK
+        string tipo
+        int cliente_id FK
+        int producto_id FK
+        string zona
+        string direccion_origen
+        string direccion_destino
+        date fecha_agenda
+        string estado
+        int ruta_id FK
+        datetime creado_en
+    }
+
+    NOVEDAD {
+        int id PK
+        int servicio_id FK
+        string tipo
+        string detalle
+        string accion
+        datetime creado_en
+    }
+
+    EVIDENCIA {
+        int id PK
+        int servicio_id FK
+        string foto_url
+        string firma_url
+        datetime capturado_en
+    }
+
+    POSICION_GPS {
+        int id PK
+        int servicio_id FK
+        int motorizado_id FK
+        decimal lat
+        decimal lng
+        datetime timestamp
+    }
+
+    MENSAJE_CHAT {
+        int id PK
+        int servicio_id FK
+        int autor_id FK
+        string texto
+        datetime enviado_en
+    }
+
+    USUARIO ||--o{ RUTA : "conduce (motorizado)"
+    USUARIO ||--o{ SERVICIO : "solicita (cliente)"
+    RUTA ||--o{ SERVICIO : "agrupa"
+    SERVICIO ||--o| NOVEDAD : "puede tener"
+    SERVICIO ||--o| EVIDENCIA : "genera"
+    SERVICIO ||--o{ POSICION_GPS : "trackea"
+    SERVICIO ||--o{ MENSAJE_CHAT : "conversa"
+    PRODUCTO ||--o{ SERVICIO : "referencia"
+    COBERTURA ||--o{ SERVICIO : "valida zona/leadtime"

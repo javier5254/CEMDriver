@@ -1,0 +1,116 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    :root{
+      --blue:#007AFF; --blue-dark:#0051D5; --blue-bg:#E8F2FF;
+      --bg:#F2F2F7; --surface:#FFFFFF; --border:#E2E5EA;
+      --text:#1C1C1E; --text-2:#8E8E93; --text-3:#9AA1AC;
+      --green:#34C759; --red:#FF3B30; --red-bg:#FDECEA;
+    }
+    *{box-sizing:border-box;}
+    body{margin:0; font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,Helvetica,Arial,sans-serif;}
+    a{color:var(--blue);} a:hover{color:var(--blue-dark);}
+    code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;}
+  </style>
+</helmet>
+
+<div style="width:1200px; height:800px; background:var(--bg); display:flex; flex-direction:column; overflow:hidden;">
+
+  <div style="background:var(--blue); padding:16px 28px; display:flex; align-items:center; justify-content:space-between; flex-shrink:0;">
+    <div style="display:flex; align-items:center; gap:10px;">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="13" height="10"/><path d="M16 10h3.2a1 1 0 0 1 .9.55L22 14v3h-6"/><circle cx="7.5" cy="18.5" r="1.6"/><circle cx="17.5" cy="18.5" r="1.6"/></svg>
+      <div style="color:#fff; font-size:17px; font-weight:700;">CMEDriver <span style="font-weight:400; opacity:.85;">&middot; Admin</span></div>
+    </div>
+    <div style="display:flex; align-items:center; gap:14px;">
+      <div style="color:#fff; font-size:13px; opacity:.9;">Ana Administradora</div>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
+    </div>
+  </div>
+
+  <div style="background:var(--surface); border-bottom:1px solid var(--border); padding:0 28px; display:flex; gap:28px; flex-shrink:0;">
+    <div style="padding:14px 2px; font-size:14px; font-weight:500; color:var(--text-2);">Dashboard</div>
+    <div style="padding:14px 2px; font-size:14px; font-weight:500; color:var(--text-2);">Usuarios</div>
+    <div style="padding:14px 2px; font-size:14px; font-weight:500; color:var(--text-2);">Cobertura</div>
+    <div style="padding:14px 2px; font-size:14px; font-weight:600; color:var(--blue); border-bottom:2px solid var(--blue);">API Keys</div>
+    <div style="padding:14px 2px; font-size:14px; font-weight:500; color:var(--text-2);">Webhooks</div>
+  </div>
+
+  <div style="flex:1; padding:26px 28px; overflow:auto;">
+
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px;">
+      <div>
+        <div style="font-size:22px; font-weight:700; color:var(--text);">API Keys</div>
+        <div style="font-size:13px; color:var(--text-2); max-width:560px; line-height:1.5; margin-top:4px;">
+          Credenciales para que sistemas externos (e-commerce, ERP) creen y consulten servicios via API sin un login humano. Cada llave actua en nombre de un usuario ALISTADOR existente.
+        </div>
+      </div>
+      <div style="background:var(--blue); color:#fff; font-weight:700; font-size:13.5px; padding:11px 18px; border-radius:9px; white-space:nowrap;">+ Nueva API Key</div>
+    </div>
+
+    <div style="margin-top:18px; border:2px solid var(--red); border-radius:10px; padding:16px 18px; background:var(--red-bg);">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+        <div style="font-size:13.5px; font-weight:700; color:var(--text);">Copia esta llave ahora: no se volvera a mostrar.</div>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-2)" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </div>
+      <div style="font-size:13px; color:var(--text); margin:8px 0;">API key para <strong>Tienda XYZ</strong>:</div>
+      <code style="display:block; padding:9px 12px; background:#ffffffaa; border-radius:6px; font-size:12.5px; word-break:break-all;">cme_live_8f2a1c9d4b6e7f30a1c9d4b6e7f30a1c</code>
+      <div style="font-size:12px; color:var(--text-2); margin-top:8px; line-height:1.5;">
+        Envia esta llave en el header <code>X-API-Key</code> de cada peticion. Una vez cierres este aviso, el valor completo no se podra recuperar de nuevo.
+      </div>
+    </div>
+
+    <div style="margin-top:22px; background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:6px 22px;">
+
+      <div style="display:grid; grid-template-columns:1fr 200px 160px auto; gap:14px; align-items:center; padding:16px 4px; border-bottom:1px solid var(--border);">
+        <div>
+          <div style="font-size:14px; font-weight:700; color:var(--text);">Tienda XYZ</div>
+          <div style="font-size:12px; color:var(--text-2);">Prefijo: <code>cme_live_8f2a</code>... &middot; Actua como: Luis Alistador (alistador1)</div>
+        </div>
+        <div style="font-size:12px; color:var(--text-2);">Creada: hoy, 10:32 a.m.<br>Ultimo uso: nunca</div>
+        <div><span style="background:var(--green); color:#fff; font-size:11px; font-weight:700; padding:5px 11px; border-radius:99px;">Activa</span></div>
+        <div style="display:flex; gap:6px; justify-content:flex-end;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-2)" stroke-width="1.8"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="1.8"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m2 0v14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V6"/></svg>
+        </div>
+      </div>
+
+      <div style="display:grid; grid-template-columns:1fr 200px 160px auto; gap:14px; align-items:center; padding:16px 4px; border-bottom:1px solid var(--border);">
+        <div>
+          <div style="font-size:14px; font-weight:700; color:var(--text);">ERP Bodega Norte</div>
+          <div style="font-size:12px; color:var(--text-2);">Prefijo: <code>cme_live_a91b</code>... &middot; Actua como: Luis Alistador (alistador1)</div>
+        </div>
+        <div style="font-size:12px; color:var(--text-2);">Creada: 3 sep 2026<br>Ultimo uso: hace 2 horas</div>
+        <div><span style="background:var(--green); color:#fff; font-size:11px; font-weight:700; padding:5px 11px; border-radius:99px;">Activa</span></div>
+        <div style="display:flex; gap:6px; justify-content:flex-end;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-2)" stroke-width="1.8"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="1.8"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m2 0v14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V6"/></svg>
+        </div>
+      </div>
+
+      <div style="display:grid; grid-template-columns:1fr 200px 160px auto; gap:14px; align-items:center; padding:16px 4px;">
+        <div>
+          <div style="font-size:14px; font-weight:700; color:var(--text-2);">Integracion piloto (descontinuada)</div>
+          <div style="font-size:12px; color:var(--text-2);">Prefijo: <code>cme_live_5c02</code>... &middot; Actua como: Luis Alistador (alistador1)</div>
+        </div>
+        <div style="font-size:12px; color:var(--text-2);">Creada: 12 ago 2026<br>Ultimo uso: hace 3 semanas</div>
+        <div><span style="background:var(--text-3); color:#fff; font-size:11px; font-weight:700; padding:5px 11px; border-radius:99px;">Inactiva</span></div>
+        <div style="display:flex; gap:6px; justify-content:flex-end;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-2)" stroke-width="1.8"><path d="M6 4l12 8-12 8V4z"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="1.8"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m2 0v14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V6"/></svg>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

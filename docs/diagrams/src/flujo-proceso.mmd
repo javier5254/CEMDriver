@@ -1,0 +1,47 @@
+flowchart TD
+    Start([Inicio]) --> Origen{Quien origina<br/>el servicio?}
+    Origen -->|Alistador crea manual| Crear[Alistador crea servicio]
+    Origen -->|Cliente planifica| Planifica[Cliente planifica recoleccion]
+    Origen -->|Sistema externo| API[Sistema externo crea via API]
+
+    Planifica --> Valida{Fecha respeta<br/>leadtime y dia<br/>habil de la zona?}
+    Valida -->|No| Rechazo[Se rechaza la solicitud]
+    Valida -->|Si| Crear
+
+    API --> Crear
+
+    Crear --> Tipo{Tipo de<br/>servicio?}
+
+    Tipo -->|ENTREGA| AsignaE[Alistador asigna a ruta]
+    Tipo -->|RECOLECCION| AsignaR[Alistador asigna a ruta]
+
+    AsignaE --> Centro[Motorizado recibe<br/>en centro de mensajeria]
+    Centro --> TransitoE[Motorizado inicia transito]
+
+    AsignaR --> TransitoR[Motorizado inicia transito<br/>hacia direccion del cliente]
+
+    TransitoE --> NovedadE{Hubo novedad<br/>en la entrega?}
+    TransitoR --> NovedadR{Hubo novedad<br/>en la recoleccion?}
+
+    NovedadE -->|Si| RegistraE[Registrar novedad]
+    NovedadE -->|No| Entrega[Confirmar entrega]
+
+    NovedadR -->|Si| RegistraR[Registrar novedad]
+    NovedadR -->|No| Evidencia[Capturar foto + firma]
+
+    RegistraE --> AccionE{Accion?}
+    AccionE -->|Reintentar| TransitoE
+    AccionE -->|Devolver a centro| Devuelto([Servicio devuelto])
+
+    RegistraR --> AccionR{Accion?}
+    AccionR -->|Reintentar| TransitoR
+    AccionR -->|Devolver a centro| Devuelto
+
+    Evidencia --> Cierre[Cerrar como RECOLECTADO]
+
+    Entrega --> FinE([Servicio ENTREGADO])
+    Cierre --> FinR([Servicio RECOLECTADO])
+
+    FinE --> Notifica[Cliente ve estado final<br/>via tracking]
+    FinR --> Notifica
+    Devuelto --> Notifica

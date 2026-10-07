@@ -1,0 +1,220 @@
+classDiagram
+    class Usuario {
+        +int id
+        +string username
+        +string password_hash
+        +string nombre
+        +string rol
+        +string telefono
+        +string email
+        +bool is_active
+        +set_password(password)
+        +check_password(password)
+    }
+
+    class Cobertura {
+        +int id
+        +string zona
+        +int leadtime_dias
+        +string dias_disponibles
+        +time hora_inicio
+        +time hora_fin
+        +dias_codigos() List~string~
+    }
+
+    class Producto {
+        +int id
+        +string sku
+        +string nombre
+        +string descripcion
+        +decimal precio
+        +int stock
+        +string centro_mensajeria
+        +bool disponible_chatbot
+    }
+
+    class Ruta {
+        +int id
+        +date fecha
+        +string estado
+    }
+
+    class Servicio {
+        +int id
+        +string tipo
+        +string zona
+        +string direccion_origen
+        +string direccion_destino
+        +date fecha_agenda
+        +string estado
+        +datetime creado_en
+        +asignarRuta(ruta)
+        +recibirEnCentro()
+        +iniciarTransito()
+        +cerrar(foto, firma)
+        +registrarNovedad(tipo, detalle, accion)
+    }
+
+    class Evidencia {
+        +int id
+        +file foto
+        +file firma
+        +datetime capturado_en
+    }
+
+    class Novedad {
+        +int id
+        +string tipo
+        +string detalle
+        +string accion
+        +datetime creado_en
+    }
+
+    class MensajeChat {
+        +int id
+        +string texto
+        +datetime enviado_en
+    }
+
+    class PosicionGPS {
+        +int id
+        +decimal lat
+        +decimal lng
+        +datetime timestamp
+    }
+
+    class ServicioProducto {
+        +int id
+        +int cantidad
+    }
+
+    class PuntoGeocodificado {
+        +int id
+        +decimal lat
+        +decimal lng
+        +string direccion_geocodificada
+        +datetime creado_en
+    }
+
+    class Conversacion {
+        +int id
+        +json contexto
+        +datetime creado_en
+    }
+
+    class MensajeBot {
+        +int id
+        +string autor
+        +string texto
+        +json function_call
+        +datetime creado_en
+    }
+
+    class MockLLMClient {
+        <<simulado>>
+        +responder(historial, mensaje_nuevo) dict
+    }
+
+    class Pago {
+        +int id
+        +decimal monto
+        +string estado
+        +string proveedor
+        +string referencia
+        +datetime creado_en
+    }
+
+    class MockPaymentProvider {
+        <<simulado>>
+        +procesar(pago) Pago
+    }
+
+    class ApiKey {
+        +int id
+        +string nombre
+        +string key_hash
+        +string prefix
+        +bool activa
+        +datetime ultimo_uso
+        +generar(nombre, actua_como)$ tuple
+    }
+
+    class WebhookEndpoint {
+        +int id
+        +string nombre
+        +string url
+        +string secret
+        +string eventos
+        +bool activo
+        +suscrito_a(evento) bool
+    }
+
+    class WebhookDelivery {
+        +int id
+        +string evento
+        +json payload
+        +int status_code
+        +bool exito
+        +string error
+    }
+
+    class EstadoPago {
+        <<enumeration>>
+        PENDIENTE
+        APROBADO
+        RECHAZADO
+    }
+
+    class Rol {
+        <<enumeration>>
+        ADMIN
+        ALISTADOR
+        MOTORIZADO
+        CLIENTE
+    }
+
+    class TipoServicio {
+        <<enumeration>>
+        ENTREGA
+        RECOLECCION
+    }
+
+    class EstadoServicio {
+        <<enumeration>>
+        CREADO
+        ASIGNADO
+        RECIBIDO_CENTRO
+        EN_TRANSITO
+        ENTREGADO
+        RECOLECTADO
+        NOVEDAD
+        DEVUELTO
+    }
+
+    Usuario "1" --> "1" Rol : tiene
+    Usuario "1" --> "0..*" Ruta : conduce (motorizado)
+    Usuario "1" --> "0..*" Servicio : solicita (cliente)
+    Usuario "1" --> "0..*" MensajeChat : autor
+    Usuario "1" --> "0..*" PosicionGPS : reporta (motorizado)
+
+    Ruta "1" --> "0..*" Servicio : agrupa
+    Servicio "1" --> "1" TipoServicio : tiene
+    Servicio "1" --> "1" EstadoServicio : tiene
+    Servicio "1" --> "0..1" Evidencia : genera
+    Servicio "1" --> "0..*" Novedad : registra
+    Servicio "1" --> "0..*" MensajeChat : contiene
+    Servicio "1" --> "0..*" PosicionGPS : trackea
+    Servicio "0..*" --> "0..1" Producto : referencia
+    Servicio "0..*" --> "1" Cobertura : valida contra
+    Servicio "1" --> "0..*" ServicioProducto : tiene lineas
+    Producto "1" --> "0..*" ServicioProducto : aparece en
+    Servicio "1" --> "0..1" PuntoGeocodificado : cache geocoding
+    Usuario "1" --> "0..*" Conversacion : conversa (cliente)
+    Conversacion "1" --> "0..*" MensajeBot : contiene
+    Conversacion "1" --> "1" MockLLMClient : usa
+    Usuario "1" --> "0..*" Pago : paga (cliente)
+    Servicio "1" --> "0..1" Pago : genera
+    Pago "1" --> "1" EstadoPago : tiene
+    Pago "1" --> "1" MockPaymentProvider : procesado por
+    Usuario "1" --> "0..*" ApiKey : actua_como (alistador)
+    WebhookEndpoint "1" --> "0..*" WebhookDelivery : registra
