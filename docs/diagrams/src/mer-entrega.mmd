@@ -21,17 +21,6 @@ erDiagram
         time hora_fin "def 18:00"
     }
 
-    PRODUCTO {
-        int id PK
-        varchar sku UK "50"
-        varchar nombre "150"
-        text descripcion "opcional"
-        decimal precio "12,2"
-        int stock "positivo"
-        varchar centro_mensajeria "100"
-        boolean disponible_chatbot
-    }
-
     RUTA {
         int id PK
         int motorizado_id FK "Usuario rol MOTORIZADO"
@@ -43,7 +32,6 @@ erDiagram
         int id PK
         varchar tipo "ENTREGA | RECOLECCION"
         int cliente_id FK "Usuario rol CLIENTE"
-        int producto_id FK "nulo"
         int ruta_id FK "nulo"
         int creado_por_id FK "nulo"
         varchar zona "100, valida contra Cobertura"
@@ -52,13 +40,6 @@ erDiagram
         date fecha_agenda
         varchar estado "8 estados, def CREADO"
         datetime creado_en
-    }
-
-    SERVICIO_PRODUCTO {
-        int id PK
-        int servicio_id FK "UK compuesta"
-        int producto_id FK "UK compuesta"
-        int cantidad "positivo, def 1"
     }
 
     EVIDENCIA {
@@ -104,35 +85,6 @@ erDiagram
         datetime creado_en
     }
 
-    CONVERSACION {
-        int id PK
-        int cliente_id FK "Usuario rol CLIENTE"
-        json contexto "slot-filling"
-        datetime creado_en
-    }
-
-    MENSAJE_BOT {
-        int id PK
-        int conversacion_id FK
-        varchar autor "CLIENTE | BOT"
-        text texto
-        json function_call "nulo, tool invocada"
-        datetime creado_en
-    }
-
-    PAGO {
-        int id PK
-        int cliente_id FK "Usuario rol CLIENTE"
-        int servicio_id FK "nulo"
-        int producto_id FK "nulo"
-        decimal monto "12,2"
-        varchar estado "PENDIENTE | APROBADO | RECHAZADO"
-        varchar proveedor "def MOCK"
-        varchar referencia UK "uuid4 hex"
-        datetime creado_en
-        datetime actualizado_en
-    }
-
     API_KEY {
         int id PK
         varchar nombre "150"
@@ -169,10 +121,7 @@ erDiagram
     USUARIO ||--o{ SERVICIO : "solicita"
     USUARIO |o--o{ SERVICIO : "registra"
     RUTA |o--o{ SERVICIO : "agrupa"
-    PRODUCTO |o--o{ SERVICIO : "es objeto de"
     COBERTURA |o..o{ SERVICIO : "habilita zona (logica)"
-    SERVICIO ||--o{ SERVICIO_PRODUCTO : "se detalla en"
-    PRODUCTO ||--o{ SERVICIO_PRODUCTO : "aparece en"
     SERVICIO ||--o| EVIDENCIA : "se respalda con"
     SERVICIO ||--o{ NOVEDAD : "registra"
     SERVICIO ||--o{ MENSAJE_CHAT : "contiene"
@@ -180,10 +129,5 @@ erDiagram
     SERVICIO ||--o{ POSICION_GPS : "se rastrea con"
     USUARIO ||--o{ POSICION_GPS : "reporta"
     SERVICIO ||--o| PUNTO_GEOCODIFICADO : "se ubica en"
-    USUARIO ||--o{ CONVERSACION : "inicia"
-    CONVERSACION ||--o{ MENSAJE_BOT : "contiene"
-    USUARIO ||--o{ PAGO : "realiza"
-    SERVICIO |o--o{ PAGO : "se cobra con"
-    PRODUCTO |o--o{ PAGO : "se paga en"
     USUARIO ||--o{ API_KEY : "es representado por"
     WEBHOOK_ENDPOINT ||--o{ WEBHOOK_DELIVERY : "registra intentos"

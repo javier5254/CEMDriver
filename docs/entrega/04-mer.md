@@ -1,8 +1,10 @@
 # 4. Modelo Entidad-Relación (MER)
 
-> **Fuente de verdad:** los `models.py` de las 9 apps del backend (`accounts`, `coverage`, `inventory`, `services`, `tracking`, `optimization`, `chatbot`, `payments`, `integrations`) y sus migraciones (`0001_initial` de cada app, más `accounts/0002_alter_usuario_email` y `services/0002_servicioproducto`). El diagrama y el diccionario reflejan el estado actual del código, no el diseño inicial.
+> **Fuente de verdad:** los `models.py` de las 6 apps del backend (`accounts`, `coverage`, `services`, `tracking`, `optimization`, `integrations`) y sus migraciones (`0001_initial` de cada app, más `accounts/0002_alter_usuario_email`). El diagrama y el diccionario reflejan el estado actual del código, no el diseño inicial. Se comprobó (2026-10-09) que `makemigrations --check` no detecta diferencias entre los modelos y las migraciones.
 >
-> **Referencias de requerimientos:** los IDs RF-xx / RNF-xx / RN-xx usados aquí son los de [01-requerimientos.md](01-requerimientos.md), que conserva sin renumerar los de [docs/13-rf-rnf-completos.md](../13-rf-rnf-completos.md) (RF-01…RF-27, RNF-01…RNF-13, RN-01…RN-08) y añade los nuevos al final (RF-28, RF-29, RNF-14…RNF-20, RN-09…RN-19). La relación entidad ↔ RF completa está en [07-trazabilidad.md](07-trazabilidad.md) §c (17/17 entidades usadas por al menos un RF).
+> **Alcance:** el MER tiene **12 entidades**. El 2026-10-09 el autor retiró del proyecto el inventario, los pagos y el chatbot (5 entidades y 3 apps); el chat queda solo para la comunicación cliente-motorizado. Ver [§4.5](#45-cambios-de-alcance).
+>
+> **Referencias de requerimientos:** los IDs RF-xx / RNF-xx / RN-xx usados aquí son los de [01-requerimientos.md](01-requerimientos.md), que conserva sin renumerar los de [docs/13-rf-rnf-completos.md](../13-rf-rnf-completos.md) (RF-01…RF-27, RNF-01…RNF-13, RN-01…RN-08) y añade los nuevos al final (RF-28, RF-29, RNF-14…RNF-20, RN-09…RN-19). Los IDs retirados por el cambio de alcance (RF-04, RF-18, RF-22, RF-23, RF-26, RN-04, RN-06 y RN-16) ya no justifican ninguna entidad. La relación entidad ↔ RF completa está en [07-trazabilidad.md](07-trazabilidad.md) §c (12/12 entidades usadas por al menos un RF).
 
 ## 4.1 Diagrama
 
@@ -36,17 +38,6 @@ erDiagram
         time hora_fin "def 18:00"
     }
 
-    PRODUCTO {
-        int id PK
-        varchar sku UK "50"
-        varchar nombre "150"
-        text descripcion "opcional"
-        decimal precio "12,2"
-        int stock "positivo"
-        varchar centro_mensajeria "100"
-        boolean disponible_chatbot
-    }
-
     RUTA {
         int id PK
         int motorizado_id FK "Usuario rol MOTORIZADO"
@@ -58,7 +49,6 @@ erDiagram
         int id PK
         varchar tipo "ENTREGA | RECOLECCION"
         int cliente_id FK "Usuario rol CLIENTE"
-        int producto_id FK "nulo"
         int ruta_id FK "nulo"
         int creado_por_id FK "nulo"
         varchar zona "100, valida contra Cobertura"
@@ -67,13 +57,6 @@ erDiagram
         date fecha_agenda
         varchar estado "8 estados, def CREADO"
         datetime creado_en
-    }
-
-    SERVICIO_PRODUCTO {
-        int id PK
-        int servicio_id FK "UK compuesta"
-        int producto_id FK "UK compuesta"
-        int cantidad "positivo, def 1"
     }
 
     EVIDENCIA {
@@ -119,35 +102,6 @@ erDiagram
         datetime creado_en
     }
 
-    CONVERSACION {
-        int id PK
-        int cliente_id FK "Usuario rol CLIENTE"
-        json contexto "slot-filling"
-        datetime creado_en
-    }
-
-    MENSAJE_BOT {
-        int id PK
-        int conversacion_id FK
-        varchar autor "CLIENTE | BOT"
-        text texto
-        json function_call "nulo, tool invocada"
-        datetime creado_en
-    }
-
-    PAGO {
-        int id PK
-        int cliente_id FK "Usuario rol CLIENTE"
-        int servicio_id FK "nulo"
-        int producto_id FK "nulo"
-        decimal monto "12,2"
-        varchar estado "PENDIENTE | APROBADO | RECHAZADO"
-        varchar proveedor "def MOCK"
-        varchar referencia UK "uuid4 hex"
-        datetime creado_en
-        datetime actualizado_en
-    }
-
     API_KEY {
         int id PK
         varchar nombre "150"
@@ -184,10 +138,7 @@ erDiagram
     USUARIO ||--o{ SERVICIO : "solicita"
     USUARIO |o--o{ SERVICIO : "registra"
     RUTA |o--o{ SERVICIO : "agrupa"
-    PRODUCTO |o--o{ SERVICIO : "es objeto de"
     COBERTURA |o..o{ SERVICIO : "habilita zona (logica)"
-    SERVICIO ||--o{ SERVICIO_PRODUCTO : "se detalla en"
-    PRODUCTO ||--o{ SERVICIO_PRODUCTO : "aparece en"
     SERVICIO ||--o| EVIDENCIA : "se respalda con"
     SERVICIO ||--o{ NOVEDAD : "registra"
     SERVICIO ||--o{ MENSAJE_CHAT : "contiene"
@@ -195,11 +146,6 @@ erDiagram
     SERVICIO ||--o{ POSICION_GPS : "se rastrea con"
     USUARIO ||--o{ POSICION_GPS : "reporta"
     SERVICIO ||--o| PUNTO_GEOCODIFICADO : "se ubica en"
-    USUARIO ||--o{ CONVERSACION : "inicia"
-    CONVERSACION ||--o{ MENSAJE_BOT : "contiene"
-    USUARIO ||--o{ PAGO : "realiza"
-    SERVICIO |o--o{ PAGO : "se cobra con"
-    PRODUCTO |o--o{ PAGO : "se paga en"
     USUARIO ||--o{ API_KEY : "es representado por"
     WEBHOOK_ENDPOINT ||--o{ WEBHOOK_DELIVERY : "registra intentos"
 ```
@@ -210,13 +156,12 @@ erDiagram
 |---|---|---|
 | accounts | USUARIO | `accounts_usuario` |
 | coverage | COBERTURA | `coverage_cobertura` |
-| inventory | PRODUCTO | `inventory_producto` |
-| services | RUTA, SERVICIO, SERVICIO_PRODUCTO, EVIDENCIA, NOVEDAD, MENSAJE_CHAT | `services_*` |
+| services | RUTA, SERVICIO, EVIDENCIA, NOVEDAD, MENSAJE_CHAT | `services_*` |
 | tracking | POSICION_GPS | `tracking_posiciongps` |
 | optimization | PUNTO_GEOCODIFICADO | `optimization_puntogeocodificado` |
-| chatbot | CONVERSACION, MENSAJE_BOT | `chatbot_*` |
-| payments | PAGO | `payments_pago` |
 | integrations | API_KEY, WEBHOOK_ENDPOINT, WEBHOOK_DELIVERY | `integrations_*` |
+
+Total: 6 apps y 12 entidades (USUARIO, COBERTURA, RUTA, SERVICIO, EVIDENCIA, NOVEDAD, MENSAJE_CHAT, POSICION_GPS, PUNTO_GEOCODIFICADO, API_KEY, WEBHOOK_ENDPOINT, WEBHOOK_DELIVERY).
 
 Se excluyen las tablas internas de Django (`auth_group`, `auth_permission`, `django_session`, `django_content_type`, `django_admin_log`, tablas M2M `usuario_groups` / `usuario_user_permissions`) porque el dominio no las usa: la autorización se resuelve con el campo `Usuario.rol` (RBAC propio), no con grupos ni permisos de Django.
 
@@ -245,7 +190,7 @@ Todas las entidades tienen `id` como PK autoincremental (`BigAutoField`). Column
 
 ### COBERTURA (`coverage.Cobertura`)
 
-**Requerimiento que la justifica:** RF-02 (matriz de cobertura), RF-17 y RF-22 (validación de leadtime/día al planificar), RN-03.
+**Requerimiento que la justifica:** RF-02 (matriz de cobertura), RF-17 (validación de leadtime y día al planificar), RN-03, RN-15.
 
 | Atributo | Tipo | PK/FK/UK | Nulo | Descripción |
 |---|---|---|---|---|
@@ -255,21 +200,6 @@ Todas las entidades tienen `id` como PK autoincremental (`BigAutoField`). Column
 | dias_disponibles | varchar(40) | | No | Códigos de día separados por coma (`LUN,MAR,...,DOM`), def. `LUN,MAR,MIE,JUE,VIE` |
 | hora_inicio | time | | No | Inicio de la franja de atención (def. 08:00) |
 | hora_fin | time | | No | Fin de la franja de atención (def. 18:00) |
-
-### PRODUCTO (`inventory.Producto`)
-
-**Requerimiento que la justifica:** RF-04 (inventario), RF-18 / RF-22 (catálogo del chatbot), RF-23 (pago), RF-26 (multi-producto), RN-04.
-
-| Atributo | Tipo | PK/FK/UK | Nulo | Descripción |
-|---|---|---|---|---|
-| id | bigint | PK | No | Identificador |
-| sku | varchar(50) | UK | No | Código único del producto |
-| nombre | varchar(150) | | No | Nombre comercial |
-| descripcion | text | | Vacío | Descripción |
-| precio | decimal(12,2) | | No | Precio unitario (def. 0); fija el `monto` del pago por chatbot |
-| stock | int positivo | | No | Unidades disponibles (def. 0) |
-| centro_mensajeria | varchar(100) | | No | Centro donde está almacenado |
-| disponible_chatbot | boolean | | No | Si se ofrece en el chatbot (def. `false`) |
 
 ### RUTA (`services.Ruta`)
 
@@ -284,37 +214,25 @@ Todas las entidades tienen `id` como PK autoincremental (`BigAutoField`). Column
 
 ### SERVICIO (`services.Servicio`) — entidad central
 
-**Requerimiento que la justifica:** RF-03, RF-05, RF-06, RF-07, RF-08, RF-09, RF-10, RF-11, RF-12, RF-13, RF-17, RF-23 (la compra por chatbot crea una ENTREGA).
+**Requerimiento que la justifica:** RF-03, RF-05, RF-06, RF-07, RF-08, RF-09, RF-10, RF-11, RF-12, RF-13, RF-17; reglas RN-01, RN-09, RN-10, RN-13.
 
 | Atributo | Tipo | PK/FK/UK | Nulo | Descripción |
 |---|---|---|---|---|
 | id | bigint | PK | No | Identificador |
 | tipo | varchar(20) | | No | `ENTREGA` o `RECOLECCION` |
 | cliente_id | bigint | FK → USUARIO | No | Cliente dueño del servicio (`rol=CLIENTE`) |
-| producto_id | bigint | FK → PRODUCTO | Sí | Producto principal (flujo simple de un producto) |
 | ruta_id | bigint | FK → RUTA | Sí | Ruta asignada; nulo hasta `asignar-ruta` |
-| creado_por_id | bigint | FK → USUARIO | Sí | Usuario que lo registró (alistador o el usuario de la API key); nulo si lo crea el cliente/chatbot |
+| creado_por_id | bigint | FK → USUARIO | Sí | Usuario que lo registró (alistador o el usuario de la API key); nulo si lo crea el propio cliente con `planificar` |
 | zona | varchar(100) | | No | Zona del servicio; debe existir en COBERTURA al planificar |
-| direccion_origen | varchar(255) | | Vacío | Dirección de recogida (obligatoria si `RECOLECCION`) |
+| direccion_origen | varchar(255) | | Vacío | Dirección de recogida (obligatoria si `RECOLECCION` al crear con `POST /servicios/`; ver 4.4.6) |
 | direccion_destino | varchar(255) | | Vacío | Dirección de entrega (obligatoria si `ENTREGA`) |
 | fecha_agenda | date | | No | Fecha programada |
 | estado | varchar(20) | | No | Ver máquina de estados en 4.4.2 (def. `CREADO`) |
 | creado_en | datetime | | No | `auto_now_add`; orden por defecto descendente |
 
-### SERVICIO_PRODUCTO (`services.ServicioProducto`)
-
-**Requerimiento que la justifica:** RF-26 (multi-producto por servicio), RN-06. Resuelve la relación N:M entre SERVICIO y PRODUCTO con el atributo `cantidad`.
-
-| Atributo | Tipo | PK/FK/UK | Nulo | Descripción |
-|---|---|---|---|---|
-| id | bigint | PK | No | Identificador |
-| servicio_id | bigint | FK → SERVICIO, UK(servicio, producto) | No | Servicio al que pertenece la línea |
-| producto_id | bigint | FK → PRODUCTO, UK(servicio, producto) | No | Producto de la línea |
-| cantidad | int positivo | | No | Unidades (def. 1; el serializer exige ≥ 1) |
-
 ### EVIDENCIA (`services.Evidencia`)
 
-**Requerimiento que la justifica:** RF-11 (foto y firma en recolección), RN-02.
+**Requerimiento que la justifica:** RF-11 (foto y firma en recolección), RN-02, RN-17.
 
 | Atributo | Tipo | PK/FK/UK | Nulo | Descripción |
 |---|---|---|---|---|
@@ -339,13 +257,13 @@ Todas las entidades tienen `id` como PK autoincremental (`BigAutoField`). Column
 
 ### MENSAJE_CHAT (`services.MensajeChat`)
 
-**Requerimiento que la justifica:** RF-16 (chat cliente-motorizado), RF-27 (tiempo real).
+**Requerimiento que la justifica:** RF-16 (chat cliente-motorizado), RF-27 (tiempo real). Es la única mensajería del sistema: el chat siempre pertenece a un servicio y sirve para que el cliente y el motorizado se comuniquen; no hay conversaciones con un asistente automático.
 
 | Atributo | Tipo | PK/FK/UK | Nulo | Descripción |
 |---|---|---|---|---|
 | id | bigint | PK | No | Identificador |
 | servicio_id | bigint | FK → SERVICIO | No | Servicio al que pertenece la conversación |
-| autor_id | bigint | FK → USUARIO | No | Quién escribe (cliente dueño, motorizado asignado, admin o alistador) |
+| autor_id | bigint | FK → USUARIO | No | Quién escribe: el cliente dueño o el motorizado asignado (el código admite además ADMIN y ALISTADOR, ver 4.4.6) |
 | texto | varchar(1000) | | No | Contenido |
 | enviado_en | datetime | | No | `auto_now_add`; orden ascendente |
 
@@ -374,47 +292,6 @@ Todas las entidades tienen `id` como PK autoincremental (`BigAutoField`). Column
 | lng | decimal(9,6) | | No | Longitud geocodificada |
 | direccion_geocodificada | varchar(255) | | No | Dirección consultada |
 | creado_en | datetime | | No | `auto_now_add` |
-
-### CONVERSACION (`chatbot.Conversacion`)
-
-**Requerimiento que la justifica:** RF-18 (chatbot guiado), RF-22 (chatbot en lenguaje libre, multi-turno).
-
-| Atributo | Tipo | PK/FK/UK | Nulo | Descripción |
-|---|---|---|---|---|
-| id | bigint | PK | No | Identificador |
-| cliente_id | bigint | FK → USUARIO | No | Cliente que conversa (`rol=CLIENTE`) |
-| contexto | json | | No (def. `{}`) | Estado de *slot-filling* entre turnos (intención, producto, zona, fecha pendientes) |
-| creado_en | datetime | | No | `auto_now_add` |
-
-### MENSAJE_BOT (`chatbot.MensajeBot`)
-
-**Requerimiento que la justifica:** RF-22, RNF-13 (LLM simulado intercambiable).
-
-| Atributo | Tipo | PK/FK/UK | Nulo | Descripción |
-|---|---|---|---|---|
-| id | bigint | PK | No | Identificador |
-| conversacion_id | bigint | FK → CONVERSACION | No | Conversación a la que pertenece |
-| autor | varchar(10) | | No | `CLIENTE` o `BOT` |
-| texto | text | | No | Contenido |
-| function_call | json | | Sí | Herramienta invocada por el bot: `{tool, args, result}` (solo autor `BOT`) |
-| creado_en | datetime | | No | `auto_now_add`; orden ascendente |
-
-### PAGO (`payments.Pago`)
-
-**Requerimiento que la justifica:** RF-23 (pago al comprar por chatbot), RNF-13 (proveedor simulado).
-
-| Atributo | Tipo | PK/FK/UK | Nulo | Descripción |
-|---|---|---|---|---|
-| id | bigint | PK | No | Identificador |
-| cliente_id | bigint | FK → USUARIO | No | Cliente que paga (`rol=CLIENTE`) |
-| servicio_id | bigint | FK → SERVICIO | Sí | Servicio de ENTREGA generado por la compra |
-| producto_id | bigint | FK → PRODUCTO | Sí | Producto comprado |
-| monto | decimal(12,2) | | No | Valor cobrado (= `Producto.precio` al comprar) |
-| estado | varchar(20) | | No | `PENDIENTE` (def.), `APROBADO`, `RECHAZADO` |
-| proveedor | varchar(50) | | No | Pasarela usada (def. `MOCK`) |
-| referencia | varchar(64) | UK | No | Referencia única autogenerada (`uuid4().hex`) |
-| creado_en | datetime | | No | `auto_now_add` |
-| actualizado_en | datetime | | No | `auto_now` (cambia al procesar el pago) |
 
 ### API_KEY (`integrations.ApiKey`)
 
@@ -466,12 +343,9 @@ Todas las entidades tienen `id` como PK autoincremental (`BigAutoField`). Column
 |---|---|---|---|---|---|---|
 | USUARIO (motorizado) | conduce | RUTA | 1 : 0..N | `ruta.motorizado_id` | PROTECT | Un motorizado tiene varias rutas en el tiempo; no se puede borrar un motorizado con rutas históricas (se desactiva con `is_active`) |
 | USUARIO (cliente) | solicita | SERVICIO | 1 : 0..N | `servicio.cliente_id` | PROTECT | Todo servicio pertenece a un cliente; se protege el historial de servicios |
-| USUARIO | registra | SERVICIO | 0..1 : 0..N | `servicio.creado_por_id` | SET_NULL | Trazabilidad de quién creó el servicio; opcional (el cliente/chatbot no lo llenan) y no debe bloquear el borrado del usuario |
+| USUARIO | registra | SERVICIO | 0..1 : 0..N | `servicio.creado_por_id` | SET_NULL | Trazabilidad de quién creó el servicio; opcional (el cliente que usa `planificar` no lo llena) y no debe bloquear el borrado del usuario |
 | RUTA | agrupa | SERVICIO | 0..1 : 0..N | `servicio.ruta_id` | SET_NULL | Un servicio se asigna como máximo a una ruta; si la ruta se elimina el servicio queda sin asignar |
-| PRODUCTO | es objeto de | SERVICIO | 0..1 : 0..N | `servicio.producto_id` | SET_NULL | Producto principal opcional (una recolección puede no tener producto); borrar un producto no elimina servicios |
-| COBERTURA | habilita zona (lógica) | SERVICIO | 0..1 : 0..N | — (sin FK; `Servicio.zona` = `Cobertura.zona`) | — | La coherencia se valida en `/servicios/planificar/` y en el chatbot; no hay FK para no romper servicios si se reconfigura la matriz |
-| SERVICIO | se detalla en | SERVICIO_PRODUCTO | 1 : 0..N | `servicioproducto.servicio_id` | CASCADE | Las líneas son parte del servicio; mueren con él |
-| PRODUCTO | aparece en | SERVICIO_PRODUCTO | 1 : 0..N | `servicioproducto.producto_id` | PROTECT | No se puede borrar un producto que figura en líneas de servicio |
+| COBERTURA | habilita zona (lógica) | SERVICIO | 0..1 : 0..N | — (sin FK; `Servicio.zona` = `Cobertura.zona`) | — | La coherencia se valida en `/servicios/planificar/`; no hay FK para no romper servicios si se reconfigura la matriz |
 | SERVICIO | se respalda con | EVIDENCIA | 1 : 0..1 | `evidencia.servicio_id` (OneToOne) | CASCADE | Una sola evidencia (foto + firma) por servicio de recolección; `update_or_create` la reemplaza |
 | SERVICIO | registra | NOVEDAD | 1 : 0..N | `novedad.servicio_id` | CASCADE | Un servicio puede tener varias novedades (reintentos) a lo largo de su vida |
 | SERVICIO | contiene | MENSAJE_CHAT | 1 : 0..N | `mensajechat.servicio_id` | CASCADE | El chat está acotado al servicio |
@@ -479,13 +353,10 @@ Todas las entidades tienen `id` como PK autoincremental (`BigAutoField`). Column
 | SERVICIO | se rastrea con | POSICION_GPS | 1 : 0..N | `posiciongps.servicio_id` | CASCADE | Serie temporal de posiciones del servicio |
 | USUARIO (motorizado) | reporta | POSICION_GPS | 1 : 0..N | `posiciongps.motorizado_id` | CASCADE | Quién generó la posición |
 | SERVICIO | se ubica en | PUNTO_GEOCODIFICADO | 1 : 0..1 | `puntogeocodificado.servicio_id` (OneToOne) | CASCADE | Caché de una coordenada por servicio |
-| USUARIO (cliente) | inicia | CONVERSACION | 1 : 0..N | `conversacion.cliente_id` | CASCADE | Las conversaciones del chatbot son del cliente |
-| CONVERSACION | contiene | MENSAJE_BOT | 1 : 0..N | `mensajebot.conversacion_id` | CASCADE | Los turnos pertenecen a la conversación |
-| USUARIO (cliente) | realiza | PAGO | 1 : 0..N | `pago.cliente_id` | PROTECT | Un pago no puede quedar huérfano de pagador; se protege el registro contable |
-| SERVICIO | se cobra con | PAGO | 0..1 : 0..N | `pago.servicio_id` | SET_NULL | El pago puede existir sin servicio y sobrevive a su borrado; FK (no OneToOne) admite reintentos de cobro |
-| PRODUCTO | se paga en | PAGO | 0..1 : 0..N | `pago.producto_id` | SET_NULL | El pago conserva el monto aunque se borre el producto |
 | USUARIO (alistador) | es representado por | API_KEY | 1 : 0..N | `apikey.actua_como_id` | CASCADE | La llave hereda los permisos del alistador; sin él la llave no tiene sentido |
 | WEBHOOK_ENDPOINT | registra intentos | WEBHOOK_DELIVERY | 1 : 0..N | `webhookdelivery.endpoint_id` | CASCADE | Bitácora de cada intento de envío al endpoint |
+
+Son 14 relaciones: 13 con FK real y 1 lógica (COBERTURA ↔ SERVICIO).
 
 ## 4.4 Restricciones del modelo
 
@@ -496,14 +367,11 @@ Todas las entidades tienen `id` como PK autoincremental (`BigAutoField`). Column
 | USUARIO | `username` único | `AbstractUser` |
 | USUARIO | `email` único y obligatorio | `accounts/models.py` + migración `0002_alter_usuario_email` |
 | COBERTURA | `zona` única | `coverage/models.py` |
-| PRODUCTO | `sku` único | `inventory/models.py` |
-| SERVICIO_PRODUCTO | `unique_together = (servicio, producto)` — un producto aparece una sola vez por servicio; la cantidad va en `cantidad` | `services/models.py`, migración `0002_servicioproducto` |
 | EVIDENCIA | `servicio` único (OneToOne) | `services/models.py` |
 | PUNTO_GEOCODIFICADO | `servicio` único (OneToOne) | `optimization/models.py` |
-| PAGO | `referencia` única (uuid4 hex autogenerado) | `payments/models.py` |
 | API_KEY | `key_hash` único | `integrations/models.py` |
 
-No hay `CheckConstraint` ni `Meta.constraints` declarados; las reglas de negocio restantes se validan en serializers y vistas.
+No hay `CheckConstraint`, `unique_together` ni `Meta.constraints` declarados; las reglas de negocio restantes se validan en serializers y vistas.
 
 ### 4.4.2 Estados del servicio y transiciones válidas
 
@@ -511,7 +379,8 @@ No hay `CheckConstraint` ni `Meta.constraints` declarados; las reglas de negocio
 
 | Acción (endpoint) | Rol | Tipo | Estado origen | Estado destino | Validación |
 |---|---|---|---|---|---|
-| `POST /servicios/`, `/servicios/planificar/`, chatbot | Alistador / Cliente | ambos | — | `CREADO` | Se fuerza `estado=CREADO` al crear |
+| `POST /servicios/` | Alistador (o API Key) | ambos | — | `CREADO` | Se fuerza `estado=CREADO` al crear |
+| `POST /servicios/planificar/` | Cliente | solo RECOLECCION | — | `CREADO` | Zona con cobertura, leadtime y día disponible; se fuerza `estado=CREADO` |
 | `asignar-ruta` | Alistador | ambos | `CREADO` | `ASIGNADO` | Error si el estado no es `CREADO`; asigna `ruta_id` |
 | `recibir-en-centro` | Motorizado asignado | solo ENTREGA | `ASIGNADO` | `RECIBIDO_CENTRO` | Rechaza RECOLECCION y cualquier otro estado |
 | `iniciar-transito` | Motorizado asignado | ENTREGA | `RECIBIDO_CENTRO` o `NOVEDAD` | `EN_TRANSITO` | |
@@ -521,7 +390,7 @@ No hay `CheckConstraint` ni `Meta.constraints` declarados; las reglas de negocio
 | `novedad` con `accion=REINTENTAR` | Motorizado asignado | ambos | cualquier estado no final con ruta asignada (`ASIGNADO`, `RECIBIDO_CENTRO`, `EN_TRANSITO`, `NOVEDAD`) | `NOVEDAD` | Crea NOVEDAD; luego se puede volver a `iniciar-transito` |
 | `novedad` con `accion=DEVOLVER_A_CENTRO` | Motorizado asignado | ambos | ídem | `DEVUELTO` (final) | Crea NOVEDAD |
 
-Estados finales: `ENTREGADO`, `RECOLECTADO`, `DEVUELTO` (no admiten novedades ni más transiciones). Disparan webhook la creación (`servicio.creado`, salvo la compra por chatbot), la asignación (`servicio.asignado`), el cierre (`servicio.entregado` / `servicio.recolectado`) y la novedad (`servicio.novedad` y, si se devuelve, también `servicio.devuelto`). `recibir-en-centro` e `iniciar-transito` **no** disparan evento (H-09, LIM-12).
+Estados finales: `ENTREGADO`, `RECOLECTADO`, `DEVUELTO` (no admiten novedades ni más transiciones). Disparan webhook la creación (`servicio.creado`, tanto en `POST /servicios/` como en `planificar`), la asignación (`servicio.asignado`), el cierre (`servicio.entregado` / `servicio.recolectado`) y la novedad (`servicio.novedad` y, si se devuelve, también `servicio.devuelto`). `recibir-en-centro` e `iniciar-transito` **no** disparan evento (H-09, LIM-12).
 
 ```
 ENTREGA:     CREADO → ASIGNADO → RECIBIDO_CENTRO → EN_TRANSITO → ENTREGADO
@@ -537,8 +406,6 @@ Novedad:     (cualquier no final) → NOVEDAD → EN_TRANSITO   |   (cualquier n
 | SERVICIO.tipo | ENTREGA, RECOLECCION | Determina dirección obligatoria y flujo de estados |
 | RUTA.estado | PLANEADA, EN_CURSO, FINALIZADA | Solo se usa el valor por defecto `PLANEADA`; el código actual no implementa transiciones de ruta |
 | NOVEDAD.accion | DEVOLVER_A_CENTRO, REINTENTAR | Obligatoria; decide el estado resultante del servicio |
-| MENSAJE_BOT.autor | CLIENTE, BOT | |
-| PAGO.estado | PENDIENTE → APROBADO / RECHAZADO | `MockPaymentProvider.procesar()` resuelve el estado (≈10 % de rechazo simulado) |
 | COBERTURA.dias_disponibles | LUN, MAR, MIE, JUE, VIE, SAB, DOM (CSV) | Se compara con el día de la semana de `fecha_agenda` |
 | WEBHOOK_ENDPOINT.eventos | `servicio.creado`, `.asignado`, `.entregado`, `.recolectado`, `.novedad`, `.devuelto` (CSV) | Validado contra `EVENTOS_WEBHOOK` |
 
@@ -547,47 +414,72 @@ Novedad:     (cualquier no final) → NOVEDAD → EN_TRANSITO   |   (cualquier n
 Django `limit_choices_to` (aplicado en formularios/admin) y validaciones de serializer restringen el rol del usuario referenciado:
 
 - `Ruta.motorizado` → `rol=MOTORIZADO`
-- `Servicio.cliente`, `Conversacion.cliente`, `Pago.cliente` → `rol=CLIENTE`
+- `Servicio.cliente` → `rol=CLIENTE`
 - `ApiKey.actua_como` → `rol=ALISTADOR` (además lo valida `ApiKeyCreateSerializer.validate_actua_como`)
 
 ### 4.4.5 Validaciones en serializers, vistas y modelos
 
 | Regla | Dónde | Requerimiento |
 |---|---|---|
-| Servicio ENTREGA exige `direccion_destino`; RECOLECCION exige `direccion_origen` | `ServicioCreateSerializer.validate` | RF-05 |
-| Al planificar: la zona debe existir en COBERTURA; `fecha_agenda ≥ hoy + leadtime_dias`; el día de la semana debe estar en `dias_disponibles` | `ServicioViewSet.planificar` (y `chatbot/llm.py`) | RF-17, RF-22, RN-03 |
+| Servicio ENTREGA exige `direccion_destino`; RECOLECCION exige `direccion_origen` (solo al crear con `POST /servicios/`) | `ServicioCreateSerializer.validate` | RF-05, RN-13 |
+| Al planificar: la zona debe existir en COBERTURA; `fecha_agenda ≥ hoy + leadtime_dias`; el día de la semana debe estar en `dias_disponibles` | `ServicioViewSet.planificar` | RF-17, RN-03, RN-15 |
 | Cerrar una RECOLECCION exige foto y firma | `CerrarServicioSerializer.validate` | RF-11, RN-02 |
-| Acciones del motorizado solo si el servicio pertenece a una ruta suya | `ServicioViewSet._motorizado_autorizado` | RNF-02 |
-| `cantidad` de línea ≥ 1; `PUT /productos/` reemplaza todas las líneas (idempotente) | `ServicioProductoItemSerializer` | RF-26 |
-| Compra por chatbot solo si `disponible_chatbot=True` y `stock > 0`; el pago toma `monto = precio` | `chatbot/llm.py` | RF-23, RN-04 |
+| Acciones del motorizado solo si el servicio pertenece a una ruta suya | `ServicioViewSet._motorizado_autorizado` | RNF-02, RN-11 |
+| Solo leen y escriben en el chat de un servicio su cliente dueño, el motorizado de su ruta, ADMIN y ALISTADOR; el texto admite hasta 1000 caracteres | `ServicioViewSet.mensajes`, `ChatConsumer._usuario_autorizado` | RF-16, RN-14 |
 | Contraseña validada con los validadores de Django y guardada con `set_password` | `UsuarioSerializer` | RNF-07 |
 | Token de restablecimiento de un solo uso | `PasswordResetConfirmSerializer` | RF-20, RNF-09 |
 | Eventos de webhook: al menos uno y todos en la lista válida; se normaliza el CSV | `WebhookEndpointDetailSerializer.validate_eventos` | RF-25 |
 | `secret` de webhook autogenerado si viene vacío | `WebhookEndpoint.save()` | RNF-11 |
 | La API key cruda solo existe al generarla; se persiste `key_hash` + `prefix` | `ApiKey.generar()` | RF-24, RNF-12 |
 | `servicio_id` obligatorio al reportar/consultar posición; el cliente solo ve su servicio | `tracking/views.py` | RF-14, RF-15 |
-| Campos `PositiveIntegerField` (`stock`, `leadtime_dias`, `cantidad`) no admiten negativos | Modelos | RF-02, RF-04, RF-26 |
+| `leadtime_dias` (`PositiveIntegerField`) no admite negativos | `coverage/models.py` | RF-02 |
 
 ### 4.4.6 Observaciones de integridad detectadas
 
-- **Cobertura ↔ Servicio no tiene FK:** la relación es lógica por el texto `zona` (LIM-18). Además, la creación manual (`POST /servicios/`) no valida la zona contra COBERTURA; solo lo hacen `planificar` y el chatbot (H-04, LIM-08).
-- **El stock no se descuenta** al comprar por chatbot ni al crear líneas de SERVICIO_PRODUCTO; `stock` solo se usa como filtro de disponibilidad (H-09, LIM-10).
+- **Cobertura ↔ Servicio no tiene FK:** la relación es lógica por el texto `zona` (LIM-18). Además, la creación manual (`POST /servicios/`) no valida la zona ni la fecha contra COBERTURA; solo lo hace `planificar` (H-04, LIM-08).
+- **`planificar` no exige `direccion_origen`:** `PlanificarRecoleccionSerializer` es un `ModelSerializer` sobre `Servicio.direccion_origen` (`blank=True`), por lo que acepta una recolección sin dirección de origen (comprobado: la solicitud con solo `zona` y `fecha_agenda` es válida). La regla de dirección obligatoria solo existe en `ServicioCreateSerializer`. No figura en 01 §8 ni en 08; queda pendiente de registrar como hallazgo.
 - **RUTA.estado** no tiene transiciones implementadas (siempre `PLANEADA`) (LIM-14).
-- **Servicio.producto y SERVICIO_PRODUCTO coexisten:** el primero es el producto principal del flujo simple; la tabla intermedia es la extensión multi-producto (RF-26). Pueden coexistir sin restricción de coherencia entre ambos (LIM-18).
+- **La máquina de estados admite `ASIGNADO → NOVEDAD → EN_TRANSITO` en una ENTREGA:** se salta `RECIBIDO_CENTRO` (H-02, LIM-09).
+- **No existe una entidad de historial de transiciones:** el MER solo conserva las novedades, la evidencia y `Servicio.creado_por`; no se puede reconstruir quién cambió el estado ni cuándo (H-06, LIM-17).
+- **Chat:** el texto de `MensajeChat` (`max_length=1000`) se valida en el serializer REST, pero `ChatConsumer._guardar_mensaje` lo guarda por el ORM sin revisar la longitud (SQLite no impone el límite de `varchar`). Además, el código deja escribir en el chat a ADMIN y ALISTADOR, aunque RF-16 solo describe el intercambio cliente-motorizado. Ninguno de los dos puntos figura en 01 §8 ni en 08.
 
-## 4.5 Diferencias con el diagrama ER anterior (`docs/diagrams/src/er.mmd`)
+## 4.5 Cambios de alcance
+
+El 2026-10-09 el autor retiró del proyecto el inventario, los pagos y el chatbot. El sistema se centra en la operación logística (servicios, rutas, tracking, evidencia, novedades, optimización e integraciones) y el chat queda solo para que el cliente y el motorizado se comuniquen dentro de un servicio. Con ello el MER pasó de **17 a 12 entidades** y el backend de 9 a **6 apps** (se eliminaron `inventory`, `payments` y `chatbot`).
+
+| Entidad retirada | Tabla que tenía | Para qué servía | Requerimientos retirados |
+|---|---|---|---|
+| PRODUCTO | `inventory_producto` | Catálogo con SKU, precio, stock y bandera `disponible_chatbot` | RF-04, RN-04 |
+| SERVICIO_PRODUCTO | `services_servicioproducto` | Líneas de producto con cantidad por servicio (N:M entre SERVICIO y PRODUCTO) | RF-26, RN-06 |
+| CONVERSACION | `chatbot_conversacion` | Estado de *slot-filling* del chatbot por cliente | RF-18, RF-22 |
+| MENSAJE_BOT | `chatbot_mensajebot` | Turnos cliente/bot y herramienta invocada (`function_call`) | RF-22 |
+| PAGO | `payments_pago` | Cobro simulado de la compra por chatbot | RF-23, RN-16 |
+
+**Por qué:** las cinco entidades existían solo para sostener la compra de productos por el chatbot (catálogo, líneas, conversación, mensajes del bot y pago). Al salir esas funciones del alcance, ya ningún requerimiento vigente las justifica, y mantenerlas habría dejado en el MER tablas sin uso.
+
+**Qué más cambió en el modelo:**
+
+- Se eliminó la FK `Servicio.producto` (único vínculo de una entidad conservada con las retiradas), por lo que no quedan FK huérfanas.
+- Se retiraron 8 de las 22 relaciones del MER anterior (las de PRODUCTO, SERVICIO_PRODUCTO, CONVERSACION, MENSAJE_BOT y PAGO); quedan 14.
+- `MENSAJE_CHAT` se conserva sin cambios: es el chat cliente-motorizado por servicio (RF-16, RF-27). No debe confundirse con `MENSAJE_BOT`, que pertenecía al chatbot y sí se retiró.
+- Las migraciones del repositorio quedaron en `0001_initial` por app (ya no existe `services/0002_servicioproducto`). Una base de desarrollo recreada con ellas contiene exactamente las 12 tablas de dominio de 4.1, además de las internas de Django.
+
+**Observaciones del MER anterior que desaparecen por la reducción de alcance** (no son correcciones, sino consecuencias de quitar las entidades): el stock nunca se descuenta (H-09 en su parte de stock, LIM-10), la compra por chatbot no se revierte si el pago es rechazado (H-12, LIM-36), el producto principal convive sin regla con las líneas multi-producto (LIM-18, parte b), la discrepancia del plan de pruebas sobre quién crea productos (H-03) y el estado de `Pago`.
+
+## 4.6 Diferencias con el diagrama ER anterior (`docs/diagrams/src/er.mmd`)
+
+El ER anterior (`docs/04-modelo-datos.md`, `er.mmd`, `er.png`) es un documento histórico y **no se actualizó con el cambio de alcance**: sigue mostrando las 17 entidades, incluidas las 5 retiradas (ver 4.5). Se conserva solo como referencia; el MER vigente es el de este documento. Las diferencias que siguen corrigen errores del ER anterior que subsisten en las 12 entidades vigentes:
 
 | # | Diferencia | Corrección en este MER |
 |---|---|---|
 | 1 | Faltaba `Servicio.creado_por` (FK a USUARIO, SET_NULL) | Agregado atributo y relación "registra" |
-| 2 | Faltaba `Pago.actualizado_en` | Agregado |
-| 3 | `SERVICIO ||--o| NOVEDAD` (0..1) | Es FK simple: 1 : 0..N (`related_name='novedades'`) |
-| 4 | `SERVICIO ||--o| PAGO` (0..1) | Es FK nullable: 0..1 : 0..N |
-| 5 | `PRODUCTO ||--o{ SERVICIO` y `PRODUCTO ||--o{ PAGO` con lado "exactamente uno" | La FK es nullable: lado PRODUCTO es 0..1 |
-| 6 | `RUTA ||--o{ SERVICIO` con lado "exactamente uno" | `ruta` es nullable: lado RUTA es 0..1 |
-| 7 | `COBERTURA ||--o{ SERVICIO` dibujada como FK | No existe FK; se dibuja punteada como relación lógica por `zona` |
-| 8 | No se dibujaban las FK `MensajeChat.autor` ni `PosicionGPS.motorizado` hacia USUARIO | Agregadas ("escribe", "reporta") |
-| 9 | No se marcaban los únicos (`email`, `username`, `zona`, `sku`, `referencia`, `key_hash`, UK compuesta de SERVICIO_PRODUCTO, OneToOne de EVIDENCIA) | Marcados con `UK` |
-| 10 | `EVIDENCIA.foto_url` / `firma_url` | En el código son `foto` / `firma` (`ImageField`, nulos) |
-| 11 | `USUARIO.password_hash`, `activo` | En el código son `password` e `is_active` (heredados de `AbstractUser`); se agregan `date_joined` y `last_login` |
-| 12 | `EVIDENCIA` y `PUNTO_GEOCODIFICADO` sin marcar FK única | Marcadas `FK,UK` (OneToOne) |
+| 2 | `SERVICIO ||--o| NOVEDAD` (0..1) | Es FK simple: 1 : 0..N (`related_name='novedades'`) |
+| 3 | `RUTA ||--o{ SERVICIO` con lado "exactamente uno" | `ruta` es nullable: lado RUTA es 0..1 |
+| 4 | `COBERTURA ||--o{ SERVICIO` dibujada como FK | No existe FK; se dibuja punteada como relación lógica por `zona` |
+| 5 | No se dibujaban las FK `MensajeChat.autor` ni `PosicionGPS.motorizado` hacia USUARIO | Agregadas ("escribe", "reporta") |
+| 6 | No se marcaban los únicos (`email`, `username`, `zona`, `key_hash`, OneToOne de EVIDENCIA) | Marcados con `UK` |
+| 7 | `EVIDENCIA.foto_url` / `firma_url` | En el código son `foto` / `firma` (`ImageField`, nulos) |
+| 8 | `USUARIO.password_hash`, `activo` | En el código son `password` e `is_active` (heredados de `AbstractUser`); se agregan `date_joined` y `last_login` |
+| 9 | `EVIDENCIA` y `PUNTO_GEOCODIFICADO` sin marcar FK única | Marcadas `FK,UK` (OneToOne) |
+
+Las diferencias del ER anterior que afectaban solo a las entidades retiradas (`Pago.actualizado_en`, la cardinalidad de `SERVICIO`–`PAGO`, la nulabilidad de `PRODUCTO`→`SERVICIO`/`PAGO` y los únicos `sku`, `referencia` y la UK compuesta de SERVICIO_PRODUCTO) dejaron de aplicar y se omiten.
