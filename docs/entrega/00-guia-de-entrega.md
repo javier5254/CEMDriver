@@ -15,7 +15,7 @@ Esta guía permite al docente ubicar cada sub-ítem de la consigna en el documen
 | Sub-ítem exigido | Dónde se cumple |
 |---|---|
 | Problema o necesidad | [01 §1](01-requerimientos.md#1-problema-o-necesidad-identificada) (problemas P1…P6) |
-| Objetivo general (y específicos) | [01 §2.1](01-requerimientos.md#21-objetivo-general) y [§2.2](01-requerimientos.md#22-objetivos-específicos) (OE-1…OE-7) |
+| Objetivo general (y específicos) | [01 §2.1](01-requerimientos.md#21-objetivo-general) y [§2.2](01-requerimientos.md#22-objetivos-específicos) (OE-1…OE-4, alineados con el paper; desglose del OE-3 en metas funcionales MF-1…MF-7 en §2.3) |
 | Actores / tipos de usuario | [01 §3.1](01-requerimientos.md#31-actores-humanos-roles-del-sistema) (4 roles con permisos verificados) y [§3.2](01-requerimientos.md#32-actores-externos-sistemas) (7 actores externos, reales o simulados) |
 | Requerimientos funcionales claros y comprobables | [01 §4](01-requerimientos.md#4-requerimientos-funcionales-rf): RF-01…RF-29 con descripción "El sistema debe…", prioridad, criterio de aceptación verificable y prueba que lo verifica |
 | Requerimientos no funcionales | [01 §5](01-requerimientos.md#5-requerimientos-no-funcionales-rnf): RNF-01…RNF-20 con métrica y evidencia |

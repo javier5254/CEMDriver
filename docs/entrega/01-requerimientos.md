@@ -11,34 +11,84 @@
 
 ## 1. Problema o necesidad identificada
 
-Los centros de mensajería (courier) de pequeña y mediana escala suelen operar con procesos manuales o con herramientas desconectadas entre sí:
+> La problemática, la pregunta y los objetivos de esta sección son los mismos del paper del proyecto (`paper/secciones/03-introduccion.md`, §3.1 a §3.3), para que la documentación técnica y el documento académico describan el mismo sistema.
 
-1. **Asignación informal de la operación.** Las rutas y los servicios se reparten por teléfono o WhatsApp; no existe un registro único del estado de cada servicio (creado, asignado, en tránsito, entregado, con novedad).
-2. **Cliente sin visibilidad.** El cliente final no sabe dónde está su pedido ni cuándo llegará, lo que genera llamadas repetidas al centro.
-3. **Sin evidencia digital.** Las recolecciones no dejan prueba verificable (foto del paquete y firma del cliente), lo que dificulta resolver reclamos.
-4. **Novedades sin trazabilidad.** Cuando una entrega falla (cliente ausente, dirección errada, rechazo) no queda registro de la causa ni de la decisión tomada (reintentar o devolver).
-5. **Sin autoservicio.** El cliente no puede comprar un producto ni agendar una recolección sin llamar, y no hay reglas automáticas que respeten la cobertura de cada zona (tiempo de alistamiento o *leadtime* y días hábiles).
-6. **Sin integración con terceros.** Un e-commerce o ERP no puede crear servicios automáticamente ni enterarse de los cambios de estado.
+### 1.1 Contexto
 
-**Necesidad:** una plataforma web/móvil única que centralice la creación, asignación, ejecución y seguimiento de servicios de mensajería, con evidencia digital, seguimiento en tiempo real, autoservicio para el cliente y una API abierta a integraciones.
+El crecimiento del comercio electrónico ha trasladado buena parte de la presión logística a la **última milla**, el último tramo de la cadena de distribución. Ese crecimiento, acelerado por la pandemia, trajo retos críticos en la entrega final (Mohammad et al., 2023). Los proveedores de ese tramo enfrentan escasez de mano de obra, alza del combustible y márgenes reducidos (Janinhoff et al., 2024).
+
+En Colombia el fenómeno es medible:
+
+- **Comercio electrónico.** La Cámara Colombiana de Comercio Electrónico registró 684,6 millones de transacciones en 2025, 19,9 % más que en 2024, con ventas en línea de 145,4 billones de pesos (CCCE, 2025).
+- **Mensajería expresa.** En el cuarto trimestre de 2025 hubo 86,2 millones de envíos de mensajería expresa, con ingresos de 785.786 millones de pesos, 12 % más que un año antes (MinTIC, 2026).
+- **Costo logístico.** En la Encuesta Nacional Logística 2022 el costo logístico fue el 17,9 % de las ventas. En pequeñas empresas llegó al 24,3 % y en microempresas al 21,9 %, frente al 12,1 % en las grandes. Entre las barreras se reportaron el costo del transporte y la complejidad de la distribución urbana (DNP, 2023).
+- **Digitalización parcial.** En la edición 2024 de la encuesta, solo el 23,4 % de las empresas usaba rastreo y seguimiento de pedidos (DNP, 2025).
+
+El problema no es solo técnico. En Bogotá, la congestión y la fragmentación logística exigen decisiones apoyadas en datos (Gutierrez-Franco et al., 2021). En Medellín, la tercerización de la última milla traslada riesgos a trabajadores informales con escasa supervisión (Restrepo-Betancur et al., 2026). En la relación con el cliente, las entregas fallidas por ausencia del destinatario son un problema crítico de la última milla B2C (Seghezzi y Mangiaracina, 2023). No existe, en las fuentes revisadas, una cifra verificada de entregas fallidas en Colombia, así que su magnitud local se trata como un supuesto por validar. Para las mensajerías urbanas pequeñas se proponen el rastreo en tiempo real, las notificaciones y la geolocalización. Su adopción enfrenta barreras de infraestructura, costo, habilidades y resistencia al cambio (Boom-Cárcamo et al., 2024).
+
+**Organización de aplicación:** Logytech Mobile, empresa multinacional de logística, en Colombia, durante el segundo semestre de 2026. En esta etapa el prototipo se construye y se modela. Su validación con la operación real se plantea para el Trabajo de Grado, y **no se afirman datos ni métricas de esa operación**.
+
+### 1.2 Planteamiento del problema
+
+El problema es la **ausencia de una plataforma que integre en un solo sistema la operación logística, la trazabilidad y la autogestión del cliente**, y que sea accesible para un operador de mensajería.
+
+A partir de las fuentes y del análisis del dominio se plantea una hipótesis a validar. Los centros de mensajería operan con procesos manuales o con herramientas desconectadas entre sí, lo que se manifiesta en los problemas operativos P1 a P6 de la tabla siguiente. Cada uno se atiende con requerimientos concretos de este documento.
+
+| # | Problema operativo (hipótesis a validar) | Cómo lo atiende CMEDriver |
+|---|---|---|
+| P1 | **Asignación informal de la operación.** Rutas y servicios se reparten por teléfono o mensajería instantánea, sin un registro único del estado de cada servicio. | Ciclo de vida del servicio con estados, rutas y asignación (RF-05, RF-07, RF-09, RF-10, RF-12) |
+| P2 | **Cliente sin visibilidad.** El cliente no sabe dónde está su pedido ni cuándo llegará. | Tracking GPS, destino/ETA y chat en tiempo real (RF-15, RF-16, RF-27, RF-28) |
+| P3 | **Sin evidencia digital.** Las recolecciones no dejan una prueba verificable (foto y firma). | Evidencia obligatoria al recolectar (RF-11, RN-02) |
+| P4 | **Novedades sin trazabilidad.** Cuando una entrega falla no queda registro de la causa ni de la decisión tomada. | Registro de novedades con acción (RF-13, RN-05) |
+| P5 | **Sin autoservicio.** El cliente no puede comprar ni agendar sin llamar, y no hay reglas automáticas de cobertura (*leadtime* y días hábiles). | Chatbot, planificación de recolección y matriz de cobertura (RF-02, RF-17, RF-18, RF-22, RF-23) |
+| P6 | **Sin integración con terceros.** Un e-commerce o ERP no puede crear servicios ni enterarse de los cambios de estado. | API Key, webhooks firmados y API documentada (RF-06, RF-24, RF-25, RF-29) |
+
+### 1.3 Pregunta de investigación
+
+> ¿Cómo puede una plataforma orientada a API integrar la gestión de servicios de mensajería (entregas y recolecciones), la trazabilidad en tiempo real, la evidencia digital de entrega y la autogestión conversacional del cliente en las operaciones de Logytech Mobile en Colombia durante el segundo semestre de 2026?
+
+**Necesidad:** una plataforma web y móvil, orientada a API, que centralice la creación, asignación, ejecución y seguimiento de servicios de mensajería, con evidencia digital, seguimiento en tiempo real, autoservicio conversacional para el cliente y una API abierta a integraciones.
+
+### 1.4 Referencias de esta sección
+
+- Boom-Cárcamo, E., Molina-Romero, S., Galindo-Angulo, C., & del Mar Restrepo, M. (2024). Barriers and strategies for digital marketing and smart delivery in urban courier companies in developing countries. *Journal of the Knowledge Economy, 15*(4), 19203–19232. https://doi.org/10.1007/s13132-024-01823-1
+- Cámara Colombiana de Comercio Electrónico. (2025). *Informe de cierre del comercio electrónico en Colombia – 2025*. https://ccce.org.co/wp-content/uploads/2017/06/V2-1-PUBLICO-INFORME-DE-CIERRE-2025.pdf
+- Departamento Nacional de Planeación. (2023, 16 de noviembre). *El DNP reveló que el costo logístico nacional se ubicó en 17,9%, 5 p.p. por encima de la meta de 12,9%* [Comunicado de prensa]. https://www.dnp.gov.co/Prensa_/Noticias/Paginas/el-dnp-revelo-que-el-costo-logistico-nacional-se-ubico-en-17-9-5-p-p-por-encima-de-la-meta-de-12-9.aspx
+- Departamento Nacional de Planeación. (2025, 19 de noviembre). *La logística del país avanza impulsada por las regiones: Menores costos y la logística verde se destacan en la ENL 2024 (Encuesta Nacional Logística)* [Comunicado de prensa]. https://dnp.gov.co/Prensa_/Noticias/Paginas/La-logistica-del-pais-avanza-impulsada-por-regiones-menores-costos-encuesta-nacional-logistica.aspx
+- Gutierrez-Franco, E., Mejia-Argueta, C., & Rabelo, L. (2021). Data-driven methodology to support long-lasting logistics and decision making for urban last-mile operations. *Sustainability, 13*(11), Article 6230. https://doi.org/10.3390/su13116230
+- Janinhoff, L., Klein, R., Sailer, D., & Schoppa, J. M. (2024). Out-of-home delivery in last-mile logistics: A review. *Computers & Operations Research, 168*, Article 106686. https://doi.org/10.1016/j.cor.2024.106686
+- Ministerio de Tecnologías de la Información y las Comunicaciones. (2026). *Boletín trimestral del sector postal: Cuarto trimestre de 2025*. Colombia TIC. https://colombiatic.mintic.gov.co/679/articles-428453_presentacion_cifras.pdf
+- Mohammad, W. A. M., Nazih Diab, Y., Elomri, A., & Triki, C. (2023). Innovative solutions in last mile delivery: Concepts, practices, challenges, and future directions. *Supply Chain Forum: An International Journal, 24*(2), 151–169. https://doi.org/10.1080/16258312.2023.2173488
+- Restrepo-Betancur, B., Sanchez-Diaz, I., & Gonzalez-Calderon, C. A. (2026). How e-commerce influences last-mile practices that foster informality. *Transportation Research Interdisciplinary Perspectives, 39*, Article 102181. https://doi.org/10.1016/j.trip.2026.102181
+- Seghezzi, A., & Mangiaracina, R. (2023). Smart home devices and B2C e-commerce: A way to reduce failed deliveries. *Industrial Management & Data Systems, 123*(5), 1624–1645. https://doi.org/10.1108/imds-10-2022-0651
 
 ---
 
 ## 2. Objetivos
 
 ### 2.1 Objetivo general
-Desarrollar una plataforma web/móvil (API REST en Django + aplicación Ionic/Angular) que permita administrar, alistar, transportar y hacer seguimiento en tiempo real de servicios de mensajería de tipo **Entrega** y **Recolección**, con un canal de autogestión (chatbot) e inventario de productos para el cliente final, y con una API documentada para integraciones externas.
+Diseñar y desarrollar un prototipo funcional temprano de una plataforma orientada a API que integre la gestión de servicios de mensajería (entregas y recolecciones), la trazabilidad en tiempo real, la evidencia digital de entrega y la autogestión conversacional del cliente en las operaciones de Logytech Mobile en Colombia durante el segundo semestre de 2026.
 
 ### 2.2 Objetivos específicos
-| # | Objetivo específico | RF relacionados |
+| # | Objetivo específico | Producto verificable | Dónde se evidencia en esta entrega |
+|---|---|---|---|
+| OE-1 | Identificar, a partir de la literatura y del análisis del dominio, los problemas de coordinación, trazabilidad y atención al cliente en los servicios de mensajería de última milla, y derivar de ellos un conjunto priorizado de requerimientos funcionales y no funcionales. | Problemas P1–P6 y requerimientos priorizados | Este documento: §1, §4 (RF con prioridad), §5 (RNF), §6 (RN), §7 (RES) |
+| OE-2 | Diseñar y documentar una arquitectura modular orientada a API (REST, comunicación en tiempo real y webhooks) que soporte los roles de administración, alistamiento, mensajería en campo y cliente, y modelarla mediante casos de uso, diagramas de clases, modelo entidad-relación, modelo C4 y mockups. | Modelo arquitectónico documentado | [02-stack](02-stack-tecnologico.md), [03-arquitectura](03-arquitectura.md), [04-MER](04-mer.md), [05-BPMN](05-bpmn.md), [06-C4](06-c4.md); casos de uso, clases y mockups en [docs/10](../10-diagrama-casos-uso.md), [docs/08](../08-diagrama-clases.md) y [docs/12](../12-mockups.md) |
+| OE-3 | Implementar un prototipo funcional temprano que cubra los flujos centrales: ciclo de vida del servicio, seguimiento GPS en tiempo real, chat cliente-motorizado, evidencia digital de recolección y chatbot conversacional. | Prototipo con esos flujos y pruebas automatizadas | Código en `backend/` y `frontend/`, 96 pruebas automatizadas; desglose en las metas funcionales MF-1…MF-7 (§2.3) y [07-trazabilidad](07-trazabilidad.md) |
+| OE-4 | Formular un protocolo de validación para Trabajo de Grado que especifique los criterios de evaluación, los instrumentos y los usuarios participantes. | Protocolo escrito | Se formula en el paper del proyecto (metodología). Su ejecución con la operación de Logytech Mobile corresponde al Trabajo de Grado y está fuera del alcance de esta entrega. |
+
+### 2.3 Metas funcionales del prototipo (desglose del OE-3)
+Para que cada requerimiento funcional tenga un objetivo verificable, el OE-3 se desglosa en siete metas funcionales. La matriz de trazabilidad ([07](07-trazabilidad.md)) usa estos IDs.
+
+| # | Meta funcional | RF relacionados |
 |---|---|---|
-| OE-1 | Permitir al Administrador gestionar usuarios por rol, la matriz de cobertura (zona, leadtime, días y horario) y el catálogo de inventario. | RF-01, RF-02, RF-03, RF-04 |
-| OE-2 | Permitir al Alistador crear servicios (manualmente o vía API Key), crear rutas, asignar servicios a rutas/motorizados y obtener una sugerencia de orden de visita. | RF-05, RF-06, RF-07, RF-08, RF-21, RF-26 |
-| OE-3 | Permitir al Motorizado ejecutar el servicio con un flujo diferenciado por tipo (recibir en centro / recolectar con foto y firma), registrar novedades y reportar su posición GPS. | RF-09 a RF-14 |
-| OE-4 | Dar al Cliente seguimiento en tiempo real (mapa, destino y ETA), chat con el motorizado y planificación de sus propias recolecciones respetando la cobertura. | RF-15, RF-16, RF-17, RF-27, RF-28 |
-| OE-5 | Ofrecer un chatbot conversacional conectado a inventario, cobertura y pagos (modelo de lenguaje y pasarela **simulados**). | RF-18, RF-22, RF-23 |
-| OE-6 | Exponer una API documentada (OpenAPI) con autenticación por API Key y notificaciones salientes por webhooks firmados. | RF-24, RF-25, RF-29, RNF-03 |
-| OE-7 | Garantizar seguridad básica (JWT, RBAC, hash de contraseñas y llaves) y verificar el sistema con una suite de pruebas automatizadas. | RF-19, RF-20, RNF-01, RNF-02, RNF-07, RNF-12, RNF-17 |
+| MF-1 | Permitir al Administrador gestionar usuarios por rol, la matriz de cobertura (zona, leadtime, días y horario) y el catálogo de inventario. | RF-01, RF-02, RF-03, RF-04 |
+| MF-2 | Permitir al Alistador crear servicios (manualmente o vía API Key), crear rutas, asignar servicios a rutas/motorizados y obtener una sugerencia de orden de visita. | RF-05, RF-06, RF-07, RF-08, RF-21, RF-26 |
+| MF-3 | Permitir al Motorizado ejecutar el servicio con un flujo diferenciado por tipo (recibir en centro / recolectar con foto y firma), registrar novedades y reportar su posición GPS. | RF-09 a RF-14 |
+| MF-4 | Dar al Cliente seguimiento en tiempo real (mapa, destino y ETA), chat con el motorizado y planificación de sus propias recolecciones respetando la cobertura. | RF-15, RF-16, RF-17, RF-27, RF-28 |
+| MF-5 | Ofrecer un chatbot conversacional conectado a inventario, cobertura y pagos (modelo de lenguaje y pasarela **simulados**). | RF-18, RF-22, RF-23 |
+| MF-6 | Exponer una API documentada (OpenAPI) con autenticación por API Key y notificaciones salientes por webhooks firmados. | RF-24, RF-25, RF-29, RNF-03 |
+| MF-7 | Garantizar seguridad básica (JWT, RBAC, hash de contraseñas y llaves) y verificar el sistema con una suite de pruebas automatizadas. | RF-19, RF-20, RNF-01, RNF-02, RNF-07, RNF-12, RNF-17 |
 
 ---
 
