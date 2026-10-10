@@ -99,6 +99,7 @@ Todas las tareas `SND_Webhook*` envían un `POST` firmado (`X-CMEDriver-Signatur
 | `GW_AgendaValida` | Exclusivo | ¿Zona y fecha válidas? | **Sí** → registrar `CREADO`; **No** (zona sin cobertura, fecha < hoy + leadtime o día no habilitado) → fin `EE_RechazoAgenda` (400) |
 | `GW_MergeValidas` | Exclusivo (unión) | — | Une los caminos de creación válidos: datos válidos (Alistador/API Key) y agenda válida (Cliente) |
 | `GW_Optimizar` | Exclusivo | ¿Pedir orden sugerido de la ruta? | **Sí** → `UT_PedirOrden`; **No** → continúa (la optimización es solo asesoría, no persiste nada) |
+| `GW_MergeOpt` | Exclusivo (unión) | — | Une la rama **No** de `GW_Optimizar` (no se pidió orden sugerido) y la salida de `ST_Optimizar`; entrega ambos caminos a `UT_ConsultarRuta` (el Motorizado consulta su ruta) |
 | `GW_TipoServicio` | Exclusivo | ¿Tipo de servicio? | **ENTREGA** → recibir en centro (RN-01); **RECOLECCIÓN** → directo a iniciar tránsito |
 | `GW_MergeTransito` | Exclusivo (unión) | — | Une Recolección, Entrega recibida y el bucle **REINTENTAR** |
 | `PG_Inicio` / `PG_Fin` | **Paralelo** (división / unión) | — | En paralelo: la visita física (`MT_Visita`) y el bucle de GPS; se unen cuando el motorizado termina la visita |
@@ -143,7 +144,7 @@ Todas las tareas `SND_Webhook*` envían un `POST` firmado (`X-CMEDriver-Signatur
 | `MF09` | `SND_WebhookNovedad` → Sistema integrador | `POST servicio.novedad` | `disparar_webhook` |
 | `MF10` | `SND_WebhookDevuelto` → Sistema integrador | `POST servicio.devuelto` | `disparar_webhook` |
 
-Comunicación **dentro** del pool (no son flujos de mensaje porque Cliente, Motorizado y Sistema son lanes del mismo pool): la posición GPS se difunde al mapa del Cliente por `ws/tracking/{id}/` (RF-27) y el chat usa `ws/chat/{id}/` (RF-16) y solo comunica al Cliente con el Motorizado; ambos se anotan en el diagrama porque no cambian el estado del servicio. Los cambios de estado **no** se notifican por WebSocket: el Cliente los ve al consultar `GET /api/servicios/`.
+Comunicación **dentro** del pool (no son flujos de mensaje porque Cliente, Motorizado y Sistema son lanes del mismo pool): la posición GPS se difunde al mapa del Cliente por `ws/tracking/{id}/` (RF-27) y el chat (RF-16) difunde sus mensajes por `ws/chat/{id}/` (la app los envía por `POST /api/servicios/{id}/mensajes/` y los recibe por WebSocket). El chat solo comunica al Cliente dueño con el Motorizado asignado: ADMIN y ALISTADOR reciben 403 y no pueden conectarse. Ambos se anotan en el diagrama porque no cambian el estado del servicio. Los cambios de estado **no** se notifican por WebSocket: el Cliente los ve al consultar `GET /api/servicios/`.
 
 ---
 
@@ -155,6 +156,7 @@ Comunicación **dentro** del pool (no son flujos de mensaje porque Cliente, Moto
 | **H-04** | "Crear servicio «include» Validar cobertura y leadtime" para todos los orígenes. | Solo `planificar` (el Cliente, para recolecciones) valida cobertura y leadtime; la creación manual y por API Key no. | `ST_ValidarAgenda` solo está en el camino de la recolección del Cliente; anotación `TA_H04`. |
 | **H-09** | Cada transición relevante notifica al integrador. | `recibir-en-centro` e `iniciar-tránsito` no disparan ningún evento (no existen en `EVENTOS_WEBHOOK`): el integrador no se entera de esos dos cambios de estado. | `ST_PasarRecibido` y `ST_PasarTransito` sin tarea de envío; anotación `TA_H09b`. |
 | H-11 (observación nueva) | Tras una novedad `REINTENTAR` el motorizado vuelve a iniciar tránsito. | El backend lo permite, pero la app del motorizado (`puedeIniciarTransito`, `puedeRegistrarNovedad` en `servicio-detail.page.ts`) no muestra botones para un servicio en `NOVEDAD`: desde la app el servicio queda detenido. | Anotación `TA_Reintentar`. |
+| H-13 (nuevo) | Toda recolección exige `direccion_origen` (RN-13), también la que planifica el Cliente. | `planificar` no la valida: sin el campo responde 500 y con `""` crea la recolección sin origen. Solo `POST /api/servicios/` (Alistador / API Key) la exige. | En el diagrama, `ST_ValidarDatos` (RN-13) está solo en el camino Alistador / API Key; el camino del Cliente solo pasa por `ST_ValidarAgenda`, que no revisa la dirección. |
 | Alcance | Cancelar un servicio. | No existe estado `CANCELADO`; el cierre sin éxito es `DEVOLVER_A_CENTRO` → `DEVUELTO`. (Además, por H-01, `DELETE /api/servicios/{id}/` está abierto a cualquier autenticado; no se modela por ser un defecto, no un paso del proceso.) | Fines `EE_Entregado`, `EE_Recolectado`, `EE_Devuelto`. |
 | Simplificación | — | El backend acepta novedades desde `ASIGNADO`, `RECIBIDO_CENTRO`, `EN_TRANSITO` y `NOVEDAD` (RN-09); el diagrama modela el caso típico (falla la visita) y lo indica en la anotación `TA_Novedad`. La "reasignación" de RF-08 no existe (H-08) y no se modela. `Ruta.estado` nunca cambia de `PLANEADA` ([04-mer.md](04-mer.md)). | — |
 
@@ -182,7 +184,7 @@ npx -y bpmn-to-image --no-footer "docs/diagrams/src/bpmn-ciclo-servicio.bpmn;doc
 
 ## 10. Cambios de alcance
 
-**2026-10-09 — se retiran del proyecto el inventario, los pagos y el chatbot.** El chat solo sirve para que el Cliente y el Motorizado se comuniquen (RF-16, `ws/chat/{id}/`); en el BPMN sigue como anotación `TA_Tracking`, porque no cambia el estado del servicio.
+**2026-10-09 — se retiran del proyecto el inventario, los pagos y el chatbot.** El chat solo sirve para que el Cliente y el Motorizado se comuniquen (RF-16, `ws/chat/{id}/`; el código rechaza a ADMIN y ALISTADOR); en el BPMN sigue como anotación `TA_Tracking`, porque no cambia el estado del servicio.
 
 Efecto en este modelo:
 

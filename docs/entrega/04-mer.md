@@ -263,7 +263,7 @@ Todas las entidades tienen `id` como PK autoincremental (`BigAutoField`). Column
 |---|---|---|---|---|
 | id | bigint | PK | No | Identificador |
 | servicio_id | bigint | FK → SERVICIO | No | Servicio al que pertenece la conversación |
-| autor_id | bigint | FK → USUARIO | No | Quién escribe: el cliente dueño o el motorizado asignado (el código admite además ADMIN y ALISTADOR, ver 4.4.6) |
+| autor_id | bigint | FK → USUARIO | No | Quién escribe: el cliente dueño o el motorizado asignado (el código no admite a ADMIN ni a ALISTADOR: reciben 403 por REST y no pueden conectarse al WebSocket) |
 | texto | varchar(1000) | | No | Contenido |
 | enviado_en | datetime | | No | `auto_now_add`; orden ascendente |
 
@@ -421,11 +421,11 @@ Django `limit_choices_to` (aplicado en formularios/admin) y validaciones de seri
 
 | Regla | Dónde | Requerimiento |
 |---|---|---|
-| Servicio ENTREGA exige `direccion_destino`; RECOLECCION exige `direccion_origen` (solo al crear con `POST /servicios/`) | `ServicioCreateSerializer.validate` | RF-05, RN-13 |
+| Servicio ENTREGA exige `direccion_destino`; RECOLECCION exige `direccion_origen` (solo al crear con `POST /servicios/`; `planificar` no la exige, ver 4.4.6 y H-13) | `ServicioCreateSerializer.validate` | RF-05, RN-13 |
 | Al planificar: la zona debe existir en COBERTURA; `fecha_agenda ≥ hoy + leadtime_dias`; el día de la semana debe estar en `dias_disponibles` | `ServicioViewSet.planificar` | RF-17, RN-03, RN-15 |
 | Cerrar una RECOLECCION exige foto y firma | `CerrarServicioSerializer.validate` | RF-11, RN-02 |
 | Acciones del motorizado solo si el servicio pertenece a una ruta suya | `ServicioViewSet._motorizado_autorizado` | RNF-02, RN-11 |
-| Solo leen y escriben en el chat de un servicio su cliente dueño, el motorizado de su ruta, ADMIN y ALISTADOR; el texto admite hasta 1000 caracteres | `ServicioViewSet.mensajes`, `ChatConsumer._usuario_autorizado` | RF-16, RN-14 |
+| Solo leen y escriben en el chat de un servicio su cliente dueño y el motorizado de su ruta (ADMIN y ALISTADOR reciben 403 por REST y no pueden conectarse al WebSocket; un cliente ajeno o un motorizado no asignado reciben 404 por REST); el texto admite hasta 1000 caracteres (validado solo por REST, ver 4.4.6) | `ServicioViewSet.mensajes`, `ChatConsumer._usuario_autorizado` | RF-16, RN-14 |
 | Contraseña validada con los validadores de Django y guardada con `set_password` | `UsuarioSerializer` | RNF-07 |
 | Token de restablecimiento de un solo uso | `PasswordResetConfirmSerializer` | RF-20, RNF-09 |
 | Eventos de webhook: al menos uno y todos en la lista válida; se normaliza el CSV | `WebhookEndpointDetailSerializer.validate_eventos` | RF-25 |
@@ -437,11 +437,12 @@ Django `limit_choices_to` (aplicado en formularios/admin) y validaciones de seri
 ### 4.4.6 Observaciones de integridad detectadas
 
 - **Cobertura ↔ Servicio no tiene FK:** la relación es lógica por el texto `zona` (LIM-18). Además, la creación manual (`POST /servicios/`) no valida la zona ni la fecha contra COBERTURA; solo lo hace `planificar` (H-04, LIM-08).
-- **`planificar` no exige `direccion_origen`:** `PlanificarRecoleccionSerializer` es un `ModelSerializer` sobre `Servicio.direccion_origen` (`blank=True`), por lo que acepta una recolección sin dirección de origen (comprobado: la solicitud con solo `zona` y `fecha_agenda` es válida). La regla de dirección obligatoria solo existe en `ServicioCreateSerializer`. No figura en 01 §8 ni en 08; queda pendiente de registrar como hallazgo.
+- **`planificar` no exige `direccion_origen`:** `PlanificarRecoleccionSerializer` es un `ModelSerializer` sobre `Servicio.direccion_origen` (`blank=True`), por lo que el serializer no la exige, y `ServicioViewSet.planificar` luego lee `data['direccion_origen']`. Comprobado en una base de datos de pruebas aislada: una solicitud con solo `zona` y `fecha_agenda` **no es válida en la práctica, porque falla con 500** (`KeyError`), y con `direccion_origen: ""` responde 201 y crea una RECOLECCION con el origen vacío. La regla de dirección obligatoria (RN-13) solo existe en `ServicioCreateSerializer`. Registrado como H-13 (01 §8) y LIM-39 (08).
 - **RUTA.estado** no tiene transiciones implementadas (siempre `PLANEADA`) (LIM-14).
 - **La máquina de estados admite `ASIGNADO → NOVEDAD → EN_TRANSITO` en una ENTREGA:** se salta `RECIBIDO_CENTRO` (H-02, LIM-09).
 - **No existe una entidad de historial de transiciones:** el MER solo conserva las novedades, la evidencia y `Servicio.creado_por`; no se puede reconstruir quién cambió el estado ni cuándo (H-06, LIM-17).
-- **Chat:** el texto de `MensajeChat` (`max_length=1000`) se valida en el serializer REST, pero `ChatConsumer._guardar_mensaje` lo guarda por el ORM sin revisar la longitud (SQLite no impone el límite de `varchar`). Además, el código deja escribir en el chat a ADMIN y ALISTADOR, aunque RF-16 solo describe el intercambio cliente-motorizado. Ninguno de los dos puntos figura en 01 §8 ni en 08.
+- **Chat, longitud del texto (abierto):** el texto de `MensajeChat` (`max_length=1000`) se valida en el serializer REST, pero `ChatConsumer._guardar_mensaje` lo guarda por el ORM sin revisar la longitud (SQLite no impone el límite de `varchar`). La app envía el chat solo por REST, así que únicamente lo alcanza un cliente WebSocket directo. No tiene ID de hallazgo propio: figura como hueco de trazabilidad en 07 §g.2 y como caso sin prueba en LIM-31.
+- **Chat, participantes (resuelto el 2026-10-09):** antes el código también dejaba leer y escribir en el chat a ADMIN y ALISTADOR, aunque RF-16 solo describe el intercambio cliente-motorizado. Ahora `ServicioViewSet.mensajes` responde 403 a ambos roles y `ChatConsumer` rechaza su conexión (cierre 4403); lo verifican tres pruebas nuevas (01 §2.4).
 
 ## 4.5 Cambios de alcance
 
@@ -461,7 +462,7 @@ El 2026-10-09 el autor retiró del proyecto el inventario, los pagos y el chatbo
 
 - Se eliminó la FK `Servicio.producto` (único vínculo de una entidad conservada con las retiradas), por lo que no quedan FK huérfanas.
 - Se retiraron 8 de las 22 relaciones del MER anterior (las de PRODUCTO, SERVICIO_PRODUCTO, CONVERSACION, MENSAJE_BOT y PAGO); quedan 14.
-- `MENSAJE_CHAT` se conserva sin cambios: es el chat cliente-motorizado por servicio (RF-16, RF-27). No debe confundirse con `MENSAJE_BOT`, que pertenecía al chatbot y sí se retiró.
+- `MENSAJE_CHAT` se conserva sin cambios en el esquema: es el chat cliente-motorizado por servicio (RF-16, RF-27). Un cambio de código posterior limitó quién puede leerlo y escribirlo al cliente dueño y al motorizado asignado (4.4.5). No debe confundirse con `MENSAJE_BOT`, que pertenecía al chatbot y sí se retiró.
 - Las migraciones del repositorio quedaron en `0001_initial` por app (ya no existe `services/0002_servicioproducto`). Una base de desarrollo recreada con ellas contiene exactamente las 12 tablas de dominio de 4.1, además de las internas de Django.
 
 **Observaciones del MER anterior que desaparecen por la reducción de alcance** (no son correcciones, sino consecuencias de quitar las entidades): el stock nunca se descuenta (H-09 en su parte de stock, LIM-10), la compra por chatbot no se revierte si el pago es rechazado (H-12, LIM-36), el producto principal convive sin regla con las líneas multi-producto (LIM-18, parte b), la discrepancia del plan de pruebas sobre quién crea productos (H-03) y el estado de `Pago`.

@@ -10,7 +10,7 @@ Prototipo funcional temprano de una plataforma web y móvil, orientada a API, pa
 
 > **Nota sobre el nombre:** el repositorio se llama **CEMDriver**, pero el producto es **CMEDriver**. Ambos nombres se refieren al mismo proyecto.
 
-> **Alcance (cambio del 2026-10-09):** el autor retiró del prototipo el **inventario, los pagos y el chatbot** para centrarlo en el ciclo operativo de mensajería. El chat solo sirve para que el cliente y el motorizado se comuniquen dentro de un servicio. El detalle del cambio está en [docs/entrega/01-requerimientos.md](docs/entrega/01-requerimientos.md#24-cambios-de-alcance). Los documentos numerados 01 a 17 de la raíz de `docs/` y `docs/v1/` son históricos y **no** reflejan este alcance; prevalece [docs/entrega/](docs/entrega/00-guia-de-entrega.md).
+> **Alcance (cambio del 2026-10-09):** el autor retiró del prototipo el **inventario, los pagos y el chatbot** para centrarlo en el ciclo operativo de mensajería. El chat solo sirve para que el cliente y el motorizado se comuniquen dentro de un servicio, y el código lo hace cumplir (ADMIN y ALISTADOR reciben 403). El detalle del cambio está en [docs/entrega/01-requerimientos.md](docs/entrega/01-requerimientos.md#24-cambios-de-alcance). Los documentos numerados 01 a 17 de la raíz de `docs/` y `docs/v1/` son históricos y **no** reflejan este alcance; prevalece [docs/entrega/](docs/entrega/00-guia-de-entrega.md).
 
 ---
 
@@ -25,7 +25,7 @@ Prototipo funcional temprano de una plataforma web y móvil, orientada a API, pa
 | Autenticación | JWT (SimpleJWT) para personas y API Key propia para integradores |
 | Documentación de la API | drf-spectacular (OpenAPI 3 + Swagger UI) |
 | Servicios externos | Nominatim y teselas de OpenStreetMap (reales). Correo SMTP configurable por variable de entorno: en desarrollo se imprime en la consola (único servicio simulado; ver [limitaciones](docs/entrega/08-limitaciones-y-mejoras.md#83-servicios-simulados-limitación-de-alcance)) |
-| Pruebas | Django test framework + DRF `APITestCase` + `channels.testing` (69 pruebas en el backend) |
+| Pruebas | Django test framework + DRF `APITestCase` + `channels.testing` (72 pruebas en el backend) |
 
 El detalle, la justificación y las alternativas descartadas están en [docs/entrega/02-stack-tecnologico.md](docs/entrega/02-stack-tecnologico.md).
 
@@ -139,7 +139,7 @@ cd backend
 .venv/bin/python manage.py test
 ```
 
-Resultado esperado: **69 pruebas, OK** (eran 96 antes del cambio de alcance del 2026-10-09, que retiró las pruebas de inventario, pagos y chatbot). Corren en una base de datos aislada y no requieren Internet porque Nominatim y los webhooks se simulan con `mock`. La prueba que verifica cada requerimiento vigente está en [docs/entrega/01-requerimientos.md](docs/entrega/01-requerimientos.md#4-requerimientos-funcionales-rf) §4 y en la [matriz de trazabilidad](docs/entrega/07-trazabilidad.md). El plan [docs/16-plan-pruebas.md](docs/16-plan-pruebas.md) es histórico: cuenta 93 pruebas y conserva casos de funciones retiradas. El frontend no tiene pruebas automatizadas (ver LIM-29).
+Resultado esperado: **72 pruebas, OK** (eran 96 antes del cambio de alcance del 2026-10-09, que retiró 27 pruebas de inventario, pagos y chatbot; después se añadieron 3 del chat restringido a cliente y motorizado). Corren en una base de datos aislada y no requieren Internet porque Nominatim y los webhooks se simulan con `mock`. La prueba que verifica cada requerimiento vigente está en [docs/entrega/01-requerimientos.md](docs/entrega/01-requerimientos.md#4-requerimientos-funcionales-rf) §4 y en la [matriz de trazabilidad](docs/entrega/07-trazabilidad.md). El plan [docs/16-plan-pruebas.md](docs/16-plan-pruebas.md) es histórico: cuenta 93 pruebas y conserva casos de funciones retiradas. El frontend no tiene pruebas automatizadas (ver LIM-29).
 
 ---
 
@@ -229,7 +229,7 @@ Antes de concretarla hay que hacer cambios de código: leer `DATABASES` y `CHANN
 | 05 | [BPMN](docs/entrega/05-bpmn.md) | Modelado de los procesos de negocio |
 | 06 | [Modelo C4](docs/entrega/06-c4.md) | Diagramas C4: contexto, contenedores, componentes y código |
 | 07 | [Matriz de trazabilidad](docs/entrega/07-trazabilidad.md) | Trazabilidad entre requerimientos, reglas, diseño, código y pruebas |
-| 08 | [Limitaciones y mejoras](docs/entrega/08-limitaciones-y-mejoras.md) | Limitaciones conocidas (34 vigentes y 4 resueltas por reducción de alcance), servicios simulados y hoja de ruta de mejoras |
+| 08 | [Limitaciones y mejoras](docs/entrega/08-limitaciones-y-mejoras.md) | Limitaciones conocidas (35 vigentes y 4 resueltas por reducción de alcance), servicios simulados y hoja de ruta de mejoras |
 
 El resto de la documentación (charter, API, cronograma, diagrama de clases, casos de uso, mockups, plan de pruebas, manual de herramientas, roadmap) está indexado en [docs/README.md](docs/README.md). Es **histórica**: se redactó antes del cambio de alcance del 2026-10-09 y no lo refleja; en caso de diferencia prevalece `docs/entrega/`.
 
@@ -237,7 +237,7 @@ El resto de la documentación (charter, API, cronograma, diagrama de clases, cas
 
 ## Limitaciones conocidas
 
-CMEDriver es un **MVP académico**. Hay 38 limitaciones registradas: **34 vigentes**, documentadas deliberadamente y sin corregir en esta entrega, y 4 resueltas por la reducción de alcance del 2026-10-09 (existían solo por el inventario, los pagos y el chatbot). Las 7 vigentes de prioridad alta son:
+CMEDriver es un **MVP académico**. Hay 39 limitaciones registradas: **35 vigentes**, documentadas deliberadamente y sin corregir en esta entrega, y 4 resueltas por la reducción de alcance del 2026-10-09 (existían solo por el inventario, los pagos y el chatbot). Las 7 vigentes de prioridad alta son:
 
 - El RBAC permite a clientes y motorizados editar o borrar servicios por `PUT/PATCH/DELETE`.
 - En la app, un servicio en `NOVEDAD` (reintentar) queda detenido porque se ocultan sus acciones.
