@@ -211,6 +211,22 @@ class MensajesChatTests(BaseAPITestCase):
         self.assertEqual(r.status_code, 201)
 
 
+    def test_admin_y_alistador_no_pueden_leer_ni_escribir_en_el_chat(self):
+        for usuario in (self.admin, self.alistador):
+            self.autenticar(usuario)
+            r = self.client.get(f'/api/servicios/{self.servicio.id}/mensajes/')
+            self.assertEqual(r.status_code, 403)
+            r = self.client.post(f'/api/servicios/{self.servicio.id}/mensajes/', {'texto': 'Hola'})
+            self.assertEqual(r.status_code, 403)
+        self.assertEqual(self.servicio.mensajes.count(), 0)
+
+    def test_motorizado_no_asignado_no_puede_acceder_al_chat(self):
+        self.autenticar(self.otro_motorizado)
+        r = self.client.get(f'/api/servicios/{self.servicio.id}/mensajes/')
+        # El servicio no aparece en su queryset (solo ve los de su ruta) -> 404.
+        self.assertEqual(r.status_code, 404)
+
+
 class ChatWebSocketTests(BaseAPITestCase):
     def setUp(self):
         super().setUp()
@@ -250,6 +266,13 @@ class ChatWebSocketTests(BaseAPITestCase):
         comm = WebsocketCommunicator(application, f'/ws/chat/{self.servicio.id}/?token={token}')
         connected, _ = await comm.connect()
         self.assertFalse(connected)
+
+    async def test_admin_y_alistador_no_pueden_conectarse_al_chat(self):
+        for usuario in (self.admin, self.alistador):
+            token = str(AccessToken.for_user(usuario))
+            comm = WebsocketCommunicator(application, f'/ws/chat/{self.servicio.id}/?token={token}')
+            connected, _ = await comm.connect()
+            self.assertFalse(connected)
 
 
 class PlanificarRecoleccionTests(BaseAPITestCase):

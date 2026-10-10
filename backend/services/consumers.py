@@ -10,6 +10,8 @@ from .serializers import MensajeChatSerializer
 class ChatConsumer(AsyncWebsocketConsumer):
     """Chat en tiempo real entre cliente y motorizado para un servicio.
 
+    Solo participan el cliente dueno del servicio y el motorizado asignado.
+
     Bidireccional: un mensaje enviado por WebSocket se guarda igual que uno
     enviado por REST (POST /api/servicios/{id}/mensajes/) y se difunde a
     todos los conectados al mismo servicio, incluyendo al propio autor (asi
@@ -65,7 +67,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
             return servicio.cliente_id == user.id
         if user.rol == 'MOTORIZADO':
             return bool(servicio.ruta and servicio.ruta.motorizado_id == user.id)
-        return user.rol in ('ADMIN', 'ALISTADOR')
+        # El chat es solo entre el cliente del servicio y el motorizado asignado.
+        return False
 
     @database_sync_to_async
     def _guardar_mensaje(self, texto):

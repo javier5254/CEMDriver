@@ -210,8 +210,8 @@ class ServicioViewSet(viewsets.ModelViewSet):
         user = request.user
         es_cliente_dueno = user.rol == 'CLIENTE' and servicio.cliente_id == user.id
         es_motorizado_asignado = user.rol == 'MOTORIZADO' and servicio.ruta and servicio.ruta.motorizado_id == user.id
-        if not (es_cliente_dueno or es_motorizado_asignado or user.rol in ('ADMIN', 'ALISTADOR')):
-            raise PermissionDenied('No tienes acceso al chat de este servicio.')
+        if not (es_cliente_dueno or es_motorizado_asignado):
+            raise PermissionDenied('El chat es solo entre el cliente del servicio y el motorizado asignado.')
 
         if request.method == 'GET':
             mensajes = servicio.mensajes.all()
