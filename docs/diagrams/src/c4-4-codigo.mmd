@@ -1,6 +1,6 @@
 classDiagram
     direction LR
-    %% C4 - Nivel 4: Codigo del componente "services" (ciclo de vida del servicio)
+    %% C4 - Nivel 4: Codigo del componente "services" (ciclo de vida del servicio y chat)
     %% Fuente: backend/services/{models,serializers,views,consumers}.py
 
     namespace services_views {
@@ -15,7 +15,6 @@ classDiagram
             -_motorizado_autorizado(servicio, user)
             -_notificar(evento, servicio)
             +asignar_ruta(request, pk) POST asignar-ruta
-            +productos(request, pk) PUT productos
             +recibir_en_centro(request, pk) POST recibir-en-centro
             +iniciar_transito(request, pk) POST iniciar-transito
             +cerrar(request, pk) POST cerrar
@@ -46,10 +45,8 @@ classDiagram
         class ServicioSerializer {
             <<ModelSerializer>>
             +cliente_detalle
-            +producto_detalle
             +evidencia
             +novedades
-            +productos_detalle
             +read_only_fields estado, creado_en
         }
         class ServicioCreateSerializer {
@@ -74,15 +71,22 @@ classDiagram
         }
         class PlanificarRecoleccionSerializer {
             <<ModelSerializer>>
-            +producto
             +zona
             +direccion_origen
             +fecha_agenda
         }
-        class ServicioProductoItemSerializer {
-            <<Serializer>>
-            +producto
-            +cantidad min 1
+        class EvidenciaSerializer {
+            <<ModelSerializer>>
+            +foto
+            +firma
+            +capturado_en
+        }
+        class NovedadSerializer {
+            <<ModelSerializer>>
+            +tipo
+            +detalle
+            +accion
+            +creado_en
         }
         class MensajeChatSerializer {
             <<ModelSerializer>>
@@ -99,7 +103,6 @@ classDiagram
             <<Model>>
             +tipo TipoServicio
             +cliente FK Usuario
-            +producto FK Producto
             +zona
             +direccion_origen
             +direccion_destino
@@ -114,12 +117,6 @@ classDiagram
             +motorizado FK Usuario
             +fecha date
             +estado EstadoRuta
-        }
-        class ServicioProducto {
-            <<Model>>
-            +servicio FK
-            +producto FK Producto
-            +cantidad int
         }
         class Evidencia {
             <<Model>>
@@ -159,6 +156,12 @@ classDiagram
             ENTREGA
             RECOLECCION
         }
+        class EstadoRuta {
+            <<enumeration>>
+            PLANEADA
+            EN_CURSO
+            FINALIZADA
+        }
     }
 
     namespace dependencias_externas {
@@ -166,6 +169,9 @@ classDiagram
             <<accounts.models>>
             +rol ADMIN|ALISTADOR|MOTORIZADO|CLIENTE
             +email unico
+        }
+        class UsuarioResumenSerializer {
+            <<accounts.serializers>>
         }
         class PermisosRBAC {
             <<accounts.permissions>>
@@ -178,9 +184,6 @@ classDiagram
             <<coverage.models>>
             +leadtime_dias
             +dias_codigos()
-        }
-        class Producto {
-            <<inventory.models>>
         }
         class DespachadorWebhooks {
             <<integrations.services>>
@@ -200,12 +203,16 @@ classDiagram
     ServicioViewSet ..> CerrarServicioSerializer : cerrar
     ServicioViewSet ..> NovedadCreateSerializer : novedad
     ServicioViewSet ..> PlanificarRecoleccionSerializer : planificar
-    ServicioViewSet ..> ServicioProductoItemSerializer : productos
     ServicioViewSet ..> MensajeChatSerializer : mensajes
     RutaViewSet ..> RutaSerializer
+    ServicioSerializer ..> EvidenciaSerializer : evidencia
+    ServicioSerializer ..> NovedadSerializer : novedades
     ChatConsumer ..> MensajeChatSerializer
     ChatConsumer ..> MensajeChat : crea
 
+    ServicioSerializer ..> UsuarioResumenSerializer : cliente_detalle
+    MensajeChatSerializer ..> UsuarioResumenSerializer : autor_detalle
+    RutaSerializer ..> UsuarioResumenSerializer : motorizado_detalle
     ServicioViewSet ..> PermisosRBAC : get_permissions()
     RutaViewSet ..> PermisosRBAC : IsAlistador
     ServicioViewSet ..> DespachadorWebhooks : _notificar()
@@ -214,14 +221,12 @@ classDiagram
     ServicioViewSet ..> Cobertura : planificar() RN-03
 
     Ruta "0..1" <-- "*" Servicio : ruta
-    Servicio "1" *-- "*" ServicioProducto : productos_detalle
     Servicio "1" *-- "0..1" Evidencia : evidencia
     Servicio "1" *-- "*" Novedad : novedades
     Servicio "1" *-- "*" MensajeChat : mensajes
     Servicio --> EstadoServicio
     Servicio --> TipoServicio
+    Ruta --> EstadoRuta
     Servicio "*" --> "1" Usuario : cliente
     Ruta "*" --> "1" Usuario : motorizado
     MensajeChat "*" --> "1" Usuario : autor
-    ServicioProducto "*" --> "1" Producto
-    Servicio "*" --> "0..1" Producto : producto
