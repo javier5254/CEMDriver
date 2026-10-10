@@ -22,7 +22,7 @@ flowchart TB
     subgraph Plataforma["Plataforma CMEDriver - Servidor ASGI Daphne (monolito modular Django)"]
         direction LR
         ADMINP["<b>Panel de administracion Django</b><br/>/admin/"]
-        API["<b>API REST CMEDriver</b><br/>Django 6.1 + DRF 3.18 - /api/*<br/>JWT + API Key + RBAC<br/>9 apps de dominio"]
+        API["<b>API REST CMEDriver</b><br/>Django 6.1 + DRF 3.18 - /api/*<br/>JWT + API Key + RBAC<br/>6 apps de dominio"]
         DOCS["<b>Documentacion API</b><br/>drf-spectacular<br/>/api/docs/ (Swagger)"]
         CL["<b>Capa de canales</b><br/>InMemoryChannelLayer (dev)<br/>Redis (propuesta prod)"]
         RT["<b>Servicio de tiempo real</b><br/>Django Channels 4.3<br/>/ws/tracking/{id}/ - /ws/chat/{id}/"]
@@ -42,8 +42,6 @@ flowchart TB
         NOM["<b>Nominatim (OpenStreetMap)</b><br/>geocodificacion - REAL"]
         SMTP["<b>Servidor SMTP</b><br/>backend de consola en dev"]
         WH["<b>Receptor de webhooks</b><br/>del sistema integrador"]
-        PAY["<b>Proveedor de pagos</b><br/>MockPaymentProvider - SIMULADO"]
-        LLM["<b>Proveedor LLM</b><br/>MockLLMClient - SIMULADO"]
     end
 
     %% ---------- Flujos ----------
@@ -67,14 +65,10 @@ flowchart TB
     API -->|"HTTPS GET /search (1 req/s)"| NOM
     API -->|"SMTP+TLS (prod) / consola (dev)"| SMTP
     API -->|"HTTPS POST + HMAC-SHA256"| WH
-    API -.->|"en proceso hoy / HTTPS a futuro"| PAY
-    API -.->|"en proceso hoy / HTTPS a futuro"| LLM
 
     classDef ext fill:#FFF3E0,stroke:#FF9500,color:#1C1C1E;
-    classDef sim fill:#F2F2F7,stroke:#8E8E93,stroke-dasharray:5 3,color:#1C1C1E;
     classDef store fill:#E8F7EE,stroke:#34C759,color:#1C1C1E;
     classDef actor fill:#FFFFFF,stroke:#007AFF,color:#1C1C1E;
     class NOM,OSM,SMTP,INT,WH ext;
-    class PAY,LLM sim;
     class DB,MEDIA store;
     class ADM,ALI,MOT,CLI actor;
