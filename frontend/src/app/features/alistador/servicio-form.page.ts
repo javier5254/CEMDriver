@@ -14,8 +14,7 @@ import {
 } from '@ionic/angular';
 import { ServiciosService } from '../../core/services/servicios.service';
 import { CoberturaService } from '../../core/services/cobertura.service';
-import { ProductosService } from '../../core/services/productos.service';
-import { Cobertura, Producto, TipoServicio } from '../../core/models';
+import { Cobertura, TipoServicio } from '../../core/models';
 import { extractErrorMessage } from '../../core/utils';
 
 @Component({
@@ -56,16 +55,6 @@ import { extractErrorMessage } from '../../core/utils';
         </ion-note>
 
         <ion-item>
-          <ion-label>Producto (opcional)</ion-label>
-          <ion-select [(ngModel)]="model.producto" name="producto">
-            <ion-select-option [value]="null">Ninguno</ion-select-option>
-            <ion-select-option *ngFor="let p of productos" [value]="p.id">
-              {{ p.nombre }} ({{ p.sku }})
-            </ion-select-option>
-          </ion-select>
-        </ion-item>
-
-        <ion-item>
           <ion-label>Zona</ion-label>
           <ion-select [(ngModel)]="model.zona" name="zona" required>
             <ion-select-option *ngFor="let c of zonas" [value]="c.zona">{{ c.zona }}</ion-select-option>
@@ -100,7 +89,6 @@ export class ServicioFormPage implements OnInit {
   model: {
     tipo: TipoServicio;
     cliente: number | null;
-    producto: number | null;
     zona: string;
     direccion_origen: string;
     direccion_destino: string;
@@ -108,7 +96,6 @@ export class ServicioFormPage implements OnInit {
   } = {
     tipo: 'ENTREGA',
     cliente: null,
-    producto: null,
     zona: '',
     direccion_origen: '',
     direccion_destino: '',
@@ -116,7 +103,6 @@ export class ServicioFormPage implements OnInit {
   };
 
   zonas: Cobertura[] = [];
-  productos: Producto[] = [];
   saving = false;
   error = '';
   success: number | null = null;
@@ -124,7 +110,6 @@ export class ServicioFormPage implements OnInit {
   constructor(
     private serviciosService: ServiciosService,
     private coberturaService: CoberturaService,
-    private productosService: ProductosService,
     private router: Router,
     private cdr: ChangeDetectorRef,
   ) {}
@@ -133,13 +118,6 @@ export class ServicioFormPage implements OnInit {
     this.coberturaService.list().subscribe({
       next: (z) => {
         this.zonas = z;
-        this.cdr.detectChanges();
-      },
-      error: () => {},
-    });
-    this.productosService.list().subscribe({
-      next: (p) => {
-        this.productos = p;
         this.cdr.detectChanges();
       },
       error: () => {},

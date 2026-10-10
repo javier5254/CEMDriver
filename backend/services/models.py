@@ -42,7 +42,6 @@ class Servicio(models.Model):
         settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name='servicios',
         limit_choices_to={'rol': 'CLIENTE'},
     )
-    producto = models.ForeignKey('inventory.Producto', on_delete=models.SET_NULL, null=True, blank=True, related_name='servicios')
     zona = models.CharField(max_length=100)
     direccion_origen = models.CharField(max_length=255, blank=True)
     direccion_destino = models.CharField(max_length=255, blank=True)
@@ -59,26 +58,6 @@ class Servicio(models.Model):
 
     def __str__(self):
         return f'Servicio {self.id} ({self.tipo}) - {self.estado}'
-
-
-class ServicioProducto(models.Model):
-    """Linea de producto adicional de un servicio (inventario avanzado).
-
-    El campo `Servicio.producto` original se mantiene para no romper flujos
-    existentes (chatbot, formulario simple del alistador) que solo manejan
-    un producto. Esta tabla permite, opcionalmente, asociar varios productos
-    con cantidad a un mismo servicio (ej. una compra con 2 items distintos).
-    """
-
-    servicio = models.ForeignKey(Servicio, on_delete=models.CASCADE, related_name='productos_detalle')
-    producto = models.ForeignKey('inventory.Producto', on_delete=models.PROTECT, related_name='lineas_servicio')
-    cantidad = models.PositiveIntegerField(default=1)
-
-    class Meta:
-        unique_together = ('servicio', 'producto')
-
-    def __str__(self):
-        return f'{self.servicio_id} x {self.producto.sku} ({self.cantidad})'
 
 
 class Evidencia(models.Model):

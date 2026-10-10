@@ -53,15 +53,10 @@ export class ServiciosService {
     return this.http.post<Servicio>(`${this.base}${id}/novedad/`, data);
   }
 
-  // Nota: el backend acepta un campo opcional "producto" (no documentado en
-  // 05-api.md) que asocia el producto comprado, pero el servicio resultante
-  // siempre queda con tipo=RECOLECCION sin importar lo que se envie en "tipo"
-  // (tambien no documentado). Ver desviaciones reportadas.
   planificar(data: {
     zona: string;
     direccion_origen: string;
     fecha_agenda: string;
-    producto?: number;
   }): Observable<Servicio> {
     return this.http.post<Servicio>(`${this.base}planificar/`, data);
   }

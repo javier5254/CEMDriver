@@ -26,7 +26,7 @@ import { estadoColor, extractErrorMessage } from '../../core/utils';
       <ion-spinner *ngIf="loading"></ion-spinner>
       <ion-text color="danger" *ngIf="error"><p>{{ error }}</p></ion-text>
       <ion-text color="medium" *ngIf="!loading && !error && servicios.length === 0">
-        <p>Aun no tienes servicios. Prueba planificar una recoleccion o usar el chatbot.</p>
+        <p>Aun no tienes servicios. Prueba planificar una recoleccion.</p>
       </ion-text>
 
       <ion-list *ngIf="!loading && !error">

@@ -4,17 +4,15 @@ from django.core.management.base import BaseCommand
 
 from accounts.models import Usuario
 from coverage.models import Cobertura
-from inventory.models import Producto
 from services.models import EstadoServicio, Ruta, Servicio, TipoServicio
 
 
 class Command(BaseCommand):
-    help = 'Crea usuarios, cobertura, productos y un servicio de demo para CMEDriver.'
+    help = 'Crea usuarios, cobertura y un servicio de demo para CMEDriver.'
 
     def handle(self, *args, **options):
         self._crear_usuarios()
         self._crear_cobertura()
-        self._crear_productos()
         self._crear_servicio_demo()
         self.stdout.write(self.style.SUCCESS('Datos de demo creados/actualizados correctamente.'))
 
@@ -48,18 +46,6 @@ class Command(BaseCommand):
             zona='Bogota - Suba',
             defaults=dict(leadtime_dias=2, dias_disponibles='LUN,MIE,VIE'),
         )
-
-    def _crear_productos(self):
-        productos = [
-            dict(sku='SKU-001', nombre='Caja pequena', precio=15000, stock=50,
-                 centro_mensajeria='Centro Norte', disponible_chatbot=True),
-            dict(sku='SKU-002', nombre='Sobre documentos', precio=8000, stock=100,
-                 centro_mensajeria='Centro Norte', disponible_chatbot=True),
-            dict(sku='SKU-003', nombre='Paquete fragil', precio=25000, stock=20,
-                 centro_mensajeria='Centro Sur', disponible_chatbot=False),
-        ]
-        for datos in productos:
-            Producto.objects.get_or_create(sku=datos['sku'], defaults=datos)
 
     def _crear_servicio_demo(self):
         cliente = Usuario.objects.filter(rol='CLIENTE').first()

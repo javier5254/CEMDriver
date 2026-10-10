@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Evidencia, MensajeChat, Novedad, Ruta, Servicio, ServicioProducto
+from .models import Evidencia, MensajeChat, Novedad, Ruta, Servicio
 
 
 @admin.register(Ruta)
@@ -29,8 +29,3 @@ class EvidenciaAdmin(admin.ModelAdmin):
 @admin.register(MensajeChat)
 class MensajeChatAdmin(admin.ModelAdmin):
     list_display = ('id', 'servicio', 'autor', 'enviado_en')
-
-
-@admin.register(ServicioProducto)
-class ServicioProductoAdmin(admin.ModelAdmin):
-    list_display = ('id', 'servicio', 'producto', 'cantidad')

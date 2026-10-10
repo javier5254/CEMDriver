@@ -13,7 +13,7 @@ from coverage.models import Cobertura
 from coverage.views import DIAS_ORDEN
 from integrations.services import disparar_webhook
 
-from .models import EstadoServicio, Evidencia, MensajeChat, Novedad, Ruta, Servicio, ServicioProducto, TipoServicio
+from .models import EstadoServicio, Evidencia, MensajeChat, Novedad, Ruta, Servicio, TipoServicio
 from .serializers import (
     AsignarRutaSerializer,
     CerrarServicioSerializer,
@@ -23,7 +23,6 @@ from .serializers import (
     PlanificarRecoleccionSerializer,
     RutaSerializer,
     ServicioCreateSerializer,
-    ServicioProductoItemSerializer,
     ServicioSerializer,
 )
 
@@ -56,7 +55,7 @@ class ServicioViewSet(viewsets.ModelViewSet):
             return [IsAlistador()]
         if self.action == 'planificar':
             return [IsCliente()]
-        if self.action in ('asignar_ruta', 'productos'):
+        if self.action == 'asignar_ruta':
             return [IsAlistador()]
         if self.action in ('recibir_en_centro', 'iniciar_transito', 'cerrar', 'novedad'):
             return [IsMotorizado()]
@@ -101,22 +100,6 @@ class ServicioViewSet(viewsets.ModelViewSet):
         servicio.estado = EstadoServicio.ASIGNADO
         servicio.save()
         self._notificar('servicio.asignado', servicio)
-        return Response(ServicioSerializer(servicio).data)
-
-    @action(detail=True, methods=['put'], url_path='productos')
-    def productos(self, request, pk=None):
-        """Reemplaza por completo las lineas de producto de un servicio
-        (inventario avanzado: varios productos con cantidad por servicio).
-        Idempotente: envia siempre la lista completa deseada."""
-        servicio = self.get_object()
-        serializer = ServicioProductoItemSerializer(data=request.data, many=True)
-        serializer.is_valid(raise_exception=True)
-
-        ServicioProducto.objects.filter(servicio=servicio).delete()
-        ServicioProducto.objects.bulk_create([
-            ServicioProducto(servicio=servicio, producto=item['producto'], cantidad=item['cantidad'])
-            for item in serializer.validated_data
-        ])
         return Response(ServicioSerializer(servicio).data)
 
     @action(detail=True, methods=['post'], url_path='recibir-en-centro')
@@ -213,7 +196,6 @@ class ServicioViewSet(viewsets.ModelViewSet):
         servicio = Servicio.objects.create(
             tipo=TipoServicio.RECOLECCION,
             cliente=request.user,
-            producto=data.get('producto'),
             zona=zona,
             direccion_origen=data['direccion_origen'],
             fecha_agenda=fecha_agenda,

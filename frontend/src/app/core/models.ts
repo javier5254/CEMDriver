@@ -37,17 +37,6 @@ export interface AgendaDisponible {
   fechas_disponibles: string[];
 }
 
-export interface Producto {
-  id: number;
-  sku: string;
-  nombre: string;
-  descripcion?: string;
-  precio: string | number;
-  stock: number;
-  centro_mensajeria: string;
-  disponible_chatbot: boolean;
-}
-
 export type TipoServicio = 'ENTREGA' | 'RECOLECCION';
 
 export type EstadoServicio =
@@ -81,8 +70,6 @@ export interface Servicio {
   tipo: TipoServicio;
   cliente: number;
   cliente_detalle?: Usuario;
-  producto?: number | null;
-  producto_detalle?: Producto | null;
   zona: string;
   direccion_origen?: string;
   direccion_destino?: string;

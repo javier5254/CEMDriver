@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
@@ -18,7 +18,7 @@ import { extractErrorMessage } from '../core/utils';
 
 /**
  * Formulario reusable de "planificar recoleccion" (RF-17). Usado tanto en la
- * pantalla dedicada del cliente como en el flujo guiado del chatbot.
+ * pantalla dedicada del cliente.
  */
 @Component({
   selector: 'app-planificar-form',
@@ -66,7 +66,7 @@ import { extractErrorMessage } from '../core/utils';
         [disabled]="!zona || !direccionOrigen || !fechaAgenda || saving"
         (click)="submit()"
       >
-        {{ saving ? 'Enviando...' : (productoId ? 'Confirmar compra' : 'Planificar recoleccion') }}
+        {{ saving ? 'Enviando...' : 'Planificar recoleccion' }}
       </ion-button>
 
       <ion-text color="success" *ngIf="creado"><p>Servicio #{{ creado.id }} creado ({{ creado.estado }}).</p></ion-text>
@@ -75,8 +75,6 @@ import { extractErrorMessage } from '../core/utils';
   `,
 })
 export class PlanificarFormComponent implements OnInit {
-  /** Producto opcional (flujo de "compra" del chatbot). */
-  @Input() productoId: number | null = null;
   @Output() creadoEvent = new EventEmitter<Servicio>();
 
   zonas: Cobertura[] = [];
@@ -133,7 +131,6 @@ export class PlanificarFormComponent implements OnInit {
         zona: this.zona,
         direccion_origen: this.direccionOrigen,
         fecha_agenda: this.fechaAgenda,
-        ...(this.productoId ? { producto: this.productoId } : {}),
       })
       .subscribe({
         next: (s) => {

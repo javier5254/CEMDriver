@@ -9,7 +9,6 @@ from testutils import BaseAPITestCase
 
 from cmedriver.asgi import application
 from coverage.models import Cobertura
-from inventory.models import Producto
 
 from .models import EstadoServicio, Ruta, Servicio, TipoServicio
 
@@ -64,46 +63,6 @@ class CrearServicioTests(BaseAPITestCase):
         })
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.data['estado'], EstadoServicio.CREADO)
-
-
-class ServicioProductoTests(BaseAPITestCase):
-    def setUp(self):
-        super().setUp()
-        self.servicio = Servicio.objects.create(
-            tipo=TipoServicio.ENTREGA, cliente=self.cliente, zona='Zona Test',
-            direccion_destino='Calle 1', fecha_agenda=datetime.date.today(),
-        )
-        self.p1 = Producto.objects.create(sku='MP-1', nombre='Item 1', precio=1000, stock=10, centro_mensajeria='C')
-        self.p2 = Producto.objects.create(sku='MP-2', nombre='Item 2', precio=2000, stock=10, centro_mensajeria='C')
-
-    def test_alistador_puede_definir_lineas_de_producto(self):
-        self.autenticar(self.alistador)
-        r = self.client.put(f'/api/servicios/{self.servicio.id}/productos/', [
-            {'producto': self.p1.id, 'cantidad': 2},
-            {'producto': self.p2.id, 'cantidad': 1},
-        ], format='json')
-        self.assertEqual(r.status_code, 200)
-        self.assertEqual(len(r.data['productos_detalle']), 2)
-
-    def test_reemplazar_lineas_es_idempotente(self):
-        self.autenticar(self.alistador)
-        self.client.put(f'/api/servicios/{self.servicio.id}/productos/', [
-            {'producto': self.p1.id, 'cantidad': 3},
-            {'producto': self.p2.id, 'cantidad': 1},
-        ], format='json')
-        r = self.client.put(f'/api/servicios/{self.servicio.id}/productos/', [
-            {'producto': self.p1.id, 'cantidad': 5},
-        ], format='json')
-        self.assertEqual(r.status_code, 200)
-        self.assertEqual(len(r.data['productos_detalle']), 1)
-        self.assertEqual(r.data['productos_detalle'][0]['cantidad'], 5)
-
-    def test_no_alistador_no_puede_definir_lineas(self):
-        self.autenticar(self.cliente)
-        r = self.client.put(f'/api/servicios/{self.servicio.id}/productos/', [
-            {'producto': self.p1.id, 'cantidad': 1},
-        ], format='json')
-        self.assertEqual(r.status_code, 403)
 
 
 class CicloDeVidaEntregaTests(BaseAPITestCase):

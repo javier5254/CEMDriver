@@ -59,12 +59,9 @@ INSTALLED_APPS = [
     'drf_spectacular',
     'accounts',
     'coverage',
-    'inventory',
     'services',
     'tracking',
     'optimization',
-    'chatbot',
-    'payments',
     'integrations',
 ]
 

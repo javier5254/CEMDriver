@@ -76,12 +76,6 @@ import { estadoColor, extractErrorMessage, mediaUrl } from '../../core/utils';
               <h3>{{ s.zona }} - {{ s.fecha_agenda }}</h3>
             </ion-label>
           </ion-item>
-          <ion-item lines="none" *ngIf="s.producto_detalle">
-            <ion-label>
-              <p>Producto</p>
-              <h3>{{ s.producto_detalle.nombre }}</h3>
-            </ion-label>
-          </ion-item>
         </ion-list>
 
         <ion-text color="success" *ngIf="actionMessage"><p>{{ actionMessage }}</p></ion-text>
@@ -137,7 +131,7 @@ import { estadoColor, extractErrorMessage, mediaUrl } from '../../core/utils';
 
           <ng-container *ngIf="s.tipo === 'RECOLECCION'">
             <ion-item lines="none">
-              <ion-label position="stacked">Foto del producto</ion-label>
+              <ion-label position="stacked">Foto del paquete</ion-label>
               <input type="file" accept="image/*" capture="environment" (change)="onFotoChange($event)" />
             </ion-item>
             <p *ngIf="fotoPreview"><img [src]="fotoPreview" style="max-width: 200px; border-radius: 6px;" /></p>
@@ -351,7 +345,7 @@ export class MotorizadoServicioDetailPage implements OnInit, OnDestroy {
   }
 
   recibirEnCentro(): void {
-    this.runAction(this.serviciosService.recibirEnCentro(Number(this.id)), 'Producto recibido en centro.');
+    this.runAction(this.serviciosService.recibirEnCentro(Number(this.id)), 'Paquete recibido en centro.');
   }
 
   iniciarTransito(): void {

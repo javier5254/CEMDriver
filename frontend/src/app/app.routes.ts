@@ -26,7 +26,6 @@ import { MotorizadoServicioDetailPage } from './features/motorizado/servicio-det
 import { ClienteServiciosListPage } from './features/cliente/servicios-list.page';
 import { TrackingPage } from './features/cliente/tracking.page';
 import { PlanificarPage } from './features/cliente/planificar.page';
-import { ChatbotPage } from './features/cliente/chatbot.page';
 import { ChatPage } from './shared/chat.page';
 
 export const routes: Routes = [
@@ -114,7 +113,6 @@ export const routes: Routes = [
       segments: [
         { label: 'Mis servicios', path: 'servicios' },
         { label: 'Planificar recoleccion', path: 'planificar' },
-        { label: 'Chatbot', path: 'chatbot' },
       ],
     },
     children: [
@@ -123,7 +121,6 @@ export const routes: Routes = [
       { path: 'servicios/:id/tracking', component: TrackingPage },
       { path: 'servicios/:id/chat', component: ChatPage },
       { path: 'planificar', component: PlanificarPage },
-      { path: 'chatbot', component: ChatbotPage },
     ],
   },
 
