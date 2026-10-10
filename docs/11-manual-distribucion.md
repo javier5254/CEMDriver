@@ -1,5 +1,7 @@
 # Manual de instalación y distribución — CMEDriver (v2)
 
+> **Nota (2026-10-09):** este manual se redactó antes de la reducción de alcance que retiró el inventario, los pagos y el chatbot (el chat quedó solo como canal entre el cliente y el motorizado). Su contenido operativo (instalación, datos semilla, servicios simulados y proveedores) se actualizó al alcance vigente; el resto del texto es el del manual original. Prevalece la documentación de [entrega/](entrega/00-guia-de-entrega.md), en particular [entrega/01-requerimientos.md §2.4](entrega/01-requerimientos.md#24-cambios-de-alcance).
+
 ## 1. Requisitos del sistema
 
 | Componente | Requisito |
@@ -11,7 +13,7 @@
 | Base de datos (producción sugerida) | PostgreSQL 14+ |
 | Navegador | Cualquier navegador moderno (Chrome, Edge, Firefox) — la app corre en el navegador, no requiere instalación en el celular |
 
-No se requieren licencias de pago ni API keys para correr el MVP: los mapas y el geocoding usan OpenStreetMap/Nominatim (gratuitos), el correo sale por consola en desarrollo, y el chatbot/pagos usan implementaciones simuladas (ver [03-arquitectura.md](03-arquitectura.md)).
+No se requieren licencias de pago ni API keys para correr el MVP: los mapas y el geocoding usan OpenStreetMap/Nominatim (gratuitos) y el correo sale por consola en desarrollo. El correo es el **único servicio simulado**: el chatbot (con su modelo de lenguaje simulado) y los pagos simulados se retiraron del proyecto el 2026-10-09 (ver [entrega/08-limitaciones-y-mejoras.md §8.3](entrega/08-limitaciones-y-mejoras.md#83-servicios-simulados-limitación-de-alcance)).
 
 ## 2. Instalación del backend (Django)
 
@@ -36,6 +38,8 @@ python manage.py runserver 0.0.0.0:8000
 
 Verificación: abrir `http://localhost:8000/api/docs/` debe mostrar la documentación Swagger de la API.
 
+`seed_data` (opcional) crea los 4 usuarios de prueba (ver §5), 2 zonas de cobertura, una ruta para `motorizado1` y 3 servicios de ejemplo (2 entregas y 1 recolección). No crea productos: el inventario ya no existe.
+
 **Nota v2**: con `channels` y `daphne` instalados (ya incluidos en `requirements.txt`) y `daphne` como primera app en `INSTALLED_APPS`, el mismo comando `runserver` sirve automáticamente tanto HTTP como WebSockets (`ws://localhost:8000/ws/...`) — no hace falta levantar un proceso aparte para los sockets en desarrollo.
 
 ### Variables de configuración relevantes (`backend/cmedriver/settings.py`)
@@ -53,9 +57,9 @@ Verificación: abrir `http://localhost:8000/api/docs/` debe mostrar la documenta
 ### Conectar proveedores reales (opcional, más allá del MVP)
 | Módulo | Archivo a modificar | Qué cambiar |
 |---|---|---|
-| Correo real | `settings.py` → `MAILERS` | Backend SMTP real (Gmail con contraseña de aplicación, SendGrid, Mailgun, AWS SES, Resend, etc.) |
-| Chatbot con LLM real | `chatbot/llm.py` | Reemplazar `MockLLMClient` por una llamada real a la API de un proveedor (ej. Anthropic), manteniendo la misma firma `responder(conversacion, mensaje_nuevo) -> dict` y las mismas funciones "tool" ya construidas |
-| Pagos reales | `payments/provider.py` | Reemplazar `MockPaymentProvider` por un cliente real de Wompi/PayU/Stripe, manteniendo la misma firma `procesar(pago)` |
+| Correo real | `settings.py` → `MAILERS` (se elige con la variable de entorno `EMAIL_BACKEND`) | Backend SMTP real (Gmail con contraseña de aplicación, SendGrid, Mailgun, AWS SES, Resend, etc.) |
+
+Es el único proveedor simulado del proyecto. El chatbot con LLM real y los pagos reales dejaron de ser opciones de configuración porque esas funciones (junto con el inventario) se retiraron del alcance el 2026-10-09; su reincorporación, si el alcance se amplía, es una mejora futura opcional (n.º 14 de la [hoja de ruta](entrega/08-limitaciones-y-mejoras.md#84-hoja-de-ruta-de-mejoras-priorizada)).
 
 ## 3. Instalación del frontend (Ionic + Angular)
 
@@ -102,7 +106,7 @@ Este MVP corre en modo desarrollo (`runserver` de Django + servidor de desarroll
 2. **Frontend**: generar el build (`npm run build`) y servir los archivos estáticos resultantes desde el mismo Nginx o un CDN.
 3. **Variables sensibles**: `SECRET_KEY` ya se lee de la variable de entorno `DJANGO_SECRET_KEY` (junto con `DJANGO_DEBUG`, `DJANGO_ALLOWED_HOSTS`, `CORS_ALLOWED_ORIGINS`, `FRONTEND_URL`, `EMAIL_BACKEND` y `DEFAULT_FROM_EMAIL`; ver `backend/.env.example`). Falta hacer lo mismo con las credenciales de base de datos (no versionarlas en el repositorio).
 4. **HTTPS**: obligatorio en producción, tanto para la API como para el frontend (los navegadores restringen geolocalización y cámara en sitios sin HTTPS).
-5. **Contenedores (opcional, recomendado a futuro)**: empaquetar backend y frontend en imágenes Docker separadas + un `docker-compose.yml` con PostgreSQL, para reproducibilidad del entorno. No incluido en el MVP por tiempo, pero es el siguiente paso natural (ver [07-roadmap-futuro.md](07-roadmap-futuro.md)).
+5. **Contenedores (opcional, recomendado a futuro)**: empaquetar backend y frontend en imágenes Docker separadas + un `docker-compose.yml` con PostgreSQL, para reproducibilidad del entorno. No incluido en el MVP por tiempo, pero es el siguiente paso natural (ver la [hoja de ruta vigente](entrega/08-limitaciones-y-mejoras.md#84-hoja-de-ruta-de-mejoras-priorizada), mejora n.º 8; el [roadmap](07-roadmap-futuro.md) es histórico).
 
 ## 7. Respaldo y mantenimiento
 - **Backup de base de datos**: en SQLite, respaldar el archivo `backend/db.sqlite3` periódicamente. En PostgreSQL, usar `pg_dump` programado.

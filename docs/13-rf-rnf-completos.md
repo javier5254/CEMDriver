@@ -1,5 +1,7 @@
 # RF y RNF completos — CMEDriver
 
+> **Nota (2026-10-09):** este documento es **histórico**: se redactó antes de la reducción de alcance que retiró el inventario, los pagos y el chatbot (el chat quedó solo como canal entre el cliente y el motorizado) y **no refleja el alcance vigente**. Incluye los requerimientos retirados (RF-04, RF-18, RF-22, RF-23, RF-26 y RNF-13); los vigentes están en [entrega/01-requerimientos.md](entrega/01-requerimientos.md#4-requerimientos-funcionales-rf). Prevalece la documentación de [entrega/](entrega/00-guia-de-entrega.md), en particular [entrega/01-requerimientos.md §2.4](entrega/01-requerimientos.md#24-cambios-de-alcance).
+
 Diligenciados con el formato de [09-formatos-historias-requisitos.md](09-formatos-historias-requisitos.md). Los criterios de verificación marcados **"Verificado"** ya fueron probados de punta a punta contra el backend real corriendo (no son solo aspiracionales).
 
 ## Requerimientos funcionales (RF)

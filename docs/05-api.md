@@ -1,5 +1,7 @@
 # Diseño de API — CMEDriver (v2)
 
+> **Nota (2026-10-09):** este documento es **histórico**: se redactó antes de la reducción de alcance que retiró el inventario, los pagos y el chatbot (el chat quedó solo como canal entre el cliente y el motorizado) y **no refleja el alcance vigente**. Documenta endpoints que ya no existen: `/api/productos/`, `/api/servicios/{id}/productos/`, `/api/chatbot/` y `/api/pagos/`. El contrato vigente es el que publica el backend en `/api/docs/` (Swagger) y se resume por app en [entrega/03-arquitectura.md §4](entrega/03-arquitectura.md#4-apps-del-backend-módulos-de-la-api-rest-cmedriver). Prevalece la documentación de [entrega/](entrega/00-guia-de-entrega.md), en particular [entrega/01-requerimientos.md §2.4](entrega/01-requerimientos.md#24-cambios-de-alcance).
+
 Base URL: `/api/`. Todas las rutas (excepto login/registro/reset) requieren header `Authorization: Bearer <token>` **o** `X-API-Key: <clave>` (para sistemas externos, ver [Integraciones](#integraciones-api-keys-y-webhooks)). Documentación interactiva servida en `/api/docs/` (drf-spectacular / Swagger). WebSockets documentados aparte al final.
 
 ## Auth

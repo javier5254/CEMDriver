@@ -1,5 +1,7 @@
 # Plan de pruebas — CMEDriver (v2)
 
+> **Nota (2026-10-09):** este documento es **histórico**: se redactó antes de la reducción de alcance que retiró el inventario, los pagos y el chatbot (el chat quedó solo como canal entre el cliente y el motorizado) y **no refleja el alcance vigente**. Cuenta 93 pruebas y conserva los casos `T-INV-*`, `T-BOT-*`, `T-PAG-*` y `T-SRV-17…19`, de funciones retiradas; la suite vigente del backend tiene **69 pruebas** y la prueba de cada requerimiento vigente está en [entrega/01-requerimientos.md §4](entrega/01-requerimientos.md#4-requerimientos-funcionales-rf). Prevalece la documentación de [entrega/](entrega/00-guia-de-entrega.md), en particular [entrega/01-requerimientos.md §2.4](entrega/01-requerimientos.md#24-cambios-de-alcance).
+
 ## 1. Estrategia
 Las pruebas del backend están **automatizadas** (no solo documentadas): cada caso de prueba de este documento tiene su contraparte ejecutable en `backend/*/tests.py`, usando el framework de pruebas de Django + `rest_framework.test.APIClient`. Cada corrida crea y destruye su propia base de datos de prueba — no depende de los datos de `seed_data`.
 

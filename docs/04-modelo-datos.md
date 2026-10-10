@@ -1,5 +1,7 @@
 # Modelo de datos — CMEDriver (v2)
 
+> **Nota (2026-10-09):** este documento es **histórico**: se redactó antes de la reducción de alcance que retiró el inventario, los pagos y el chatbot (el chat quedó solo como canal entre el cliente y el motorizado) y **no refleja el alcance vigente**. Muestra 17 entidades; ya no existen `PRODUCTO`, `SERVICIO_PRODUCTO`, `CONVERSACION`, `MENSAJE_BOT` ni `PAGO`. El modelo vigente, de 12 entidades, está en [entrega/04-mer.md](entrega/04-mer.md). Prevalece la documentación de [entrega/](entrega/00-guia-de-entrega.md), en particular [entrega/01-requerimientos.md §2.4](entrega/01-requerimientos.md#24-cambios-de-alcance).
+
 ![Modelo entidad-relación](diagrams/img/er.png)
 
 Fuente editable (Mermaid): [diagrams/src/er.mmd](diagrams/src/er.mmd). El diagrama creció de 9 a 17 entidades en v2 — el layout automático de Mermaid lo deja denso; recomendado verlo en el navegador con zoom.

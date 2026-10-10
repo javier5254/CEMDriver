@@ -1,5 +1,7 @@
 # Diagrama de clases — CMEDriver (v2)
 
+> **Nota (2026-10-09):** este documento es **histórico**: se redactó antes de la reducción de alcance que retiró el inventario, los pagos y el chatbot (el chat quedó solo como canal entre el cliente y el motorizado) y **no refleja el alcance vigente**. El diagrama incluye las clases de `inventory`, `chatbot` y `payments` y `ServicioProducto`, que ya no existen; el modelo vigente está en [entrega/04-mer.md](entrega/04-mer.md) y los componentes y clases vigentes, en [entrega/06-c4.md](entrega/06-c4.md). Prevalece la documentación de [entrega/](entrega/00-guia-de-entrega.md), en particular [entrega/01-requerimientos.md §2.4](entrega/01-requerimientos.md#24-cambios-de-alcance).
+
 > Derivado directamente de los modelos Django implementados en `backend/` (accounts, coverage, inventory, services, tracking, optimization, chatbot, payments, integrations), para que el diagrama quede consistente con el código real.
 
 ![Diagrama de clases](diagrams/img/clases.png)

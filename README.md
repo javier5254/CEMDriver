@@ -1,6 +1,6 @@
 # CMEDriver
 
-Prototipo funcional temprano de una plataforma web y móvil, orientada a API, para la gestión de servicios de mensajería de última milla (**entregas** y **recolecciones**), con Logytech Mobile (Colombia, segundo semestre de 2026) como organización de aplicación. Responde a un problema concreto: no existe una plataforma que integre en un solo sistema la operación logística, la trazabilidad y la autogestión del cliente. Sin ella, la operación se reparte por teléfono o mensajería instantánea, el cliente no sabe dónde está su pedido, las recolecciones no dejan evidencia y un e-commerce no puede integrarse (problemática, pregunta y objetivos en [docs/entrega/01-requerimientos.md](docs/entrega/01-requerimientos.md#1-problema-o-necesidad-identificada)). CMEDriver centraliza la creación, asignación, ejecución y seguimiento de cada servicio en un solo sistema con cuatro roles: Administrador, Alistador, Motorizado y Cliente. Incluye tracking GPS y chat en tiempo real, evidencia digital (foto y firma), un chatbot de autoservicio con catálogo, matriz de cobertura con *leadtime*, sugerencia de orden de ruta y una API abierta a integradores (API Keys y webhooks firmados).
+Prototipo funcional temprano de una plataforma web y móvil, orientada a API, para la gestión de servicios de mensajería de última milla (**entregas** y **recolecciones**), con Logytech Mobile (Colombia, segundo semestre de 2026) como organización de aplicación. Responde a un problema concreto: no existe una plataforma que integre en un solo sistema la operación logística, la trazabilidad y la autogestión del cliente. Sin ella, la operación se reparte por teléfono o mensajería instantánea, el cliente no sabe dónde está su pedido, las recolecciones no dejan evidencia y un e-commerce no puede integrarse (problemática, pregunta y objetivos en [docs/entrega/01-requerimientos.md](docs/entrega/01-requerimientos.md#1-problema-o-necesidad-identificada)). CMEDriver centraliza la creación, asignación, ejecución y seguimiento de cada servicio en un solo sistema con cuatro roles: Administrador, Alistador, Motorizado y Cliente. Incluye tracking GPS y chat en tiempo real entre el cliente y el motorizado, evidencia digital (foto y firma), matriz de cobertura con *leadtime*, planificación de recolecciones por el propio cliente, sugerencia de orden de ruta y una API abierta a integradores (API Keys y webhooks firmados).
 
 | | |
 |---|---|
@@ -10,6 +10,8 @@ Prototipo funcional temprano de una plataforma web y móvil, orientada a API, pa
 
 > **Nota sobre el nombre:** el repositorio se llama **CEMDriver**, pero el producto es **CMEDriver**. Ambos nombres se refieren al mismo proyecto.
 
+> **Alcance (cambio del 2026-10-09):** el autor retiró del prototipo el **inventario, los pagos y el chatbot** para centrarlo en el ciclo operativo de mensajería. El chat solo sirve para que el cliente y el motorizado se comuniquen dentro de un servicio. El detalle del cambio está en [docs/entrega/01-requerimientos.md](docs/entrega/01-requerimientos.md#24-cambios-de-alcance). Los documentos numerados 01 a 17 de la raíz de `docs/` y `docs/v1/` son históricos y **no** reflejan este alcance; prevalece [docs/entrega/](docs/entrega/00-guia-de-entrega.md).
+
 ---
 
 ## Tecnologías utilizadas
@@ -17,13 +19,13 @@ Prototipo funcional temprano de una plataforma web y móvil, orientada a API, pa
 | Capa | Tecnología |
 |---|---|
 | Frontend | Ionic 9 + Angular 22 (SPA, tema iOS), Leaflet (mapas), signature_pad (firma), Capacitor 8 (Android) |
-| Backend | Python 3.12 + Django 6.1 + Django REST Framework 3.18 (monolito modular de 9 apps) |
+| Backend | Python 3.12 + Django 6.1 + Django REST Framework 3.18 (monolito modular de 6 apps) |
 | Tiempo real | Django Channels 4.3 + Daphne 4.2 (ASGI, WebSocket) |
 | Base de datos | SQLite en desarrollo; PostgreSQL propuesto para producción |
 | Autenticación | JWT (SimpleJWT) para personas y API Key propia para integradores |
 | Documentación de la API | drf-spectacular (OpenAPI 3 + Swagger UI) |
-| Servicios externos | Nominatim y teselas de OpenStreetMap (reales). LLM, pagos y correo simulados (ver [limitaciones](docs/entrega/08-limitaciones-y-mejoras.md#83-servicios-simulados-limitación-de-alcance)) |
-| Pruebas | Django test framework + DRF `APITestCase` + `channels.testing` (96 pruebas en el backend) |
+| Servicios externos | Nominatim y teselas de OpenStreetMap (reales). Correo SMTP configurable por variable de entorno: en desarrollo se imprime en la consola (único servicio simulado; ver [limitaciones](docs/entrega/08-limitaciones-y-mejoras.md#83-servicios-simulados-limitación-de-alcance)) |
+| Pruebas | Django test framework + DRF `APITestCase` + `channels.testing` (69 pruebas en el backend) |
 
 El detalle, la justificación y las alternativas descartadas están en [docs/entrega/02-stack-tecnologico.md](docs/entrega/02-stack-tecnologico.md).
 
@@ -31,7 +33,7 @@ El detalle, la justificación y las alternativas descartadas están en [docs/ent
 
 ## Arquitectura general
 
-CMEDriver es un **cliente-servidor** formado por una **SPA** (Ionic + Angular) que consume una **API REST** en Django. El backend es un **monolito modular** de 9 apps de dominio: `accounts`, `coverage`, `inventory`, `services`, `tracking`, `optimization`, `chatbot`, `payments` e `integrations`. Toda regla de negocio vive en el servidor y se aplica igual para la app, el chatbot y los integradores. El tiempo real (tracking y chat) usa WebSocket con Django Channels en el mismo proceso ASGI (Daphne) y pasa a consultas periódicas (polling) si el socket falla. Las dependencias sin credenciales (LLM, pasarela de pagos) están detrás de interfaces intercambiables. Los integradores se autentican con API Key y reciben webhooks firmados con HMAC-SHA256.
+CMEDriver es un **cliente-servidor** formado por una **SPA** (Ionic + Angular) que consume una **API REST** en Django. El backend es un **monolito modular** de 6 apps de dominio: `accounts`, `coverage`, `services`, `tracking`, `optimization` e `integrations`. Toda regla de negocio vive en el servidor y se aplica igual para la app y para los integradores. El tiempo real (tracking y chat cliente-motorizado) usa WebSocket con Django Channels en el mismo proceso ASGI (Daphne) y pasa a consultas periódicas (polling) si el socket falla. El único servicio simulado es el correo: en desarrollo se imprime en la consola y en producción se configura un SMTP por variable de entorno. Los integradores se autentican con API Key y reciben webhooks firmados con HMAC-SHA256.
 
 ![Arquitectura general de CMEDriver](docs/diagrams/img/arquitectura-general.png)
 
@@ -48,12 +50,9 @@ CEMDriver/                       (producto: CMEDriver)
 │   ├── cmedriver/               configuración del proyecto (settings, urls, asgi)
 │   ├── accounts/                usuarios, roles, login JWT, reset de contraseña, seed_data
 │   ├── coverage/                matriz de cobertura y agenda disponible
-│   ├── inventory/               productos
-│   ├── services/                rutas, servicios, evidencias, novedades, chat
+│   ├── services/                rutas, servicios, evidencias, novedades, chat cliente-motorizado
 │   ├── tracking/                posiciones GPS, destino y ETA
 │   ├── optimization/            geocodificación (Nominatim) y orden sugerido de ruta
-│   ├── chatbot/                 chatbot conversacional (LLM simulado)
-│   ├── payments/                pagos (proveedor simulado)
 │   ├── integrations/            API Keys y webhooks
 │   ├── requirements.txt         dependencias con versiones fijas
 │   ├── .env.example             plantilla de variables de entorno
@@ -63,9 +62,10 @@ CEMDriver/                       (producto: CMEDriver)
 │   ├── src/environments/        URL de la API (dev / prod)
 │   └── android/                 proyecto nativo Capacitor
 ├── docs/                        documentación (índice en docs/README.md)
-│   ├── entrega/                 entregables finales 00..08 (00 = guía de la entrega)
+│   ├── entrega/                 entregables finales 00..08 (00 = guía de la entrega); vigentes
+│   ├── 01-…17-*.md              documentos históricos, anteriores al cambio de alcance del 2026-10-09
 │   ├── diagrams/                fuentes (src/) e imágenes (img/) de los diagramas
-│   ├── mockups/                 mockups editables
+│   ├── mockups/                 mockups editables (históricos)
 │   └── v1/                      snapshot histórico del MVP v1
 └── paper/                       artículo del proyecto
 ```
@@ -109,7 +109,7 @@ Como `daphne` es la primera app de `INSTALLED_APPS`, `runserver` sirve tanto HTT
 | Esquema OpenAPI 3 | <http://localhost:8000/api/schema/> |
 | Panel de administración de Django | <http://localhost:8000/admin/> (entrar con el usuario `admin` de la semilla o crear uno con `manage.py createsuperuser`) |
 
-`seed_data` crea los usuarios de prueba (ver más abajo), 2 zonas de cobertura, 3 productos (2 visibles en el chatbot) y varios servicios de ejemplo en distintos estados (CREADO, ASIGNADO, ENTREGADO, RECOLECTADO), para probar la interfaz sin partir de cero.
+`seed_data` crea los 4 usuarios de prueba (ver más abajo), 2 zonas de cobertura (`Bogota - Chapinero` y `Bogota - Suba`), una ruta para `motorizado1` con fecha de mañana y 3 servicios de ejemplo del `cliente1` (2 entregas y 1 recolección, en estados `CREADO` y `ASIGNADO`), para probar la interfaz sin partir de cero. Es idempotente: no duplica lo que ya existe.
 
 ### 2. Frontend (Ionic + Angular) — igual en Windows, Linux y macOS
 
@@ -119,9 +119,9 @@ npm install
 npm start          # ng serve -> http://localhost:4200
 ```
 
-Requiere el backend corriendo. Se validó de punta a punta en los 4 roles: login, dashboards, ciclo de vida completo de los servicios, tracking con Leaflet, chat, captura de foto y firma, y chatbot.
+Requiere el backend corriendo. Se validó de punta a punta en los 4 roles: login, dashboards, ciclo de vida completo de los servicios, tracking con Leaflet, chat cliente-motorizado y captura de foto y firma.
 
-Para generar un build estático: `npm run build` (genera `www/`). El empaquetado Android con Capacitor está en [docs/11-manual-distribucion.md](docs/11-manual-distribucion.md) §4.
+Para generar un build estático: `npm run build` (genera `www/`). El empaquetado Android con Capacitor está en [docs/11-manual-distribucion.md](docs/11-manual-distribucion.md) §4 (manual de distribución, con el contenido operativo actualizado al alcance vigente).
 
 ### 3. Pruebas automatizadas
 
@@ -139,7 +139,7 @@ cd backend
 .venv/bin/python manage.py test
 ```
 
-Resultado esperado: **96 pruebas, OK**. Corren en una base de datos aislada y no requieren Internet porque Nominatim y los webhooks se simulan con `mock`. El detalle de los casos está en [docs/16-plan-pruebas.md](docs/16-plan-pruebas.md). El frontend no tiene pruebas automatizadas (ver LIM-29).
+Resultado esperado: **69 pruebas, OK** (eran 96 antes del cambio de alcance del 2026-10-09, que retiró las pruebas de inventario, pagos y chatbot). Corren en una base de datos aislada y no requieren Internet porque Nominatim y los webhooks se simulan con `mock`. La prueba que verifica cada requerimiento vigente está en [docs/entrega/01-requerimientos.md](docs/entrega/01-requerimientos.md#4-requerimientos-funcionales-rf) §4 y en la [matriz de trazabilidad](docs/entrega/07-trazabilidad.md). El plan [docs/16-plan-pruebas.md](docs/16-plan-pruebas.md) es histórico: cuenta 93 pruebas y conserva casos de funciones retiradas. El frontend no tiene pruebas automatizadas (ver LIM-29).
 
 ---
 
@@ -222,22 +222,22 @@ Antes de concretarla hay que hacer cambios de código: leer `DATABASES` y `CHANN
 | # | Entregable | Punto de la consigna que cubre |
 |---|---|---|
 | 00 | [Guía de la entrega](docs/entrega/00-guia-de-entrega.md) | Mapa de cada punto de la consigna al documento y la sección donde se cumple; recorrido para la sustentación |
-| 01 | [Requerimientos](docs/entrega/01-requerimientos.md) | Problema, objetivos, actores, requerimientos funcionales y no funcionales, reglas de negocio y restricciones |
+| 01 | [Requerimientos](docs/entrega/01-requerimientos.md) | Problema, objetivos, actores, requerimientos funcionales y no funcionales, reglas de negocio y restricciones; incluye el cambio de alcance del 2026-10-09 (§2.4) |
 | 02 | [Stack tecnológico](docs/entrega/02-stack-tecnologico.md) | Tecnologías (frontend, backend, BD, servicios externos, nube, despliegue, control de versiones) con su justificación |
 | 03 | [Arquitectura](docs/entrega/03-arquitectura.md) | Arquitectura propuesta: estilo, diagrama general, componentes, seguridad y vista de despliegue |
 | 04 | [Modelo entidad-relación](docs/entrega/04-mer.md) | MER, diccionario de datos, relaciones y restricciones |
 | 05 | [BPMN](docs/entrega/05-bpmn.md) | Modelado de los procesos de negocio |
 | 06 | [Modelo C4](docs/entrega/06-c4.md) | Diagramas C4: contexto, contenedores, componentes y código |
 | 07 | [Matriz de trazabilidad](docs/entrega/07-trazabilidad.md) | Trazabilidad entre requerimientos, reglas, diseño, código y pruebas |
-| 08 | [Limitaciones y mejoras](docs/entrega/08-limitaciones-y-mejoras.md) | Limitaciones conocidas, servicios simulados y hoja de ruta de mejoras |
+| 08 | [Limitaciones y mejoras](docs/entrega/08-limitaciones-y-mejoras.md) | Limitaciones conocidas (34 vigentes y 4 resueltas por reducción de alcance), servicios simulados y hoja de ruta de mejoras |
 
-El resto de la documentación (charter, API, cronograma, diagrama de clases, casos de uso, mockups, plan de pruebas, manual de herramientas, roadmap) está indexado en [docs/README.md](docs/README.md).
+El resto de la documentación (charter, API, cronograma, diagrama de clases, casos de uso, mockups, plan de pruebas, manual de herramientas, roadmap) está indexado en [docs/README.md](docs/README.md). Es **histórica**: se redactó antes del cambio de alcance del 2026-10-09 y no lo refleja; en caso de diferencia prevalece `docs/entrega/`.
 
 ---
 
 ## Limitaciones conocidas
 
-CMEDriver es un **MVP académico**. Hay 38 limitaciones identificadas y documentadas deliberadamente, sin corregir en esta entrega. Las de prioridad alta son:
+CMEDriver es un **MVP académico**. Hay 38 limitaciones registradas: **34 vigentes**, documentadas deliberadamente y sin corregir en esta entrega, y 4 resueltas por la reducción de alcance del 2026-10-09 (existían solo por el inventario, los pagos y el chatbot). Las 7 vigentes de prioridad alta son:
 
 - El RBAC permite a clientes y motorizados editar o borrar servicios por `PUT/PATCH/DELETE`.
 - En la app, un servicio en `NOVEDAD` (reintentar) queda detenido porque se ocultan sus acciones.
@@ -246,7 +246,7 @@ CMEDriver es un **MVP académico**. Hay 38 limitaciones identificadas y document
 - No hay cumplimiento de la Ley 1581 de 2012 (protección de datos personales).
 - La configuración de base de datos y de `environment.prod.ts` no está lista para producción.
 
-El LLM, los pagos y el correo están simulados. El frontend no tiene pruebas automatizadas y no hay CI. La lista completa, con evidencia, prioridad y mejora propuesta, está en [docs/entrega/08-limitaciones-y-mejoras.md](docs/entrega/08-limitaciones-y-mejoras.md). Lo que queda fuera del MVP está en [docs/07-roadmap-futuro.md](docs/07-roadmap-futuro.md).
+El único servicio simulado es el correo (SIM-03: en desarrollo se imprime en la consola). El frontend no tiene pruebas automatizadas y no hay CI. La lista completa, con evidencia, prioridad y mejora propuesta, está en [docs/entrega/08-limitaciones-y-mejoras.md](docs/entrega/08-limitaciones-y-mejoras.md), junto con la [hoja de ruta de mejoras](docs/entrega/08-limitaciones-y-mejoras.md#84-hoja-de-ruta-de-mejoras-priorizada). El roadmap histórico [docs/07-roadmap-futuro.md](docs/07-roadmap-futuro.md) es anterior al cambio de alcance y todavía lista como pendientes el chatbot con LLM real, los pagos y el inventario.
 
 ---
 

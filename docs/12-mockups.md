@@ -1,5 +1,7 @@
 # Mockups — CMEDriver (v2)
 
+> **Nota (2026-10-09):** este documento es **histórico**: se redactó antes de la reducción de alcance que retiró el inventario, los pagos y el chatbot (el chat quedó solo como canal entre el cliente y el motorizado) y **no refleja el alcance vigente**. Incluye la pantalla «Chatbot conversacional» (compra y pago), retirada; el frontend vigente no la tiene. Prevalece la documentación de [entrega/](entrega/00-guia-de-entrega.md), en particular [entrega/01-requerimientos.md §2.4](entrega/01-requerimientos.md#24-cambios-de-alcance).
+
 > La versión v1 de estos mockups (7 pantallas, estilo Material) quedó congelada en [`v1/12-mockups.md`](v1/12-mockups.md) y [`v1/mockups/`](v1/mockups/).
 
 Canvas navegable con las 11 pantallas clave del producto (MVP + funcionalidades v2): **https://claude.ai/code/artifact/9fcedc09-e71f-49e7-accb-16ca8795d8bb**

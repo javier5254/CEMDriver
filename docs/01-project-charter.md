@@ -2,7 +2,7 @@
 
 > Este documento describe el proyecto en su versión v2 (expandida). La versión original del MVP queda congelada en [docs/v1/](v1/) tal como se entregó primero.
 
-> **Nota (octubre de 2026):** la problemática, la pregunta y los objetivos vigentes son los del paper del proyecto y están en [entrega/01-requerimientos.md §1–§2](entrega/01-requerimientos.md#1-problema-o-necesidad-identificada). Las secciones 2 a 4 de este charter se conservan como registro histórico.
+> **Nota (octubre de 2026; ampliada el 2026-10-09):** este documento es **histórico** y **no refleja el alcance vigente**. La problemática, la pregunta y los objetivos vigentes son los del paper del proyecto y están en [entrega/01-requerimientos.md §1–§2](entrega/01-requerimientos.md#1-problema-o-necesidad-identificada). Además, el 2026-10-09 el autor redujo el alcance: se retiraron el **inventario, los pagos y el chatbot** (el chat quedó solo como canal entre el cliente y el motorizado), de modo que la descripción del proyecto (§1), el problema, los objetivos, el alcance del MVP y de v2 y la innovación (§2 a §6, incluida la cifra de 9 apps Django) se conservan solo como registro histórico. Prevalece la documentación de [entrega/](entrega/00-guia-de-entrega.md), en particular [entrega/01-requerimientos.md §2.4](entrega/01-requerimientos.md#24-cambios-de-alcance).
 
 ## 1. Nombre del proyecto
 **CMEDriver** — Plataforma de gestión de servicios de mensajería (entregas y recolecciones) con tracking en tiempo real, chatbot de autogestión para clientes e inventario integrado.

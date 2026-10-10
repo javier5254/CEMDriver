@@ -1,5 +1,7 @@
 # Manual de herramientas, arquitecturas y modelos usados — CMEDriver (v2)
 
+> **Nota (2026-10-09):** este documento es **histórico**: se redactó antes de la reducción de alcance que retiró el inventario, los pagos y el chatbot (el chat quedó solo como canal entre el cliente y el motorizado) y **no refleja el alcance vigente**. Lista como parte del stack el chatbot con modelo de lenguaje simulado y la pasarela de pagos simulada, y 9 apps Django; la lista vigente está en [entrega/02-stack-tecnologico.md](entrega/02-stack-tecnologico.md). Prevalece la documentación de [entrega/](entrega/00-guia-de-entrega.md), en particular [entrega/01-requerimientos.md §2.4](entrega/01-requerimientos.md#24-cambios-de-alcance).
+
 Referencia de todo lo que compone el proyecto: lenguajes, frameworks, librerías, modelos de arquitectura y herramientas de diseño/documentación, con el motivo de cada elección.
 
 ## 1. Backend

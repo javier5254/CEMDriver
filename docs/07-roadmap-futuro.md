@@ -1,5 +1,7 @@
 # Roadmap futuro — CMEDriver (más allá de v2)
 
+> **Nota (2026-10-09):** este documento es **histórico**: se redactó antes de la reducción de alcance que retiró el inventario, los pagos y el chatbot (el chat quedó solo como canal entre el cliente y el motorizado) y **no refleja el alcance vigente**. Todavía lista como pendientes el chatbot con LLM real, los pagos y el inventario avanzado; esos tres ítems son ahora una mejora futura opcional (n.º 14 de la [hoja de ruta vigente](entrega/08-limitaciones-y-mejoras.md#84-hoja-de-ruta-de-mejoras-priorizada)). Prevalece la documentación de [entrega/](entrega/00-guia-de-entrega.md), en particular [entrega/01-requerimientos.md §2.4](entrega/01-requerimientos.md#24-cambios-de-alcance).
+
 Casi todo lo que este documento proponía como "roadmap" en el MVP original ya se construyó en v2 (ver [06-cronograma.md](06-cronograma.md) para el detalle). Esta versión documenta qué de eso quedó real vs. simulado, y qué sigue siendo trabajo futuro genuino.
 
 ## Ya completado en v2 (con su alcance real)

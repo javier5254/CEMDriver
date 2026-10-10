@@ -1,5 +1,7 @@
 # Arquitectura — CMEDriver (v2)
 
+> **Nota (2026-10-09):** este documento es **histórico**: se redactó antes de la reducción de alcance que retiró el inventario, los pagos y el chatbot (el chat quedó solo como canal entre el cliente y el motorizado) y **no refleja el alcance vigente**. Describe 9 apps (`inventory`, `chatbot` y `payments` ya no existen), el chatbot con modelo de lenguaje simulado y los pagos simulados; la arquitectura vigente, de 6 apps, está en [entrega/03-arquitectura.md](entrega/03-arquitectura.md). Prevalece la documentación de [entrega/](entrega/00-guia-de-entrega.md), en particular [entrega/01-requerimientos.md §2.4](entrega/01-requerimientos.md#24-cambios-de-alcance).
+
 ## 1. Vista general
 
 ```mermaid

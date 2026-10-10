@@ -1,5 +1,7 @@
 # Requisitos — CMEDriver
 
+> **Nota (2026-10-09):** este documento es **histórico**: se redactó antes de la reducción de alcance que retiró el inventario, los pagos y el chatbot (el chat quedó solo como canal entre el cliente y el motorizado) y **no refleja el alcance vigente**. Incluye las historias RF-04, RF-18, RF-22, RF-23 y RF-26 y las reglas RN-04 y RN-06, que están retiradas; los requerimientos vigentes están en [entrega/01-requerimientos.md](entrega/01-requerimientos.md#4-requerimientos-funcionales-rf). Prevalece la documentación de [entrega/](entrega/00-guia-de-entrega.md), en particular [entrega/01-requerimientos.md §2.4](entrega/01-requerimientos.md#24-cambios-de-alcance).
+
 ## 1. Requerimientos funcionales por rol (historias de usuario)
 
 ### Administrador
