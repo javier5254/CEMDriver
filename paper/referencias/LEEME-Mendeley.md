@@ -1,8 +1,10 @@
 # Referencias de CMEDriver en Mendeley
 
-> **Actualización 2026-10-09 (cambio de alcance).** Las listas de referencias cambiaron: en la Entrega 2 se retiraron Su et al. (2024) y OWASP GenAI Security Project (2025) y se agregaron Madhwal et al. (2022) y Souza et al. (2022); la Entrega 1 no cambió. Cada lista sigue con 10 y 28 fuentes. **Los archivos `.bib` y `.ris` no están en esta carpeta** (solo este LEEME); hay que regenerarlos a partir de `secciones/referencias-entrega1.md` y `referencias-entrega2.md`, que son la versión vigente, o importar las fuentes con DOI directamente en Mendeley.
+> **Actualización 2026-10-13.** Los archivos de importación **ya existen** en esta carpeta: `entrega1.ris` y `entrega1.bib` (10 fuentes) y `entrega2.ris` y `entrega2.bib` (28 fuentes). Se generaron a partir de `secciones/referencias-entrega1.md` y `referencias-entrega2.md`, que son la versión vigente; el RIS es el formato más fiable en Mendeley. Antes de esta fecha solo existía este texto, por lo que las referencias **sin DOI** (CCCE 2025, MinTIC 2026, los dos comunicados del DNP, normas y páginas web) no se podían traer a Mendeley de ninguna forma: no hay DOI desde el cual importarlas, hay que cargarlas desde estos archivos o crearlas a mano.
+>
+> **Actualización 2026-10-09 (cambio de alcance).** En la Entrega 2 se retiraron Su et al. (2024) y OWASP GenAI Security Project (2025) y se agregaron Madhwal et al. (2022) y Souza et al. (2022); la Entrega 1 no cambió.
 
-Archivos previstos: `entrega1.bib` y `entrega1.ris` (10 fuentes), `entrega2.bib` y `entrega2.ris` (28 fuentes). Son exactamente las listas de `secciones/referencias-entrega1.md` y `referencias-entrega2.md`. Las fuentes con DOI traían metadatos de Crossref (títulos y años ajustados a la lista del pool); las demás se escribieron a mano desde el pool, sin campos añadidos.
+Los registros se escribieron con los datos tal como están en las listas, sin añadir campos nuevos. Cuando una fuente no trae fecha, el RIS lleva la nota "Sin fecha (s. f.)". Si se cambia una lista de referencias, hay que regenerar estos archivos.
 
 ## 1. Importar en Mendeley Reference Manager
 
