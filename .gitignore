@@ -22,3 +22,6 @@ frontend/dist/
 .idea/
 Thumbs.db
 .DS_Store
+
+# Archivos temporales de Word
+~$*
