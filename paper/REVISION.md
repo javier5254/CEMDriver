@@ -15,7 +15,7 @@ Archivos: `paper/Proyecto_CMEDriver_Entrega1.docx` (10 páginas físicas) y `pap
 | (e) 5 a 10 citas académicas únicas | Cumple | 10 fuentes únicas (sin cambios): Mohammad 2023, Janinhoff 2024, CCCE 2025, MinTIC 2026, DNP 2023, DNP 2025, Gutierrez-Franco 2021, Restrepo-Betancur 2026, Seghezzi 2023, Boom-Cárcamo 2024. Tres son informes oficiales, no académicos |
 | Referencias sin huérfanas | Cumple | 10 citadas, 10 en la lista |
 | Referencias recientes (70 % de 2021 a 2026) | Cumple | 10 de 10 (100 %) |
-| Extensión (Introducción 4 a 5 páginas) | Cumple | Introducción 5 páginas (2 075 palabras; p. 4 a 8, la última al 85 %); Resumen 1 página; referencias 2 páginas; total 10 |
+| Extensión (Introducción 4 a 5 páginas) | Cumple | Introducción 5 páginas (2 061 palabras; p. 4 a 8, la última al 85 %) en el documento unificado; Resumen 1 página. En el archivo `Entrega1.docx` suelto, con dos saltos de página manuales dentro de la Introducción, ocupa 6 páginas; el unificado los quita sin cambiar texto |
 | Tercera persona | Cumple | Sin primera persona |
 | Citas textuales de 40 o más palabras | Cumple | Ninguna |
 | Afirmaciones empíricas inventadas | Cumple | Ningún resultado propio; "72 pruebas" es el conteo de la suite del backend; los usuarios son simulados |
@@ -35,7 +35,7 @@ Archivos: `paper/Proyecto_CMEDriver_Entrega1.docx` (10 páginas físicas) y `pap
 | Citas en Metodología (3 a 5) | Cumple | 5 fuentes únicas (Peffers, Hernández-Sampieri, Schwaber, Brown, Anthropic) |
 | Referencias (mínimo 20 a 25, sin huérfanas) | Cumple | 28 únicas (25 del marco más Peffers, Hernández-Sampieri y Anthropic), generadas desde KEYS en build.js; ninguna cita sin entrada y ninguna entrada sin cita |
 | 70 % de 2021 a 2026 en la lista | Parcial | 16 de 28 (57 %): las 15 del marco más Anthropic. Sin contar normas colombianas y andina y Brown s. f. (5), 16 de 23 (70 %). Quedan fuera de rango Sommerville, Bass, Beck, Schwaber, ISO 29148, Peffers y Hernández-Sampieri, exigidas por la guía o metodológicas |
-| Extensión (Marco 8 a 10 páginas; Metodología 3 a 4) | Parcial | Medido con Word (COM): Marco 10 páginas (p. 3 a 12; 3 842 palabras de prosa y 408 en tablas); Metodología 6 páginas (p. 13 a 18; 1 269 palabras de prosa y 551 en tablas), por encima de lo sugerido por las tablas obligatorias. Total de contenido 16 páginas; el documento tiene 21 páginas físicas (referencias p. 19 a 21) |
+| Extensión (Marco 8 a 10 páginas; Metodología 3 a 4) | Cumple | Medido con Word (COM) el 2026-10-13 sobre el documento unificado: Marco 10 páginas (la última al 82 %; 4 255 palabras con 3 tablas); Metodología 4 páginas (la última al 92 %; 1 412 palabras con 4 tablas y la Figura 1 resumida). Para lograrlo se condensó la redacción de la Metodología, la comparación de metodologías de desarrollo pasó de tabla a párrafo y la figura de contenedores se reemplazó por una versión resumida y legible (`docs/diagrams/src/c4-2-contenedores-resumen.mmd`). Margen estrecho en la Metodología: unas 4 líneas |
 | Tercera persona | Cumple | Sin primera persona |
 | Citas textuales de 40 o más palabras | Cumple | Ninguna; el marco y la metodología parafrasean y no incluyen citas entre comillas |
 | Afirmaciones empíricas inventadas | Cumple | No hay resultados de CMEDriver; lo atribuido a Madhwal y Souza viene del resumen leído en el pool y se declara su límite; la restricción del chat y las pruebas se verificaron contra `backend/services/views.py`, `consumers.py` y `tests.py` |
@@ -58,11 +58,11 @@ Archivos: `paper/Proyecto_CMEDriver_Entrega1.docx` (10 páginas físicas) y `pap
 3. Confirmar el nuevo **título provisional** (ya no dice "autogestión conversacional") y, si la Entrega 1 ya se entregó con el chatbot en el objetivo, informar a la docente del ajuste de alcance.
 4. Confirmar el tercer autor de Hernández-Sampieri y restituir los diacríticos de Kuhrmann et al.
 5. Fuentes verificadas del pool que quedaron fuera del marco por el tope de 25 y que pueden sustituir a otras si se prefiere otro balance: Heinbach et al. (2022; visibilidad, notificaciones y prueba de entrega digital), Fette y Melnikov (2011; protocolo WebSocket), Su et al. (2024; regreso de microservicios a monolito), Stripe (s. f.) y GitHub (s. f.) sobre firma HMAC de webhooks, Krawczyk et al. (1997; HMAC), Ferraiolo et al. (2001; RBAC), Ley 527 de 1999 (mensajes de datos y firma electrónica) y Engelhardt et al. (2026). Para cambiar la lista, editar el texto y `KEYS` en `build/build.js`.
-6. La Metodología (6 páginas) excede lo sugerido por las tablas y la figura; podría pasar la Tabla 3 a texto.
+6. (Resuelto el 2026-10-13) La Metodología pasó de 6 a 4 páginas; ver la fila de extensión de la Entrega 2.
 7. Verificar los enlaces de las referencias y revisar y reescribir el texto con voz propia (el contenido contó con asistencia de IA).
 8. Abrir los .docx en Word, actualizar paginación y revisar el aspecto de las tablas y la Figura 1.
 9. Decidir si la Entrega 1 debe incluir la declaración de IA con su referencia (hoy vive en la Entrega 2).
-10. Los archivos `.bib` y `.ris` que menciona `referencias/LEEME-Mendeley.md` no están en la carpeta; regenerarlos desde las listas vigentes si se usa Mendeley.
+10. (Resuelto el 2026-10-13) Los archivos `entrega1.ris`/`.bib` y `entrega2.ris`/`.bib` ya existen en `referencias/`.
 
 ## Cambios 2026-10-09 (sincronización con el cambio de alcance)
 
@@ -75,3 +75,11 @@ Alcance vigente: ciclo de vida del servicio (entregas y recolecciones), tracking
 - **Metodología:** pregunta reformulada en 5.1; Tabla 1 (pruebas y encuesta sin chatbot); Tabla 2 (sin chatbot y pagos, con la fila de correo simulado); arquitectura con 6 apps y 12 entidades; párrafo "Lo que se simula"; Figura 1 reemplazada por `docs/diagrams/img/c4-2-contenedores.png` (misma figura actualizada, sin pagos ni LLM); 5.4 sin chatbot e inventario y con la nota del ajuste de alcance; Tabla 5 (seis apps, 72 pruebas); 5.7 aclara que el prototipo no incorpora ningún modelo de lenguaje y que la IA fue herramienta del autor.
 - **CONVENCIONES.md** (secciones 2, 8, 9, 11, 13 y 14), **README.md**, `referencias/LEEME-Mendeley.md` y esta REVISION.md actualizados.
 - Se conservaron los marcadores `[COMPLETAR]`. El pool `fuentes/*.md` no se modificó (sus notas sobre chatbots y LLM son material de investigación, no texto del paper).
+
+## Cambios 2026-10-13 (ajuste de extensión y documento unificado)
+
+- **Documento unificado:** `Proyecto_CMEDriver_Unificado.docx` (26 páginas físicas) une la Entrega 1 (con las citas de Mendeley Cite) y el cuerpo de la Entrega 2, con una sola portada y una lista de 36 referencias sin duplicados; se genera con `build/unir_entregas.py` y no modifica los archivos de origen.
+- **Metodología:** de 6 a 4 páginas (texto condensado; la comparación de metodologías de desarrollo pasó a párrafo; Figura 1 resumida). Las tablas de la Metodología pasaron a numerarse 4 a 7 (antes repetían la numeración del Marco, 1 a 3).
+- **Marco teórico:** de 11 a 10 páginas (recorte de unas 90 palabras repetidas); sigue con 25 citas únicas. Se unificó el apóstrofo de Al-Qora'n con la lista de referencias.
+- **Formato de tablas (`build.js`):** menos espacio interno en las celdas y bajo cada tabla; figura con ancho máximo de 5,6 pulgadas.
+- Medir páginas: `build/medir_paginas.ps1 -Ruta ..\Proyecto_CMEDriver_Unificado.docx` (usa Word por COM, solo lectura).

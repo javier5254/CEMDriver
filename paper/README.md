@@ -27,6 +27,16 @@ node build.js 2     # Proyecto_CMEDriver_Entrega2.docx (marco teórico, metodolo
 
 El script lee `secciones/*.md`, el pool `fuentes/*.md` y genera las listas `secciones/referencias-entrega1.md` y `referencias-entrega2.md` a partir de la lista `KEYS` de `build/build.js` (si se agrega o quita una cita, hay que editar `KEYS`). Si cambia el título, editar también `TITLE` en `build.js` y `secciones/00-portada.md`.
 
+### Documento unificado (Entregas 1 y 2)
+
+```
+cd paper/build
+python unir_entregas.py     # genera Proyecto_CMEDriver_Unificado.docx
+```
+
+Une los dos Word **sin regenerar nada**: toma `Proyecto_CMEDriver_Entrega1.docx` completo (portada, contraportada, resumen e introducción, **con las citas de Mendeley Cite que se le hayan insertado**), le agrega el cuerpo de `Proyecto_CMEDriver_Entrega2.docx` desde "4. Marco Teórico" hasta antes de las referencias (con sus 8 tablas y la figura) y escribe una sola lista de referencias, sin duplicados y en orden alfabético. Solo cambia el rótulo de la portada y la contraportada ("Entrega 1" pasa a "Entregas 1 y 2"). No modifica los archivos de origen y solo usa la librería estándar de Python. Las citas de la parte de la Entrega 2 siguen siendo texto, no campos de Mendeley. **No ejecutar `node build.js 1` después de insertar citas de Mendeley**: sobrescribiría el archivo de la Entrega 1.
+
+
 ## Lo que debe hacer el estudiante (los agentes entregan borradores)
 
 La guía de UNINPAHU prohíbe entregar un trabajo escrito totalmente por IA y exige declarar el uso. Antes de entregar:

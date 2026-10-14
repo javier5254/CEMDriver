@@ -2,7 +2,7 @@
 const fs = require('fs'), path = require('path');
 const D = require('docx');
 const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, ImageRun, Header, AlignmentType,
-  PageNumber, WidthType, ShadingType, BorderStyle, LevelFormat, HeadingLevel } = D;
+  PageNumber, WidthType, ShadingType, BorderStyle, LevelFormat, HeadingLevel, LineRuleType } = D;
 const E = process.argv[2];
 const ROOT = path.resolve(__dirname, '..');
 const SEC = f => fs.readFileSync(path.join(ROOT, 'secciones', f), 'utf8');
@@ -65,7 +65,7 @@ function mdTable(lines) {
     rows: rows.map((r, ri) => new TableRow({ tableHeader: ri === 0, cantSplit: true, children: r.map((c, i) => new TableCell({
       borders, width: { size: cw[i], type: WidthType.DXA },
       shading: ri === 0 ? { fill: 'D9D9D9', type: ShadingType.CLEAR, color: 'auto' } : undefined,
-      margins: { top: 50, bottom: 50, left: 90, right: 90 },
+      margins: { top: 30, bottom: 30, left: 90, right: 90 },
       children: [new Paragraph({ alignment: AlignmentType.LEFT, spacing: { line: 240, after: 0 }, children: inline(c, { size: 18, bold: ri === 0 }) })],
     })) })),
   });
@@ -83,9 +83,9 @@ function convert(md, opts = {}) {
         pageBreakBefore: lv === 1 && !opts.noBreak, children: [new TextRun({ text: m[2] })] }));
       i++; continue;
     }
-    if (l.startsWith('|')) { const b = []; while (i < L.length && L[i].startsWith('|')) b.push(L[i++]); out.push(mdTable(b)); out.push(new Paragraph({ spacing: { after: 0, line: 240 }, children: [] })); continue; }
+    if (l.startsWith('|')) { const b = []; while (i < L.length && L[i].startsWith('|')) b.push(L[i++]); out.push(mdTable(b)); out.push(new Paragraph({ spacing: { after: 0, line: 100, lineRule: LineRuleType.EXACT }, children: [] })); continue; }
     if ((m = l.match(/^!\[(.*?)\]\((.*?)\)$/))) {
-      const f = path.resolve(ROOT, 'secciones', m[2]); const [w, h] = pngSize(f); const W = Math.min(600, Math.round(560 * w / h));
+      const f = path.resolve(ROOT, 'secciones', m[2]); const [w, h] = pngSize(f); const W = Math.min(540, Math.round(560 * w / h));
       out.push(new Paragraph({ alignment: AlignmentType.CENTER, spacing: { line: 240 }, children: [new ImageRun({ type: 'png', data: fs.readFileSync(f), transformation: { width: W, height: Math.round(W * h / w) }, altText: { title: 'Figura', description: m[1], name: 'fig' } })] }));
       i++; continue;
     }
@@ -97,7 +97,7 @@ function convert(md, opts = {}) {
     if (l.startsWith('> ')) { out.push(P(l.slice(2), { indent: { left: 567, right: 567 } })); i++; continue; }
     if (/^\*\*(Tabla|Figura) \d+\*\*$/.test(l)) { out.push(P(l, { alignment: AlignmentType.LEFT, keepNext: true, spacing: { before: 120, after: 0 } })); i++; continue; }
     if (/^\*[^*].*\*$/.test(l) && !l.startsWith('*Nota')) { out.push(P(l, { alignment: AlignmentType.LEFT, keepNext: true, spacing: { after: 60 } })); i++; continue; }
-    if (l.startsWith('*Nota.*')) { out.push(P(l, { alignment: AlignmentType.LEFT, spacing: { line: 240, before: 60, after: 200 } }, { size: 20 })); i++; continue; }
+    if (l.startsWith('*Nota.*')) { out.push(P(l, { alignment: AlignmentType.LEFT, spacing: { line: 240, before: 40, after: 140 } }, { size: 20 })); i++; continue; }
     out.push(P(l)); i++;
   }
   return out;

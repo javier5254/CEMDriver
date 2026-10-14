@@ -1,0 +1,48 @@
+%%{init: {"flowchart": {"nodeSpacing": 28, "rankSpacing": 60}}}%%
+flowchart LR
+    %% C4 - Nivel 2: Contenedores, version resumida para el paper (Figura 1 de la Metodologia).
+    %% El diagrama completo, con todos los contenedores y protocolos, esta en c4-2-contenedores.mmd
+    %% y se explica en docs/entrega/06-c4.md. Nombres canonicos: docs/entrega/03-arquitectura.md seccion 9.
+
+    USU["<b>Usuarios</b><br/>[Persona]<br/>Administrador, Alistador,<br/>Motorizado y Cliente"]
+    INT["<b>Sistema integrador</b><br/>[Sistema externo]"]
+
+    subgraph CME["Plataforma CMEDriver [Sistema]"]
+        APP["<b>App CMEDriver</b><br/>[Contenedor]<br/>Ionic 9 + Angular 22<br/>Capacitor 8"]
+
+        subgraph DAPHNE["Servidor ASGI Daphne"]
+            API["<b>API REST</b><br/>[Contenedor]<br/>Django 6.1 + DRF<br/>6 apps de dominio"]
+            RT["<b>Servicio de tiempo real</b><br/>[Contenedor]<br/>Django Channels<br/>GPS y chat"]
+        end
+
+        DB[("<b>Base de datos</b><br/>SQLite / PostgreSQL")]
+        MEDIA[("<b>Evidencias</b><br/>Fotos y firmas")]
+    end
+
+    OSM["<b>Teselas OpenStreetMap</b><br/>[Sistema externo]"]
+    NOM["<b>Nominatim</b><br/>[Sistema externo]"]
+    SMTP["<b>Servidor SMTP</b><br/>[Sistema externo]"]
+    WH["<b>Receptor de webhooks</b><br/>[Sistema externo]"]
+
+    USU -->|"Usa"| APP
+    INT -->|"REST + API Key"| API
+    APP -->|"REST + JWT"| API
+    APP <-->|"WebSocket"| RT
+    APP -->|"Mapa base"| OSM
+    API --> DB
+    RT --> DB
+    API --> MEDIA
+    API -->|"Geocodifica"| NOM
+    API -->|"Correo"| SMTP
+    API -->|"Webhooks firmados"| WH
+
+    classDef persona fill:#08427b,stroke:#052e56,color:#ffffff;
+    classDef contenedor fill:#438dd5,stroke:#2e6295,color:#ffffff;
+    classDef almacen fill:#438dd5,stroke:#2e6295,color:#ffffff;
+    classDef externo fill:#999999,stroke:#6b6b6b,color:#ffffff;
+    class USU persona;
+    class APP,API,RT contenedor;
+    class DB,MEDIA almacen;
+    class INT,OSM,NOM,SMTP,WH externo;
+    style CME fill:#ffffff,stroke:#1168bd,stroke-width:2px,stroke-dasharray:6 4,color:#1168bd
+    style DAPHNE fill:#f4f8fd,stroke:#438dd5,stroke-width:1px,stroke-dasharray:3 3,color:#2e6295
