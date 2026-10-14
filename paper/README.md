@@ -32,7 +32,7 @@ El script lee `secciones/*.md`, el pool `fuentes/*.md` y genera las listas `secc
 La guía de UNINPAHU prohíbe entregar un trabajo escrito totalmente por IA y exige declarar el uso. Antes de entregar:
 
 1. Leer todo, editar y reescribir con su propia voz; entender cada afirmación (la sustentación es en la semana 15).
-2. Completar los marcadores `[COMPLETAR: ...]` (resaltados en amarillo en los .docx): nombre del estudiante, ciudad, entregas fallidas en Colombia, registro del software y titularidad, alcance exacto del uso de IA, participantes de la validación, definiciones con página de Sommerville (2005) y Bass et al. (2003).
+2. Completar el único marcador `[COMPLETAR: ...]` que queda (resaltado en amarillo en el .docx de la Entrega 2): definiciones con página de Sommerville (2005) y Bass et al. (2003), previa consulta de los libros. El resto se completó el 2026-10-13.
 3. Abrir al azar varias referencias (DOI/URL) y confirmar que dicen lo que el texto afirma.
 4. Abrir el `.docx` en Word, actualizar la paginación y confirmar la extensión (REVISION.md trae las páginas medidas con Word el 2026-10-09).
 5. Confirmar con la docente asesora el título provisional (cambió: ya no dice "autogestión conversacional"), la pregunta de investigación y los objetivos; si la Entrega 1 ya se entregó con el alcance anterior, informarle del ajuste.

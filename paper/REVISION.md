@@ -47,13 +47,13 @@ Archivos: `paper/Proyecto_CMEDriver_Entrega1.docx` (10 páginas físicas) y `pap
 - La entrada **Anthropic (2026)** no existe en el pool; se tomó literal de CONVENCIONES.md, sección 9.
 - Hernández-Sampieri y Mendoza Torres (2018): el pool la verifica con dos autores; pendiente confirmar en la portada del ejemplar si hay un tercero.
 - Kuhrmann et al. (2022): referencia tomada del pool (19 autores, sin diacríticos en Münch, Tüzün, López, Küpper).
-- Sommerville (2005) y Bass et al. (2003): textos no consultados; el marco lo declara y deja `[COMPLETAR]`.
+- Sommerville (2005) y Bass et al. (2003): textos no consultados; el marco lo declara y deja `[COMPLETAR]` (único marcador pendiente).
 - Fuentes de normativa y de la docente citadas sin DOI: enlaces según el pool, no revalidados hoy.
 - Madhwal et al. (2022) trata una cadena de bloques que CMEDriver no usa, y Souza et al. (2022) es un estudio brasileño de entregas, no de recolecciones: ambos se citan con esa salvedad en 4.2, 4.5 y 4.10.
 
 ## Pendientes para el estudiante
 
-1. Completar todos los `[COMPLETAR]` (resaltados en amarillo en los .docx): nombre del estudiante (portada y contraportada), ciudad (Bogotá, por confirmar), registro del software y titularidad de derechos (marco y metodología), definiciones con página de Sommerville (2005) y Bass et al. (2003), número de participantes y criterio de selección, y alcance exacto del uso de IA.
+1. Completar el único marcador `[COMPLETAR]` que queda (resaltado en amarillo en el .docx de la Entrega 2): definiciones con página de Sommerville (2005) y Bass et al. (2003), previa consulta de los libros. El 2026-10-13 se completaron el resto: nombre y ciudad de la portada, decisión de no registrar el software, titularidad por definir con Logytech Mobile, participantes por definir con la organización y el alcance del uso de IA (borradores, fuentes, documentación y diagramas, código).
 2. Docente asesora en portada: Luisa Fernanda Loza Muñetón, según la guía; verificar ortografía del nombre.
 3. Confirmar el nuevo **título provisional** (ya no dice "autogestión conversacional") y, si la Entrega 1 ya se entregó con el chatbot en el objetivo, informar a la docente del ajuste de alcance.
 4. Confirmar el tercer autor de Hernández-Sampieri y restituir los diacríticos de Kuhrmann et al.

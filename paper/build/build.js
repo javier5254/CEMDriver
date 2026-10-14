@@ -114,15 +114,15 @@ const portada = [
   C('Proyecto (Ingeniería de Software)'),
   C(entTxt, { italics: true }, { after: 1000 }),
   C('Estudiante', { bold: true }),
-  C('[COMPLETAR: nombre completo del estudiante]', {}, { after: 300 }),
+  C('Javier Esteban Mora Osorio', {}, { after: 300 }),
   C('Docente asesora', { bold: true }),
   C('Luisa Fernanda Loza Muñetón', {}, { after: 1000 }),
-  C('Bogotá [COMPLETAR: confirmar ciudad]'),
+  C('Bogotá'),
   C('Octubre de 2026'),
 ];
 const contra = [
   new Paragraph({ pageBreakBefore: true, spacing: { before: 2800 }, alignment: AlignmentType.CENTER, children: inline(TITLE, { bold: true, size: 26 }) }),
-  C('Autor: [COMPLETAR: nombre completo del estudiante]', {}, { before: 600 }),
+  C('Autor: Javier Esteban Mora Osorio', {}, { before: 600 }),
   C('Asesora: Luisa Fernanda Loza Muñetón'),
   C('Programa de Ingeniería de Software, UNINPAHU'),
   C('Proyecto (Ingeniería de Software), ' + entTxt.split(':')[0]),
