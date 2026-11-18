@@ -4,7 +4,7 @@
 >
 > **Alcance:** el MER tiene **12 entidades**. El 2026-10-09 el autor retiró del proyecto el inventario, los pagos y el chatbot (5 entidades y 3 apps); el chat queda solo para la comunicación cliente-motorizado. Ver [§4.5](#45-cambios-de-alcance).
 >
-> **Referencias de requerimientos:** los IDs RF-xx / RNF-xx / RN-xx usados aquí son los de [01-requerimientos.md](01-requerimientos.md), que conserva sin renumerar los de [docs/13-rf-rnf-completos.md](../13-rf-rnf-completos.md) (RF-01…RF-27, RNF-01…RNF-13, RN-01…RN-08) y añade los nuevos al final (RF-28, RF-29, RNF-14…RNF-20, RN-09…RN-19). Los IDs retirados por el cambio de alcance (RF-04, RF-18, RF-22, RF-23, RF-26, RN-04, RN-06 y RN-16) ya no justifican ninguna entidad. La relación entidad ↔ RF completa está en [07-trazabilidad.md](07-trazabilidad.md) §c (12/12 entidades usadas por al menos un RF).
+> **Referencias de requerimientos:** los IDs RF-xx / RNF-xx / RN-xx usados aquí son los de [01-requerimientos.md](01-requerimientos.md), que conserva sin renumerar los de [docs/13-rf-rnf-completos.md](../13-rf-rnf-completos.md) (RF-01…RF-27, RNF-01…RNF-13, RN-01…RN-08) y añade los nuevos al final (RF-28, RF-29, RF-30, RNF-14…RNF-20, RN-09…RN-19). Los IDs retirados por el cambio de alcance (RF-04, RF-18, RF-22, RF-23, RF-26, RN-04, RN-06 y RN-16) ya no justifican ninguna entidad. La relación entidad ↔ RF completa está en [07-trazabilidad.md](07-trazabilidad.md) §c (12/12 entidades usadas por al menos un RF).
 
 ## 4.1 Diagrama
 
@@ -464,6 +464,7 @@ El 2026-10-09 el autor retiró del proyecto el inventario, los pagos y el chatbo
 - Se retiraron 8 de las 22 relaciones del MER anterior (las de PRODUCTO, SERVICIO_PRODUCTO, CONVERSACION, MENSAJE_BOT y PAGO); quedan 14.
 - `MENSAJE_CHAT` se conserva sin cambios en el esquema: es el chat cliente-motorizado por servicio (RF-16, RF-27). Un cambio de código posterior limitó quién puede leerlo y escribirlo al cliente dueño y al motorizado asignado (4.4.5). No debe confundirse con `MENSAJE_BOT`, que pertenecía al chatbot y sí se retiró.
 - Las migraciones del repositorio quedaron en `0001_initial` por app (ya no existe `services/0002_servicioproducto`). Una base de desarrollo recreada con ellas contiene exactamente las 12 tablas de dominio de 4.1, además de las internas de Django.
+- El módulo de indicadores (RF-30, 2026-11-17) **no modifica el modelo**: no añade entidades, campos ni migraciones. Solo lee SERVICIO, NOVEDAD, EVIDENCIA, RUTA, USUARIO, POSICION_GPS, MENSAJE_CHAT, API_KEY, WEBHOOK_ENDPOINT y WEBHOOK_DELIVERY ([07 §c.1](07-trazabilidad.md#c1-administrador-mf-1-mf-6)). Los comandos `seed_demo` y `exportar_indicadores` tampoco cambian el esquema.
 
 **Observaciones del MER anterior que desaparecen por la reducción de alcance** (no son correcciones, sino consecuencias de quitar las entidades): el stock nunca se descuenta (H-09 en su parte de stock, LIM-10), la compra por chatbot no se revierte si el pago es rechazado (H-12, LIM-36), el producto principal convive sin regla con las líneas multi-producto (LIM-18, parte b), la discrepancia del plan de pruebas sobre quién crea productos (H-03) y el estado de `Pago`.
 

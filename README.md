@@ -1,6 +1,6 @@
 # CMEDriver
 
-Prototipo funcional temprano de una plataforma web y móvil, orientada a API, para la gestión de servicios de mensajería de última milla (**entregas** y **recolecciones**), con Logytech Mobile (Colombia, segundo semestre de 2026) como organización de aplicación. Responde a un problema concreto: no existe una plataforma que integre en un solo sistema la operación logística, la trazabilidad y la autogestión del cliente. Sin ella, la operación se reparte por teléfono o mensajería instantánea, el cliente no sabe dónde está su pedido, las recolecciones no dejan evidencia y un e-commerce no puede integrarse (problemática, pregunta y objetivos en [docs/entrega/01-requerimientos.md](docs/entrega/01-requerimientos.md#1-problema-o-necesidad-identificada)). CMEDriver centraliza la creación, asignación, ejecución y seguimiento de cada servicio en un solo sistema con cuatro roles: Administrador, Alistador, Motorizado y Cliente. Incluye tracking GPS y chat en tiempo real entre el cliente y el motorizado, evidencia digital (foto y firma), matriz de cobertura con *leadtime*, planificación de recolecciones por el propio cliente, sugerencia de orden de ruta y una API abierta a integradores (API Keys y webhooks firmados).
+Prototipo funcional temprano de una plataforma web y móvil, orientada a API, para la gestión de servicios de mensajería de última milla (**entregas** y **recolecciones**), con Logytech Mobile (Colombia, segundo semestre de 2026) como organización de aplicación. Responde a un problema concreto: no existe una plataforma que integre en un solo sistema la operación logística, la trazabilidad y la autogestión del cliente. Sin ella, la operación se reparte por teléfono o mensajería instantánea, el cliente no sabe dónde está su pedido, las recolecciones no dejan evidencia y un e-commerce no puede integrarse (problemática, pregunta y objetivos en [docs/entrega/01-requerimientos.md](docs/entrega/01-requerimientos.md#1-problema-o-necesidad-identificada)). CMEDriver centraliza la creación, asignación, ejecución y seguimiento de cada servicio en un solo sistema con cuatro roles: Administrador, Alistador, Motorizado y Cliente. Incluye tracking GPS y chat en tiempo real entre el cliente y el motorizado, evidencia digital (foto y firma), matriz de cobertura con *leadtime*, planificación de recolecciones por el propio cliente, sugerencia de orden de ruta, un dashboard de indicadores operativos para el Administrador y el Alistador, y una API abierta a integradores (API Keys y webhooks firmados).
 
 | | |
 |---|---|
@@ -10,7 +10,7 @@ Prototipo funcional temprano de una plataforma web y móvil, orientada a API, pa
 
 > **Nota sobre el nombre:** el repositorio se llama **CEMDriver**, pero el producto es **CMEDriver**. Ambos nombres se refieren al mismo proyecto.
 
-> **Alcance (cambio del 2026-10-09):** el autor retiró del prototipo el **inventario, los pagos y el chatbot** para centrarlo en el ciclo operativo de mensajería. El chat solo sirve para que el cliente y el motorizado se comuniquen dentro de un servicio, y el código lo hace cumplir (ADMIN y ALISTADOR reciben 403). El detalle del cambio está en [docs/entrega/01-requerimientos.md](docs/entrega/01-requerimientos.md#24-cambios-de-alcance). Los documentos numerados 01 a 17 de la raíz de `docs/` y `docs/v1/` son históricos y **no** reflejan este alcance; prevalece [docs/entrega/](docs/entrega/00-guia-de-entrega.md).
+> **Alcance (cambio del 2026-10-09):** el autor retiró del prototipo el **inventario, los pagos y el chatbot** para centrarlo en el ciclo operativo de mensajería. El chat solo sirve para que el cliente y el motorizado se comuniquen dentro de un servicio, y el código lo hace cumplir (ADMIN y ALISTADOR reciben 403). El detalle del cambio está en [docs/entrega/01-requerimientos.md](docs/entrega/01-requerimientos.md#24-cambios-de-alcance). Los documentos numerados 01 a 17 de la raíz de `docs/` y `docs/v1/` son históricos y **no** reflejan este alcance; prevalece [docs/entrega/](docs/entrega/00-guia-de-entrega.md). El 2026-11-17 se añadió el dashboard de indicadores operativos (RF-30), sin cambiar el modelo de datos (ver [Dashboard de indicadores y datos de demostración](#dashboard-de-indicadores-y-datos-de-demostración)).
 
 ---
 
@@ -18,14 +18,14 @@ Prototipo funcional temprano de una plataforma web y móvil, orientada a API, pa
 
 | Capa | Tecnología |
 |---|---|
-| Frontend | Ionic 9 + Angular 22 (SPA, tema iOS), Leaflet (mapas), signature_pad (firma), Capacitor 8 (Android) |
+| Frontend | Ionic 9 + Angular 22 (SPA, tema iOS), Leaflet (mapas), signature_pad (firma), Capacitor 8 (Android); los gráficos del dashboard son SVG propios, sin librería de gráficos |
 | Backend | Python 3.12 + Django 6.1 + Django REST Framework 3.18 (monolito modular de 6 apps) |
 | Tiempo real | Django Channels 4.3 + Daphne 4.2 (ASGI, WebSocket) |
 | Base de datos | SQLite en desarrollo; PostgreSQL propuesto para producción |
 | Autenticación | JWT (SimpleJWT) para personas y API Key propia para integradores |
 | Documentación de la API | drf-spectacular (OpenAPI 3 + Swagger UI) |
 | Servicios externos | Nominatim y teselas de OpenStreetMap (reales). Correo SMTP configurable por variable de entorno: en desarrollo se imprime en la consola (único servicio simulado; ver [limitaciones](docs/entrega/08-limitaciones-y-mejoras.md#83-servicios-simulados-limitación-de-alcance)) |
-| Pruebas | Django test framework + DRF `APITestCase` + `channels.testing` (72 pruebas en el backend) |
+| Pruebas | Django test framework + DRF `APITestCase` + `channels.testing` (110 pruebas en el backend) |
 
 El detalle, la justificación y las alternativas descartadas están en [docs/entrega/02-stack-tecnologico.md](docs/entrega/02-stack-tecnologico.md).
 
@@ -48,9 +48,9 @@ CEMDriver/                       (producto: CMEDriver)
 ├── README.md                    este archivo
 ├── backend/                     API REST + tiempo real (Django)
 │   ├── cmedriver/               configuración del proyecto (settings, urls, asgi)
-│   ├── accounts/                usuarios, roles, login JWT, reset de contraseña, seed_data
+│   ├── accounts/                usuarios, roles, login JWT, reset de contraseña, seed_data y seed_demo
 │   ├── coverage/                matriz de cobertura y agenda disponible
-│   ├── services/                rutas, servicios, evidencias, novedades, chat cliente-motorizado
+│   ├── services/                rutas, servicios, evidencias, novedades, chat cliente-motorizado, indicadores operativos (RF-30)
 │   ├── tracking/                posiciones GPS, destino y ETA
 │   ├── optimization/            geocodificación (Nominatim) y orden sugerido de ruta
 │   ├── integrations/            API Keys y webhooks
@@ -58,15 +58,16 @@ CEMDriver/                       (producto: CMEDriver)
 │   ├── .env.example             plantilla de variables de entorno
 │   └── run_tests.ps1 / .sh      scripts para correr las pruebas
 ├── frontend/                    app Ionic + Angular (login + áreas por rol)
-│   ├── src/app/                 core (servicios, guards, interceptores), features por rol, shared
+│   ├── src/app/                 core (servicios, guards, interceptores), features por rol e indicadores, shared (incluye charts)
 │   ├── src/environments/        URL de la API (dev / prod)
 │   └── android/                 proyecto nativo Capacitor
 ├── docs/                        documentación (índice en docs/README.md)
-│   ├── entrega/                 entregables finales 00..08 (00 = guía de la entrega); vigentes
+│   ├── entrega/                 entregables finales 00..09 (00 = guía de la entrega); vigentes
 │   ├── 01-…17-*.md              documentos históricos, anteriores al cambio de alcance del 2026-10-09
 │   ├── diagrams/                fuentes (src/) e imágenes (img/) de los diagramas
 │   ├── mockups/                 mockups editables (históricos)
 │   └── v1/                      snapshot histórico del MVP v1
+├── presentacion/                presentación de venta en HTML (python presentacion/construir.py genera index.html)
 └── paper/                       artículo del proyecto
 ```
 
@@ -139,7 +140,7 @@ cd backend
 .venv/bin/python manage.py test
 ```
 
-Resultado esperado: **72 pruebas, OK** (eran 96 antes del cambio de alcance del 2026-10-09, que retiró 27 pruebas de inventario, pagos y chatbot; después se añadieron 3 del chat restringido a cliente y motorizado). Corren en una base de datos aislada y no requieren Internet porque Nominatim y los webhooks se simulan con `mock`. La prueba que verifica cada requerimiento vigente está en [docs/entrega/01-requerimientos.md](docs/entrega/01-requerimientos.md#4-requerimientos-funcionales-rf) §4 y en la [matriz de trazabilidad](docs/entrega/07-trazabilidad.md). El plan [docs/16-plan-pruebas.md](docs/16-plan-pruebas.md) es histórico: cuenta 93 pruebas y conserva casos de funciones retiradas. El frontend no tiene pruebas automatizadas (ver LIM-29).
+Resultado esperado: **110 pruebas, OK** (eran 96 antes del cambio de alcance del 2026-10-09, que retiró 27 pruebas de inventario, pagos y chatbot; después se añadieron 3 del chat restringido a cliente y motorizado, con lo que quedaron 72, y 38 del módulo de indicadores). Desglose por app: accounts 11, coverage 4, integrations 19, optimization 8, services 59 (21 en `tests.py` y 38 en `tests_indicadores.py`) y tracking 9. Corren en una base de datos aislada y no requieren Internet porque Nominatim y los webhooks se simulan con `mock`. La prueba que verifica cada requerimiento vigente está en [docs/entrega/01-requerimientos.md](docs/entrega/01-requerimientos.md#4-requerimientos-funcionales-rf) §4 y en la [matriz de trazabilidad](docs/entrega/07-trazabilidad.md). El plan [docs/16-plan-pruebas.md](docs/16-plan-pruebas.md) es histórico: cuenta 93 pruebas y conserva casos de funciones retiradas. El frontend no tiene pruebas automatizadas (ver LIM-29).
 
 ---
 
@@ -198,6 +199,73 @@ El inicio de sesión acepta el nombre de usuario o el correo.
 
 ---
 
+## Dashboard de indicadores y datos de demostración
+
+El módulo de **indicadores operativos** (RF-30) calcula, directamente sobre la base de datos de CMEDriver, el volumen y los estados de los servicios, la tasa de éxito, las novedades, la completitud de la evidencia, la productividad por motorizado, la actividad de la operación (rutas, GPS y chat) y el estado de las integraciones. Lo consultan el **Administrador** y el **Alistador**; el Cliente y el Motorizado reciben 403. Los gráficos son SVG propios, sin librerías de gráficos nuevas. El contrato, las fórmulas, las limitaciones y las pruebas están en [docs/entrega/09-dashboard-indicadores.md](docs/entrega/09-dashboard-indicadores.md).
+
+> **Las cifras de la demostración son sintéticas.** Salen de datos generados por `seed_demo`: no son operaciones reales de Logytech Mobile ni evidencia del desempeño de ninguna operación (LIM-40). Tampoco hay «tiempo de entrega» para las entregas, porque el sistema no guarda historial de transiciones (LIM-41).
+
+### Cargar los datos de demostración
+
+```bash
+cd backend
+./.venv/Scripts/python.exe manage.py migrate
+./.venv/Scripts/python.exe manage.py seed_data
+./.venv/Scripts/python.exe manage.py seed_demo --reset
+```
+
+`seed_demo` crea de forma reproducible 240 servicios repartidos en 60 días (entregas y recolecciones, en todos los estados) con sus rutas, novedades, evidencias, posiciones GPS, mensajes de chat, una API key y un webhook de demostración. `--reset` borra solo lo creado por el propio comando y lo recrea; sin `--reset` no duplica nada. Opciones: `--dias` (por defecto 60), `--servicios` (240) y `--semilla` (2026). En Linux y macOS, sustituir `./.venv/Scripts/python.exe` por `.venv/bin/python`.
+
+> **Credenciales de demostración: solo para desarrollo local.** `seed_demo` crea usuarios `demo_*` con una contraseña de desarrollo conocida y publicada. No ejecute `seed_demo` en un entorno con datos reales ni deje esos usuarios en producción: se eliminan con `seed_demo --reset` o borrando los usuarios `demo_*`.
+
+| Usuario | Rol | Contraseña (solo desarrollo) |
+|---|---|---|
+| `demo_admin` | ADMIN | `demo1234` |
+| `demo_alistador1` | ALISTADOR | `demo1234` |
+| `demo_moto1` … `demo_moto4` | MOTORIZADO | `demo1234` |
+| `demo_cliente1` … `demo_cliente8` | CLIENTE | `demo1234` |
+
+### Dónde se ve
+
+Con el backend y el frontend en marcha, iniciar sesión en <http://localhost:4200> como `demo_admin` o `demo_alistador1` y abrir el segmento **Indicadores** del menú:
+
+| Rol | Ruta de la app |
+|---|---|
+| Administrador | `/admin/indicadores` |
+| Alistador | `/alistador/indicadores` |
+
+### Endpoint y Swagger
+
+`GET /api/indicadores/?dias=30[&zona=...]`, con JWT (o con la API Key de un alistador). `dias` es un entero de 1 a 365 (por defecto 30; fuera de rango responde 400) y `zona` filtra por el texto exacto de la zona (por ejemplo `Bogota - Chapinero`). Responde 200 a ADMIN y ALISTADOR, 403 a CLIENTE y MOTORIZADO y 401 sin token. Está documentado en Swagger (<http://localhost:8000/api/docs/>, etiqueta `indicadores`).
+
+### Exportar los indicadores a JSON
+
+```bash
+cd backend
+./.venv/Scripts/python.exe manage.py exportar_indicadores --dias 30 --salida ../presentacion/datos/indicadores.json
+```
+
+Sin `--salida` imprime el JSON por la salida estándar y `--zona` filtra una zona. Usa la misma función de cálculo que el endpoint.
+
+### Presentación de venta (`presentacion/`)
+
+La carpeta `presentacion/` contiene una presentación comercial en HTML cuyas cifras salen de `presentacion/datos/indicadores.json` (la exportación anterior) y no de valores escritos a mano. Para construirla, desde la raíz del repositorio:
+
+```bash
+python presentacion/construir.py
+```
+
+y abrir `presentacion/index.html` en el navegador (es un solo archivo y no necesita conexión a Internet). Las opciones del constructor, el origen de cada dato y las capturas están en [presentacion/README.md](presentacion/README.md).
+
+### Pruebas del dashboard
+
+```bash
+cd backend
+./.venv/Scripts/python.exe manage.py test services.tests_indicadores   # 38 pruebas del módulo de indicadores
+```
+
+---
+
 ## Despliegue
 
 **El sistema no tiene despliegue público:** solo se ejecuta en local, en modo desarrollo. No hay CI ni artefactos de despliegue (Docker) en el repositorio.
@@ -229,7 +297,8 @@ Antes de concretarla hay que hacer cambios de código: leer `DATABASES` y `CHANN
 | 05 | [BPMN](docs/entrega/05-bpmn.md) | Modelado de los procesos de negocio |
 | 06 | [Modelo C4](docs/entrega/06-c4.md) | Diagramas C4: contexto, contenedores, componentes y código |
 | 07 | [Matriz de trazabilidad](docs/entrega/07-trazabilidad.md) | Trazabilidad entre requerimientos, reglas, diseño, código y pruebas |
-| 08 | [Limitaciones y mejoras](docs/entrega/08-limitaciones-y-mejoras.md) | Limitaciones conocidas (35 vigentes y 4 resueltas por reducción de alcance), servicios simulados y hoja de ruta de mejoras |
+| 08 | [Limitaciones y mejoras](docs/entrega/08-limitaciones-y-mejoras.md) | Limitaciones conocidas (37 vigentes y 4 resueltas por reducción de alcance), servicios simulados y hoja de ruta de mejoras |
+| 09 | [Dashboard de indicadores](docs/entrega/09-dashboard-indicadores.md) | Ampliación (RF-30): indicadores operativos calculados sobre la base de datos, comandos de datos de demostración, contrato, fórmulas, limitaciones y pruebas |
 
 El resto de la documentación (charter, API, cronograma, diagrama de clases, casos de uso, mockups, plan de pruebas, manual de herramientas, roadmap) está indexado en [docs/README.md](docs/README.md). Es **histórica**: se redactó antes del cambio de alcance del 2026-10-09 y no lo refleja; en caso de diferencia prevalece `docs/entrega/`.
 
@@ -237,7 +306,7 @@ El resto de la documentación (charter, API, cronograma, diagrama de clases, cas
 
 ## Limitaciones conocidas
 
-CMEDriver es un **MVP académico**. Hay 39 limitaciones registradas: **35 vigentes**, documentadas deliberadamente y sin corregir en esta entrega, y 4 resueltas por la reducción de alcance del 2026-10-09 (existían solo por el inventario, los pagos y el chatbot). Las 7 vigentes de prioridad alta son:
+CMEDriver es un **MVP académico**. Hay 41 limitaciones registradas: **37 vigentes**, documentadas deliberadamente y sin corregir en esta entrega, y 4 resueltas por la reducción de alcance del 2026-10-09 (existían solo por el inventario, los pagos y el chatbot). Las 7 vigentes de prioridad alta son:
 
 - El RBAC permite a clientes y motorizados editar o borrar servicios por `PUT/PATCH/DELETE`.
 - En la app, un servicio en `NOVEDAD` (reintentar) queda detenido porque se ocultan sus acciones.
@@ -246,7 +315,7 @@ CMEDriver es un **MVP académico**. Hay 39 limitaciones registradas: **35 vigent
 - No hay cumplimiento de la Ley 1581 de 2012 (protección de datos personales).
 - La configuración de base de datos y de `environment.prod.ts` no está lista para producción.
 
-El único servicio simulado es el correo (SIM-03: en desarrollo se imprime en la consola). El frontend no tiene pruebas automatizadas y no hay CI. La lista completa, con evidencia, prioridad y mejora propuesta, está en [docs/entrega/08-limitaciones-y-mejoras.md](docs/entrega/08-limitaciones-y-mejoras.md), junto con la [hoja de ruta de mejoras](docs/entrega/08-limitaciones-y-mejoras.md#84-hoja-de-ruta-de-mejoras-priorizada). El roadmap histórico [docs/07-roadmap-futuro.md](docs/07-roadmap-futuro.md) es anterior al cambio de alcance y todavía lista como pendientes el chatbot con LLM real, los pagos y el inventario.
+El único servicio simulado es el correo (SIM-03: en desarrollo se imprime en la consola). El frontend no tiene pruebas automatizadas y no hay CI. Las cifras del dashboard de indicadores se calculan sobre datos de demostración sintéticos (LIM-40) y no incluyen tiempo de entrega para las entregas (LIM-41). La lista completa, con evidencia, prioridad y mejora propuesta, está en [docs/entrega/08-limitaciones-y-mejoras.md](docs/entrega/08-limitaciones-y-mejoras.md), junto con la [hoja de ruta de mejoras](docs/entrega/08-limitaciones-y-mejoras.md#84-hoja-de-ruta-de-mejoras-priorizada). El roadmap histórico [docs/07-roadmap-futuro.md](docs/07-roadmap-futuro.md) es anterior al cambio de alcance y todavía lista como pendientes el chatbot con LLM real, los pagos y el inventario.
 
 ---
 

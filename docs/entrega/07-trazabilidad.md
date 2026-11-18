@@ -1,8 +1,8 @@
 # Fase 6b — Matriz de trazabilidad
 
 > **Objetivo:** demostrar que cada necesidad del problema se convierte en requerimientos, que esos requerimientos aparecen en el proceso (BPMN), en la arquitectura (C4), en los datos (MER) y en el código, y que el código está verificado por pruebas.
-> **Insumos:** [01-requerimientos.md](01-requerimientos.md) (problema, OE-1…OE-4, metas funcionales MF-1…MF-7 que desglosan el OE-3 —MF-5 retirada—, RF-01…RF-29 —24 vigentes—, RNF-01…RNF-20 —19 vigentes—, RN-01…RN-19 —16 vigentes—, hallazgos H-01…H-13 —H-03 y H-12 resueltos por reducción de alcance; H-13 posterior a ese cambio—), [02-stack-tecnologico.md](02-stack-tecnologico.md), [03-arquitectura.md](03-arquitectura.md) (nombres canónicos; 6 apps), [04-mer.md](04-mer.md) (12 entidades), [05-bpmn.md](05-bpmn.md) (IDs de actividades y gateways), [06-c4.md](06-c4.md) (N2 contenedores, N3 componentes —6 apps—, N4 clases de `services`), [16-plan-pruebas.md](../16-plan-pruebas.md) (IDs `T-…`; documento histórico que conserva casos obsoletos, ver §g.2).
-> **Verificación:** cada endpoint, archivo, clase, función y prueba citada se comprobó contra el código actual (`backend/*/urls.py`, `views.py`, `serializers.py`, `models.py`, `tests.py`, `cmedriver/routing.py` y `frontend/src/app`) y contra el archivo `docs/diagrams/src/bpmn-ciclo-servicio.bpmn`. El conteo de pruebas (72 métodos `test_*`) y el de clases de prueba se hicieron con `grep` sobre los `tests.py`. Los comportamientos de `planificar` y del chat que se señalan en §g.2 se comprobaron además con una ejecución puntual contra una base de datos de pruebas aislada (no se modificó código ni datos).
+> **Insumos:** [01-requerimientos.md](01-requerimientos.md) (problema, OE-1…OE-4, metas funcionales MF-1…MF-7 que desglosan el OE-3 —MF-5 retirada—, RF-01…RF-30 —25 vigentes—, RNF-01…RNF-20 —19 vigentes—, RN-01…RN-19 —16 vigentes—, hallazgos H-01…H-13 —H-03 y H-12 resueltos por reducción de alcance; H-13 posterior a ese cambio—), [02-stack-tecnologico.md](02-stack-tecnologico.md), [03-arquitectura.md](03-arquitectura.md) (nombres canónicos; 6 apps), [04-mer.md](04-mer.md) (12 entidades), [05-bpmn.md](05-bpmn.md) (IDs de actividades y gateways), [06-c4.md](06-c4.md) (N2 contenedores, N3 componentes —6 apps—, N4 clases de `services`), [16-plan-pruebas.md](../16-plan-pruebas.md) (IDs `T-…`; documento histórico que conserva casos obsoletos, ver §g.2).
+> **Verificación:** cada endpoint, archivo, clase, función y prueba citada se comprobó contra el código actual (`backend/*/urls.py`, `views.py`, `serializers.py`, `models.py`, `tests.py`, `services/indicadores.py`, `services/views_indicadores.py`, `services/tests_indicadores.py`, `cmedriver/routing.py` y `frontend/src/app`) y contra el archivo `docs/diagrams/src/bpmn-ciclo-servicio.bpmn`. El conteo de pruebas (110 métodos `test_*`) y el de clases de prueba se hicieron con `grep` sobre los `tests.py` y sobre `services/tests_indicadores.py`. Los comportamientos de `planificar` y del chat que se señalan en §g.2 se comprobaron además con una ejecución puntual contra una base de datos de pruebas aislada (no se modificó código ni datos).
 
 ---
 
@@ -11,11 +11,12 @@
 El autor retiró del proyecto el **inventario, los pagos y el chatbot** ([01 §2.4](01-requerimientos.md#24-cambios-de-alcance)); el chat queda solo para la comunicación cliente↔motorizado. Efecto en esta matriz:
 
 - **Retirados (conservan su fila de una línea, sin renumerar):** RF-04, RF-18, RF-22, RF-23, RF-26 · RN-04, RN-06, RN-16 · RNF-13 · MF-5 (y RES-06, RES-07). No cuentan en ninguna métrica de §g. Los hallazgos H-03 y H-12 quedaron resueltos por reducción de alcance; H-09 sigue vigente solo para `recibir-en-centro` e `iniciar-transito`.
-- **Vigentes:** 24 de 29 RF, 16 de 19 RN, 19 de 20 RNF y 6 de 7 MF. Todas las cifras de §g se recalcularon sobre los vigentes.
+- **Vigentes:** 25 de 30 RF (24 de 29 el 2026-10-09; RF-30 se añadió el 2026-11-17), 16 de 19 RN, 19 de 20 RNF y 6 de 7 MF. Todas las cifras de §g se recalcularon sobre los vigentes.
 - **Modelos:** MER de 12 entidades (antes 17); backend de 6 apps (antes 9); C4 N1 con 5 sistemas externos (antes 7); BPMN sin `GW_QueSolicita`, `UT_Comprar`, `ST_CrearCompra`, `GW_MergeCreado` ni `TA_Compra` (`SE_Cliente` → `UT_Planificar` directo).
-- **Pruebas:** 72 métodos `test_*` (antes 96: se retiraron 27 de lo eliminado y se añadieron 3 del chat restringido a cliente y motorizado). Los casos T-INV-01…03, T-BOT-01…09, T-PAG-01…03 y T-SRV-17…19 del plan de pruebas quedan obsoletos y ninguna fila vigente los cita.
+- **Pruebas:** 110 métodos `test_*` (96 antes del cambio → 69 al retirar 27 de lo eliminado → 72 al añadir 3 del chat restringido a cliente y motorizado → 110 al añadir 38 del módulo de indicadores, RF-30). Los casos T-INV-01…03, T-BOT-01…09, T-PAG-01…03 y T-SRV-17…19 del plan de pruebas quedan obsoletos y ninguna fila vigente los cita.
 - **P5 redefinido:** «sin autoservicio de agendamiento ni reglas de cobertura» (planificar una recolección y matriz de cobertura), sin chatbot ni compras.
 - **Filas vigentes ajustadas:** RF-05, RF-16, RF-17, RF-25, RF-27, RN-03, RN-14, RNF-02, RNF-08, RNF-15, RNF-17, RNF-20, el desglose de OE-3 y el ejemplo narrado (§f, sin cambios de fondo).
+- **Ampliación posterior (2026-11-17), RF-30:** fila nueva en §c.1 (Consultar indicadores operativos, MF-1, Implementado con límites), cifras de §g.1 recalculadas sobre 25 RF vigentes, y ajustes en §b (MF-1 → RF-01..03 y RF-30) y §e (RNF-02 y RNF-17). No cambia el MER (12 entidades), el BPMN ni el número de apps. Se añadió el hueco 23 de §g.2 y las limitaciones LIM-40 y LIM-41 de [08](08-limitaciones-y-mejoras.md).
 - **Hallazgos de esta revisión** (marcados «nuevo» en §g.2): chat por WebSocket sin validación de longitud, `planificar` sin exigir `direccion_origen` (registrado como **H-13** y **LIM-39**; deja **RN-13 en estado Parcial**, antes Implementado), casos obsoletos del plan de pruebas y códigos 403 del plan que las pruebas reales verifican como 404. Dos huecos de la revisión anterior quedaron **resueltos** (marcados «resuelto» en §g.2): el acceso de ADMIN y ALISTADOR al chat (el código lo restringió al cliente dueño y al motorizado asignado y hay 3 pruebas nuevas) y el gateway `GW_MergeOpt` (ya figura en 05 §5).
 
 ---
@@ -49,7 +50,7 @@ Problemas del §1 de 01-requerimientos.md: **P1** asignación informal · **P2**
 |---|---|---|
 | OE-1 Identificar problemas y derivar requerimientos priorizados | Problemas P1–P6 derivados de la literatura y del dominio; RF con prioridad, RNF, RN y RES | [01 §1](01-requerimientos.md#1-problema-o-necesidad-identificada), §4–§7 |
 | OE-2 Diseñar y documentar la arquitectura y modelarla | Arquitectura orientada a API (REST, WebSocket, webhooks), MER, BPMN, C4 N1–N4, casos de uso, clases y mockups | [02](02-stack-tecnologico.md), [03](03-arquitectura.md), [04](04-mer.md), [05](05-bpmn.md), [06](06-c4.md) |
-| OE-3 Implementar el prototipo funcional temprano | Metas funcionales MF-1…MF-7 (MF-5 retirada) → 24 RF vigentes → código y pruebas (tabla siguiente y §c) | `backend/`, `frontend/`, 72 pruebas |
+| OE-3 Implementar el prototipo funcional temprano | Metas funcionales MF-1…MF-7 (MF-5 retirada) → 25 RF vigentes → código y pruebas (tabla siguiente y §c) | `backend/`, `frontend/`, 110 pruebas |
 | OE-4 Formular el protocolo de validación | Fuera del alcance de esta entrega técnica; se formula en el paper y se ejecuta en el Trabajo de Grado | Paper del proyecto (metodología) |
 
 **Desglose del OE-3 en metas funcionales y RF:**
@@ -62,7 +63,7 @@ Necesidad: plataforma única para crear, asignar, ejecutar y seguir servicios de
 
 | Problema (§1) | Objetivo específico | RF que lo cumplen |
 |---|---|---|
-| P1 Asignación informal, sin registro único de estados | MF-1 (configurar la operación), MF-2 (crear y asignar), MF-3 (ejecutar) | RF-01, RF-03, RF-05, RF-07, RF-09, RF-10, RF-12, RF-21 |
+| P1 Asignación informal, sin registro único de estados | MF-1 (configurar la operación), MF-2 (crear y asignar), MF-3 (ejecutar) | RF-01, RF-03, RF-05, RF-07, RF-09, RF-10, RF-12, RF-21, RF-30 |
 | P2 Cliente sin visibilidad | MF-4 (seguimiento en tiempo real y chat) | RF-08, RF-15, RF-16, RF-27, RF-28 |
 | P3 Sin evidencia digital | MF-3 | RF-11 (+ RN-02, RN-17) |
 | P4 Novedades sin trazabilidad | MF-3, MF-2 | RF-13 (+ RN-05), RF-08 |
@@ -70,7 +71,7 @@ Necesidad: plataforma única para crear, asignar, ejecutar y seguir servicios de
 | P6 Sin integración con terceros | MF-6 (API documentada, API Key, webhooks) | RF-06, RF-24, RF-25, RF-29 (+ RNF-03) |
 | Transversal: acceso seguro de los 4 roles | MF-7 (seguridad y pruebas) | RF-19, RF-20 (+ RNF-01, RNF-02, RNF-07, RNF-12, RNF-17) |
 
-Asignación de RF a objetivos (sin huecos ni duplicados): MF-1 → RF-01..03 · MF-2 → RF-05..08, RF-21 · MF-3 → RF-09..14 · MF-4 → RF-15..17, RF-27, RF-28 · MF-6 → RF-24, RF-25, RF-29 · MF-7 → RF-19, RF-20 (3 + 5 + 6 + 5 + 3 + 2 = 24). **Los 24 RF vigentes tienen objetivo y las seis metas vigentes tienen al menos un RF.** MF-5 (chatbot y pagos) está retirada y RF-04, RF-18, RF-22, RF-23 y RF-26 ya no se asignan a ninguna meta.
+Asignación de RF a objetivos (sin huecos ni duplicados): MF-1 → RF-01..03, RF-30 · MF-2 → RF-05..08, RF-21 · MF-3 → RF-09..14 · MF-4 → RF-15..17, RF-27, RF-28 · MF-6 → RF-24, RF-25, RF-29 · MF-7 → RF-19, RF-20 (4 + 5 + 6 + 5 + 3 + 2 = 25). **Los 25 RF vigentes tienen objetivo y las seis metas vigentes tienen al menos un RF.** MF-5 (chatbot y pagos) está retirada y RF-04, RF-18, RF-22, RF-23 y RF-26 ya no se asignan a ninguna meta.
 
 ---
 
@@ -87,6 +88,7 @@ Asignación de RF a objetivos (sin huecos ni duplicados): MF-1 → RF-01..03 · 
 | **RF-24** Generar API Keys | P6 / MF-6 | Fuera del proceso (configuración); habilita `ST_AutenticarKey` | App, API | integrations, Autenticación por API Key | API_KEY, USUARIO | `/api/integraciones/api-keys/` → `integrations/views.py:ApiKeyViewSet.create`; `integrations/serializers.py:ApiKeyCreateSerializer.validate_actua_como` | `features/admin/api-keys-list.page.ts`; `core/services/api-keys.service.ts` | T-INT-01, T-INT-02, T-INT-03 → `integrations/tests.py::ApiKeyEndpointTests` (6), `ApiKeyAuthenticationTests` (4) | Implementado |
 | **RF-25** Configurar webhooks | P6 / MF-6 | `SND_WebhookCreado`, `SND_WebhookAsignado`, `SND_WebhookEntregado`, `SND_WebhookRecolectado`, `SND_WebhookNovedad`, `SND_WebhookDevuelto` | App, API | integrations, Despachador de webhooks | WEBHOOK_ENDPOINT, WEBHOOK_DELIVERY | `/api/integraciones/webhooks/` → `integrations/views.py:WebhookEndpointViewSet`; envío: `integrations/services.py:disparar_webhook`, `firmar`, `_enviar_a_endpoint`; invocado por `services/views.py:ServicioViewSet._notificar` | `features/admin/webhooks-list.page.ts`; `core/services/webhooks.service.ts` | T-INT-01, T-INT-04, T-INT-05 → `integrations/tests.py::WebhookEndpointTests` (4), `DispararWebhookTests` (5) | Implementado (H-09: `recibir-en-centro` e `iniciar-transito` no emiten evento) |
 | **RF-29** Consultar bitácora de webhooks | P6 / MF-6 | Fuera del proceso (consulta de lo registrado por `SND_Webhook*`) | App, API | integrations | WEBHOOK_DELIVERY | `GET /api/integraciones/webhooks/{endpoint_id}/entregas/` → `integrations/views.py:WebhookEntregasView` | `features/admin/webhooks-list.page.ts` (`webhooksService.entregas`) | Sin ID T- (H-05) → `integrations/tests.py::WebhookEndpointTests.test_entregas_endpoint_lista_bitacora_solo_para_admin` | Implementado |
+| **RF-30** Consultar indicadores operativos (Administrador y Alistador) | P1 / MF-1 | Fuera del proceso modelado (consulta) | App, API | services, Permisos RBAC | SERVICIO, NOVEDAD, EVIDENCIA, RUTA, USUARIO, POSICION_GPS, MENSAJE_CHAT, WEBHOOK_DELIVERY, API_KEY, WEBHOOK_ENDPOINT | `GET /api/indicadores/?dias=&zona=` → `services/views_indicadores.py:IndicadoresView.get` (`IsAdminOAlistador`, `accounts/permissions.py`) → `services/indicadores.py:calcular_indicadores`; contrato y esquema OpenAPI en `services/serializers_indicadores.py`; datos de demostración: `accounts/management/commands/seed_demo.py`; exportación a JSON: `services/management/commands/exportar_indicadores.py` | `features/indicadores/indicadores.page.ts` (rutas `/admin/indicadores` y `/alistador/indicadores`); `core/services/indicadores.service.ts`; gráficos SVG propios en `shared/charts/` | Sin ID T- (el plan es anterior a RF-30) → `services/tests_indicadores.py::IndicadoresPermisosTests` (5), `IndicadoresCifrasTests` (10), `IndicadoresConsultasTests` (1), `IndicadoresFiltrosTests` (6), `IndicadoresPeriodoLocalTests` (1); soporte: `SeedDemoTests` (11), `ExportarIndicadoresTests` (4) | Implementado (límites: datos de demostración sintéticos, LIM-40; sin historial de transiciones ni marca de cierre en entregas, LIM-17 y LIM-41; pantalla sin prueba automatizada, LIM-29) |
 
 ### c.2 Alistador y sistema integrador (MF-2)
 
@@ -163,7 +165,7 @@ Asignación de RF a objetivos (sin huecos ni duplicados): MF-1 → RF-01..03 · 
 | RNF | Decisión de stack / arquitectura | Dónde está en el C4 | Evidencia verificable |
 |---|---|---|---|
 | RNF-01 JWT | SimpleJWT (access 8 h, refresh 1 día); JWT también para WebSocket | N3 Autenticación JWT, Middleware JWT de WebSocket | `cmedriver/settings.py` (`SIMPLE_JWT`, `DEFAULT_AUTHENTICATION_CLASSES`); `cmedriver/ws_auth.py:JWTAuthMiddleware`; T-ACC-01, T-ACC-06 |
-| RNF-02 RBAC | Rol en `Usuario.rol` + clases de permiso por vista + filtrado en `get_queryset` | N3 Permisos RBAC | `accounts/permissions.py`; `ServicioViewSet.get_permissions`; T-ACC-05, T-COV-01, T-SRV-01, T-SRV-06, T-SRV-13, T-TRK-02, T-TRK-04, T-OPT-01, T-INT-01 (⚠️ H-01) |
+| RNF-02 RBAC | Rol en `Usuario.rol` + clases de permiso por vista + filtrado en `get_queryset` | N3 Permisos RBAC | `accounts/permissions.py`; `ServicioViewSet.get_permissions`; T-ACC-05, T-COV-01, T-SRV-01, T-SRV-06, T-SRV-13, T-TRK-02, T-TRK-04, T-OPT-01, T-INT-01, `services/tests_indicadores.py::IndicadoresPermisosTests` (RF-30) (⚠️ H-01) |
 | RNF-03 API documentada | drf-spectacular (OpenAPI 3 + Swagger UI) | N2 Documentación API | `GET /api/schema/`, `GET /api/docs/` en `cmedriver/urls.py`; inspección manual |
 | RNF-07 / RNF-12 Credenciales con hash | `set_password()` (PBKDF2); API Key guardada como SHA-256 + prefijo | N3 accounts, Autenticación por API Key | `integrations/models.py:ApiKey.key_hash`, `prefix`; T-ACC-10, T-INT-02 |
 | RNF-08 Modularidad | Monolito modular de 6 apps Django (`accounts`, `coverage`, `services`, `tracking`, `optimization`, `integrations`; decisión §8 de 03-arquitectura) | N3: 6 componentes (apps) | Estructura `backend/<app>/{models,serializers,views,urls,tests}.py` (verificada en las 6 apps); `INSTALLED_APPS` en `cmedriver/settings.py` |
@@ -173,7 +175,7 @@ Asignación de RF a objetivos (sin huecos ni duplicados): MF-1 → RF-01..03 · 
 | RNF-15 Tolerancia a fallos externos | `geocodificar` devuelve `None` ante cualquier falla de Nominatim (caché `PuntoGeocodificado` y salida controlada); webhook caído se registra con `exito=False` | N3 Cliente de geocodificación, Despachador de webhooks | T-OPT-03, T-INT-05, `tracking/tests.py::DestinoTests.test_geocoding_fallido_devuelve_404_no_500` |
 | RNF-05 / RNF-14 Usabilidad móvil y portabilidad | Ionic 9 + Angular 22 (tema iOS) y Capacitor 8 | N2 App CMEDriver | T-UI-05 (manual); build Android no verificado (RES-14) |
 | RNF-06 Frecuencia GPS | Intervalo fijo de 8 s en la app | N2 App CMEDriver | `features/motorizado/servicio-detail.page.ts:startTracking` (`setInterval(..., 8000)`); BPMN `IE_Cada8s` |
-| RNF-17 Suite de pruebas | Django test runner + `APIClient`, BD aislada | — | 72 métodos `test_*` en 6 `tests.py` (accounts 11, coverage 4, integrations 19, optimization 8, services 21, tracking 9); `run_tests.ps1` / `run_tests.sh` (⚠️ H-05: el plan dice 93; eran 96 antes del 2026-10-09) |
+| RNF-17 Suite de pruebas | Django test runner + `APIClient`, BD aislada | — | 110 métodos `test_*` en 7 archivos de pruebas (accounts 11, coverage 4, integrations 19, optimization 8, services 59 —21 en `tests.py` y 38 en `tests_indicadores.py`—, tracking 9); `run_tests.ps1` / `run_tests.sh` (⚠️ H-05: el plan dice 93; eran 96 antes del 2026-10-09) |
 | RNF-18 Configuración segura | Variables de entorno; arranque bloqueado sin `DJANGO_SECRET_KEY` en producción | N2 nodo Servidor ASGI Daphne | `cmedriver/settings.py` (`RuntimeError` si `DEBUG=False` sin clave) |
 | RNF-20 Privacidad | Filtrado por propietario (RN-14) en servicios, tracking, destino y chat | N3 Permisos RBAC + `get_queryset` | T-SRV-13, T-SRV-21, T-TRK-04, T-TRK-06, `MensajesChatTests.test_admin_y_alistador_no_pueden_leer_ni_escribir_en_el_chat` (⚠️ H-01, H-07, RES-11) |
 
@@ -210,26 +212,26 @@ Este recorrido sirve para la sustentación porque toca todas las capas con un re
 
 ### g.1 Métricas
 
-Todas las cifras se calculan sobre los elementos **vigentes** tras el cambio de alcance del 2026-10-09 (RF 24, RN 16, RNF 19). Los retirados (RF-04, 18, 22, 23, 26; RN-04, 06, 16; RNF-13) conservan su fila de una línea y no entran en ninguna métrica.
+Todas las cifras se calculan sobre los elementos **vigentes** tras el cambio de alcance del 2026-10-09 (RF 25, RN 16, RNF 19). Los retirados (RF-04, 18, 22, 23, 26; RN-04, 06, 16; RNF-13) conservan su fila de una línea y no entran en ninguna métrica.
 
 | Indicador | Valor | Detalle |
 |---|---|---|
-| RF vigentes | **24 / 29** | Retirados: RF-04, RF-18, RF-22, RF-23, RF-26 |
-| RF con objetivo específico (OE) | **24 / 24 (100 %)** | Ver §b (MF-1: 3 · MF-2: 5 · MF-3: 6 · MF-4: 5 · MF-6: 3 · MF-7: 2) |
-| RF con al menos una prueba automatizada específica | **22 / 24 (92 %)** | Sin prueba específica: RF-03 (ninguna) y RF-08 (solo indirecta) |
-| RF con alguna prueba automatizada (incluida indirecta) | **23 / 24 (96 %)** | Solo RF-03 depende de verificación manual |
-| RF que aparecen como actividad en el BPMN | **13 / 24 (54 %)** | RF-05, 06, 07, 09, 10, 11, 12, 13, 14, 17, 21, 25, 27 (coincide con 05-bpmn §1) |
-| RF fuera del proceso modelado | **11 / 24** | RF-01, 02, 03, 08, 15, 16, 19, 20, 24, 28, 29 (configuración, autenticación y consultas; RF-15, RF-16 y RF-28 aparecen solo en la anotación `TA_Tracking` y RF-02 como dato de `ST_ValidarAgenda`) |
-| RF con componente C4 N3 y entidad MER | **24 / 24** | Toda fila vigente de §c tiene ambos |
+| RF vigentes | **25 / 30** | Retirados: RF-04, RF-18, RF-22, RF-23, RF-26 (RF-30 se añadió el 2026-11-17) |
+| RF con objetivo específico (OE) | **25 / 25 (100 %)** | Ver §b (MF-1: 4 · MF-2: 5 · MF-3: 6 · MF-4: 5 · MF-6: 3 · MF-7: 2) |
+| RF con al menos una prueba automatizada específica | **23 / 25 (92 %)** | Sin prueba específica: RF-03 (ninguna) y RF-08 (solo indirecta) |
+| RF con alguna prueba automatizada (incluida indirecta) | **24 / 25 (96 %)** | Solo RF-03 depende de verificación manual |
+| RF que aparecen como actividad en el BPMN | **13 / 25 (52 %)** | RF-05, 06, 07, 09, 10, 11, 12, 13, 14, 17, 21, 25, 27 (coincide con 05-bpmn §1) |
+| RF fuera del proceso modelado | **12 / 25** | RF-01, 02, 03, 08, 15, 16, 19, 20, 24, 28, 29, 30 (configuración, autenticación y consultas; RF-15, RF-16 y RF-28 aparecen solo en la anotación `TA_Tracking` y RF-02 como dato de `ST_ValidarAgenda`) |
+| RF con componente C4 N3 y entidad MER | **25 / 25** | Toda fila vigente de §c tiene ambos |
 | Entidades MER usadas por al menos un RF | **12 / 12** | Ninguna entidad huérfana |
-| RF con pantalla en el frontend | **23 / 24 (96 %)** | Sin pantalla: RF-06 (actor externo, no aplica). Parciales en la UI: RF-08 (el Alistador no ve el historial de novedades) y RF-28 (solo para el Cliente) |
-| Estado de los RF | **21 Implementado · 3 Parcial · 0 Simulado** | Parcial: RF-01 (H-08), RF-08 (H-08), RF-13 (H-11) |
+| RF con pantalla en el frontend | **24 / 25 (96 %)** | Sin pantalla: RF-06 (actor externo, no aplica). Parciales en la UI: RF-08 (el Alistador no ve el historial de novedades) y RF-28 (solo para el Cliente) |
+| Estado de los RF | **22 Implementado · 3 Parcial · 0 Simulado** | Parcial: RF-01 (H-08), RF-08 (H-08), RF-13 (H-11) |
 | RN vigentes | **16 / 19** | Retiradas: RN-04, RN-06, RN-16 |
 | RN con prueba automatizada | **15 / 16 (94 %)** | Sin prueba: RN-18. Solo camino feliz o cobertura parcial: RN-03, RN-10, RN-12, RN-13 (solo en `POST /servicios/`), RN-15, RN-17 |
 | RN con punto en el BPMN | **13 / 16 (81 %)** | Fuera del proceso: RN-14, RN-18, RN-19 |
 | Estado de las RN | **11 Implementado · 5 Parcial · 0 Simulado** | Parcial: RN-01 (H-02), RN-03 (H-04), RN-09 (H-02, H-11), RN-13 (`planificar`, H-13), RN-14 (H-01) |
 | RNF vigentes con fila en §e | **16 / 19 (84 %)** | Sin fila (la matriz es de «principales»): RNF-04, RNF-09, RNF-19; su evidencia está en 01 §5 |
-| Pruebas automatizadas existentes | **72 métodos `test_*`** | accounts 11, coverage 4, integrations 19, optimization 8, services 21, tracking 9 (6 apps; todas en verde) |
+| Pruebas automatizadas existentes | **110 métodos `test_*`** | accounts 11, coverage 4, integrations 19, optimization 8, services 59 (21 en `tests.py` y 38 en `tests_indicadores.py`), tracking 9 (6 apps; todas en verde) |
 | Casos del plan de pruebas obsoletos | **18** | T-INV-01…03, T-BOT-01…09, T-PAG-01…03, T-SRV-17…19: siguen en `16-plan-pruebas.md`, ninguna fila vigente los cita |
 
 ### g.2 Huecos de trazabilidad detectados
@@ -268,6 +270,9 @@ Los ítems marcados **(nuevo)** se detectaron en esta revisión; los marcados **
 19. **Atributo sin requerimiento que lo mueva:** `RUTA.estado` (`EstadoRuta`) nunca cambia de `PLANEADA`; ningún RF ni actividad BPMN lo actualiza.
 
 **Documentación**
-20. **Plan de pruebas desactualizado (nuevo):** `16-plan-pruebas.md` conserva 18 casos de funciones retiradas (T-INV-01…03, T-BOT-01…09, T-PAG-01…03, T-SRV-17…19) y declara «93/93»; hoy hay 72 pruebas (H-05, LIM-33). Los IDs vigentes no se renumeraron, de ahí el salto T-SRV-16 → T-SRV-20.
+20. **Plan de pruebas desactualizado (nuevo):** `16-plan-pruebas.md` conserva 18 casos de funciones retiradas (T-INV-01…03, T-BOT-01…09, T-PAG-01…03, T-SRV-17…19) y declara «93/93»; hoy hay 110 pruebas (H-05, LIM-33). Los IDs vigentes no se renumeraron, de ahí el salto T-SRV-16 → T-SRV-20.
 21. **Códigos de estado del plan (nuevo):** T-SRV-06 y T-SRV-13 del plan declaran 403, pero las pruebas reales (`test_motorizado_no_asignado_no_puede_operar_el_servicio` y `test_otro_cliente_no_puede_acceder_al_chat`) verifican 404, porque el servicio ajeno no entra en el *queryset* (`get_queryset`) y no se revela su existencia. 01 §4 ya lo dice así en RF-09 («404») y en RF-16 («404»).
 22. *Corregido en la Fase 7:* la anotación `TA_Reintentar` de `docs/diagrams/src/bpmn-ciclo-servicio.bpmn` usaba el ID provisional "O-01"; ahora dice "Hallazgo H-11" y el PNG/SVG se regeneraron.
+
+**Indicadores (RF-30) (nuevo)**
+23. **RF-30:** la pantalla `features/indicadores/indicadores.page.ts` no tiene prueba automatizada (LIM-29): lo que verifican las pruebas es el endpoint y el cálculo (`tests_indicadores.py`). Las cifras de la demostración salen de datos sintéticos de `seed_demo` (LIM-40) y, al no haber historial de transiciones ni marca de cierre en las entregas, no existe «tiempo de entrega» para ENTREGA (LIM-17, LIM-41). Las 13 limitaciones del cálculo están en [09 §9.7](09-dashboard-indicadores.md#97-limitaciones).

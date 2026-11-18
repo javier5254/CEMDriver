@@ -1,6 +1,6 @@
 # Índice de documentación — CMEDriver
 
-> **Nota (2026-10-09): cambio de alcance.** El autor redujo el alcance del proyecto: se retiraron el **inventario, los pagos y el chatbot** (código incluido), y el chat quedó solo como canal entre el cliente y el motorizado. Los documentos numerados **01 a 17 de esta carpeta** y todo `v1/` son **históricos**: se redactaron antes de ese cambio y **no reflejan el alcance vigente** (todavía describen inventario, pagos, chatbot, 9 apps y 17 entidades). **Prevalece [entrega/](entrega/00-guia-de-entrega.md)**, que se verificó contra el código actual (6 apps, 12 entidades y 72 pruebas). Si un documento histórico contradice a uno de `entrega/`, vale el de `entrega/`. El detalle del cambio está en [entrega/01-requerimientos.md §2.4](entrega/01-requerimientos.md#24-cambios-de-alcance).
+> **Nota (2026-10-09): cambio de alcance.** El autor redujo el alcance del proyecto: se retiraron el **inventario, los pagos y el chatbot** (código incluido), y el chat quedó solo como canal entre el cliente y el motorizado. Los documentos numerados **01 a 17 de esta carpeta** y todo `v1/` son **históricos**: se redactaron antes de ese cambio y **no reflejan el alcance vigente** (todavía describen inventario, pagos, chatbot, 9 apps y 17 entidades). **Prevalece [entrega/](entrega/00-guia-de-entrega.md)**, que se verificó contra el código actual (6 apps, 12 entidades y 110 pruebas). Si un documento histórico contradice a uno de `entrega/`, vale el de `entrega/`. El detalle del cambio está en [entrega/01-requerimientos.md §2.4](entrega/01-requerimientos.md#24-cambios-de-alcance).
 
 ## Entrega final (docs/entrega/) — vigente
 
@@ -16,7 +16,8 @@ Documentos consolidados de la entrega final, verificados contra el código y aju
 | 05 | [BPMN](entrega/05-bpmn.md) | Modelado del proceso de negocio «Ciclo de vida de un servicio de mensajería» |
 | 06 | [Modelo C4](entrega/06-c4.md) | Contexto, contenedores, componentes y código |
 | 07 | [Matriz de trazabilidad](entrega/07-trazabilidad.md) | Relación entre requerimientos, reglas, componentes y pruebas |
-| 08 | [Limitaciones y mejoras](entrega/08-limitaciones-y-mejoras.md) | Limitaciones conocidas LIM-01…LIM-39 (35 vigentes y 4 resueltas por reducción de alcance), servicio simulado (correo) y hoja de ruta |
+| 08 | [Limitaciones y mejoras](entrega/08-limitaciones-y-mejoras.md) | Limitaciones conocidas LIM-01…LIM-41 (37 vigentes y 4 resueltas por reducción de alcance), servicio simulado (correo) y hoja de ruta |
+| 09 | [Dashboard de indicadores](entrega/09-dashboard-indicadores.md) | RF-30: endpoint `GET /api/indicadores/`, fórmulas de cada indicador, datos de demostración (`seed_demo`), exportación (`exportar_indicadores`), credenciales de demostración, 13 limitaciones propias y pruebas |
 
 ## Documentos históricos (docs/01 a docs/17) — NO reflejan el alcance vigente
 
@@ -39,7 +40,7 @@ Anteriores a la reducción de alcance del 2026-10-09. Se conservan como registro
 | 13 | [RF y RNF completos](13-rf-rnf-completos.md) | Requerimientos diligenciados con criterio de verificación; incluye los retirados |
 | 14 | [Diagrama C4](14-diagrama-c4.md) | Contexto (C1) y Contenedores (C2); el vigente está en [entrega/06-c4.md](entrega/06-c4.md) |
 | 15 | [Diagrama de flujo](15-diagrama-flujo.md) | Proceso end-to-end de un servicio, con bifurcaciones (no depende de lo retirado) |
-| 16 | [Plan de pruebas](16-plan-pruebas.md) | Casos de prueba y cómo ejecutar la suite; cuenta 93 pruebas y conserva casos `T-INV-*`, `T-BOT-*` y `T-PAG-*`. La suite vigente tiene 72 |
+| 16 | [Plan de pruebas](16-plan-pruebas.md) | Casos de prueba y cómo ejecutar la suite; cuenta 93 pruebas y conserva casos `T-INV-*`, `T-BOT-*` y `T-PAG-*`. La suite vigente tiene 110 |
 | 17 | [Manual de herramientas](17-manual-herramientas.md) | Todo el stack, modelos de arquitectura y herramientas de diseño usados, con justificación |
 
 ## Otros archivos de este directorio
