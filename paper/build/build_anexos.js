@@ -18,6 +18,7 @@ const SUBS = [
   { f: '07-trazabilidad.md', t: 'Matriz de trazabilidad', land: true },
   { f: '08-limitaciones-y-mejoras.md', t: 'Limitaciones y mejoras' },
   { f: null, t: 'Casos de uso por actor' },
+  { f: null, t: 'Mockups de las pantallas', mock: true },
 ];
 const reported = [];
 const MAPS = {};
@@ -121,7 +122,7 @@ function mdTable(lines, FW, sz) {
     wts.push(Math.max(6, Math.min(70, 0.5 * avg + 0.5 * p90)) + 4);
   }
   const tot = wts.reduce((a, b) => a + b, 0);
-  const minw = []; for (let i = 0; i < n; i++) { let lw = 3; for (const r of rows) for (const w of cleanLinks(r[i]).replace(/[*`~]/g, '').split(/\s+/)) if (!/[\/:_]/.test(w)) lw = Math.max(lw, Math.min(w.length, 13)); minw.push(lw * sz * 5.4 + 220); }
+  const minw = []; for (let i = 0; i < n; i++) { let lw = 3; for (const r of rows) for (const w of cleanLinks(r[i]).replace(/[*`~]/g, '').split(/\s+/)) if (!/[\/:_]/.test(w)) lw = Math.max(lw, Math.min(w.length, 19)); minw.push(lw * sz * 5.4 + 220); }
   let cw = wts.map((w, i) => Math.max(620, Math.floor(minw[i]), Math.floor(FW * w / tot)));
   { let sum = cw.reduce((a, b) => a + b, 0); if (sum > FW) { // reduce solo lo que excede el mínimo, empezando por las columnas más anchas
       let over = sum - FW; for (let g = 0; g < 400 && over > 0; g++) { const k = cw.indexOf(Math.max(...cw)); const d = Math.min(over, 40); cw[k] -= d; over -= d; }
@@ -245,6 +246,42 @@ SUBS.forEach((s, k) => {
   if (s.f) {
     const md = anonimizar(fs.readFileSync(path.join(ENT, s.f), 'utf8')).replace(/^# .*\r?\n/, '');
     kids.push(...convert(md, { land: !!s.land, sub, file: s.f }));
+  } else if (s.mock) {
+    kids.push(P('Los mockups son diseños de interfaz elaborados antes y durante la implementación como referencia visual. Se incluyen las diez pantallas vigentes. Las pantallas implementadas son las del frontend (`frontend/src/app/app.routes.ts`), cuyas rutas se indican en la tabla siguiente junto con los requerimientos que cada diseño ilustra.', { spacing: { line: PROSE, after: 120 }, alignment: AlignmentType.LEFT }));
+    kids.push(new Paragraph({ heading: HeadingLevel.HEADING_3, keepNext: true, children: [new TextRun(`A.${sub}.1 Correspondencia con el frontend`)] }));
+    const T = [
+      '| Mockup | Rol | Ruta del frontend implementada | RF que ilustra | Estado |',
+      '|---|---|---|---|---|',
+      '| Main (inicio de sesión) | Todos | `/login` | RF-19 | Implementado |',
+      '| ForgotPassword | Todos | `/forgot-password` y `/reset-password` | RF-20 | Implementado |',
+      '| AdminDashboard | Administrador | `/admin/dashboard` | RF-03 | Implementado con diferencias menores: el mockup muestra solo las pestañas Dashboard, Usuarios y Cobertura; la aplicación añade API Keys, Webhooks e Indicadores |',
+      '| AdminApiKeys | Administrador | `/admin/api-keys` | RF-24, RF-06 | Implementado |',
+      '| AdminWebhooks | Administrador | `/admin/webhooks` | RF-25 | Implementado |',
+      '| AlistadorCrearServicio | Alistador | `/alistador/servicios/nuevo` | RF-05 | Implementado con diferencias menores: el mockup reúne el formulario y la lista de servicios recientes en una pantalla; en el frontend son rutas separadas (`/alistador/servicios` y `/alistador/servicios/nuevo`) |',
+      '| OptimizarRuta | Alistador | `/alistador/optimizar-ruta` | RF-21 | Implementado |',
+      '| MotorizadoLista | Motorizado | `/motorizado/servicios` | RF-09 | Implementado con diferencias menores: los contadores Pendientes y Cerrados del mockup no aparecen en la pantalla implementada |',
+      '| MotorizadoDetalle | Motorizado | `/motorizado/servicios/:id` | RF-10, RF-11, RF-12, RF-13 | Implementado |',
+      '| ClienteTracking | Cliente | `/cliente/servicios/:id/tracking` | RF-15, RF-16, RF-28 | Implementado con diferencias menores: el chat es una pantalla aparte (`/cliente/servicios/:id/chat`), no un panel bajo el mapa |',
+    ];
+    kids.push(mdTable(T, 9360, 17));
+    kids.push(new Paragraph({ spacing: { after: 0, line: 120, lineRule: LineRuleType.EXACT }, children: [] }));
+    kids.push(new Paragraph({ heading: HeadingLevel.HEADING_3, keepNext: true, children: [new TextRun(`A.${sub}.2 Pantallas`)] }));
+    const FIGS = [
+      ['autenticacion', 'Inicio de sesión y restablecimiento de contraseña (RF-19, RF-20)'],
+      ['admin-dashboard', 'Administrador: panel de servicios (RF-03)'],
+      ['admin-apikeys', 'Administrador: API Keys (RF-24)'],
+      ['admin-webhooks', 'Administrador: webhooks (RF-25)'],
+      ['alistador-crear', 'Alistador: creación de servicio (RF-05)'],
+      ['alistador-optimizar', 'Alistador: optimización de ruta (RF-21)'],
+      ['motorizado', 'Motorizado: lista y detalle de servicio (RF-09 a RF-13)'],
+      ['cliente-tracking', 'Cliente: seguimiento y chat (RF-15, RF-16, RF-28)'],
+    ];
+    FIGS.forEach(([n, title], j) => {
+      kids.push(P(`**Figura A.${sub}.${j + 1}**`, { keepNext: true, alignment: AlignmentType.LEFT, spacing: { before: 200, after: 0 } }));
+      kids.push(P(title, { keepNext: true, alignment: AlignmentType.LEFT, spacing: { after: 60 } }, { italics: true }));
+      const img = imgPara(path.resolve(ROOT, 'figuras', `mockup-${n}.png`), title, 600, 560); kids.push(img);
+      kids.push(P('*Nota.* Fuente: Elaboración propia.', { alignment: AlignmentType.LEFT, spacing: { line: SINGLE, before: 40, after: 160 } }, { size: 20 }));
+    });
   } else {
     const figs = [['Administrador', 'administrador'], ['Alistador', 'alistador'], ['Motorizado', 'motorizado'], ['Cliente', 'cliente']];
     const fcu = path.resolve(ROOT, 'figuras', 'fig-casos-uso.png');
