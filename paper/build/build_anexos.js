@@ -2,7 +2,7 @@
 const fs = require('fs'), path = require('path');
 const D = require('docx');
 const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, ImageRun, Header, AlignmentType, PageNumber,
-  WidthType, ShadingType, BorderStyle, LevelFormat, HeadingLevel, LineRuleType, PageOrientation, SectionType, TableOfContents } = D;
+  WidthType, ShadingType, BorderStyle, LevelFormat, HeadingLevel, LineRuleType, PageOrientation, SectionType, TableOfContents, TableLayoutType } = D;
 const ROOT = path.resolve(__dirname, '..'), ENT = path.resolve(ROOT, '..', 'docs', 'entrega'), IMG = path.join(__dirname, 'img');
 const FONT = 'Arial', PROSE = 276, SINGLE = 240;
 const TITLE = 'Anexos — CMEDriver: plataforma orientada a API para la gestión de servicios de mensajería';
@@ -71,11 +71,16 @@ function cleanLinks(t) {
   t = t.replace(/\[([^\]]*)\]\(([^)\s]*)\)/g, (m, a, u) => /^https?:/.test(u) && a !== u ? `${a} (${u})` : a);
   return t.replace(/<br\s*\/?>/g, ' ').replace(/\\\|/g, '|');
 }
+function zw(t, code) {
+  const Z = '​';
+  const ins = w => w.replace(/(\/|::|_|-|\.|,)(?=[^\/:_\-.,\s])/g, '$1' + Z);
+  return code ? ins(t) : t.split(/(\s+)/).map(w => (w.length > 18 && !/^\s/.test(w)) ? ins(w) : w).join('');
+}
 function inline(text, o = {}) {
   text = cleanLinks(text);
   const runs = [], re = /\*\*\*(.+?)\*\*\*|\*\*(.+?)\*\*|\*(.+?)\*|`([^`]+)`|~~(.+?)~~/g;
   let last = 0, m;
-  const push = (t, x = {}) => { if (t) runs.push(new TextRun(base({ ...o, ...x, text: t }))); };
+  const push = (t, x = {}) => { if (t) runs.push(new TextRun(base({ ...o, ...x, text: o.zw ? zw(t, x.font === 'Consolas') : t }))); };
   while ((m = re.exec(text))) {
     push(text.slice(last, m.index));
     if (m[1] !== undefined) runs.push(...inline(m[1], { ...o, bold: true, italics: true }));
@@ -116,15 +121,19 @@ function mdTable(lines, FW, sz) {
     wts.push(Math.max(6, Math.min(70, 0.5 * avg + 0.5 * p90)) + 4);
   }
   const tot = wts.reduce((a, b) => a + b, 0);
-  const cw = wts.map(w => Math.floor(FW * w / tot)); cw[n - 1] += FW - cw.reduce((a, b) => a + b, 0);
+  const minw = []; for (let i = 0; i < n; i++) { let lw = 3; for (const r of rows) for (const w of cleanLinks(r[i]).replace(/[*`~]/g, '').split(/\s+/)) if (!/[\/:_]/.test(w)) lw = Math.max(lw, Math.min(w.length, 13)); minw.push(lw * sz * 5.4 + 220); }
+  let cw = wts.map((w, i) => Math.max(620, Math.floor(minw[i]), Math.floor(FW * w / tot)));
+  { let sum = cw.reduce((a, b) => a + b, 0); if (sum > FW) { // reduce solo lo que excede el mínimo, empezando por las columnas más anchas
+      let over = sum - FW; for (let g = 0; g < 400 && over > 0; g++) { const k = cw.indexOf(Math.max(...cw)); const d = Math.min(over, 40); cw[k] -= d; over -= d; }
+    } else cw[cw.indexOf(Math.max(...cw))] += FW - sum; }
   const bd = { style: BorderStyle.SINGLE, size: 4, color: '808080' }, borders = { top: bd, bottom: bd, left: bd, right: bd };
   return new Table({
-    width: { size: FW, type: WidthType.DXA }, columnWidths: cw,
+    width: { size: FW, type: WidthType.DXA }, columnWidths: cw, layout: TableLayoutType.FIXED,
     rows: rows.map((r, ri) => new TableRow({ tableHeader: ri === 0, cantSplit: true, children: r.map((c, i) => new TableCell({
       borders, width: { size: cw[i], type: WidthType.DXA },
       shading: ri === 0 ? { fill: 'D9D9D9', type: ShadingType.CLEAR, color: 'auto' } : undefined,
       margins: { top: 30, bottom: 30, left: 80, right: 80 },
-      children: [new Paragraph({ alignment: AlignmentType.LEFT, spacing: { line: SINGLE, after: 0 }, children: inline(c, { size: sz, bold: ri === 0 }) })],
+      children: [new Paragraph({ alignment: AlignmentType.LEFT, spacing: { line: SINGLE, after: 0 }, children: inline(c, { size: sz, bold: ri === 0, zw: true }) })],
     })) })),
   });
 }
@@ -176,7 +185,7 @@ md = md.split(/\r?\n/).map(x => { const m = x.match(/^###\s+(\d+\.\d+)\s/); if (
       out.push(new Paragraph({ heading: [null, null, HeadingLevel.HEADING_3, HeadingLevel.HEADING_4, HeadingLevel.HEADING_5][lv], keepNext: true, children: [new TextRun({ text: (num ? num + ' ' : '') + cleanLinks(t) })] }));
       i++; continue;
     }
-    if (l.startsWith('|')) { const b = []; while (i < L.length && L[i].startsWith('|')) b.push(L[i++]); out.push(mdTable(b, FW, land ? 18 : 17)); out.push(new Paragraph({ spacing: { after: 0, line: 120, lineRule: LineRuleType.EXACT }, children: [] })); continue; }
+    if (l.startsWith('|')) { const b = []; while (i < L.length && L[i].startsWith('|')) b.push(L[i++]); out.push(mdTable(b, FW, Math.max(...b.map(x => splitRow(x).length)) >= 6 ? 16 : (land ? 18 : 17))); out.push(new Paragraph({ spacing: { after: 0, line: 120, lineRule: LineRuleType.EXACT }, children: [] })); continue; }
     if ((m = l.match(/^!\[(.*?)\]\((.*?)\)\s*$/))) {
       out.push(imgPara(path.resolve(ENT, m[2]), m[1], maxW, maxH)); lastImg = i; i++; continue;
     }
