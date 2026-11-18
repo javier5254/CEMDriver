@@ -18,13 +18,13 @@ El problema, por tanto, es la ausencia de una plataforma que integre en un solo 
 
 ## 3.2 Pregunta de investigación
 
-> **¿Cómo puede una plataforma orientada a API integrar la gestión de servicios de mensajería (entregas y recolecciones), la trazabilidad en tiempo real, la evidencia digital de entrega y la comunicación directa entre cliente y mensajero en las operaciones de Logytech Mobile en Colombia durante el segundo semestre de 2026?**
+> **¿Cómo puede una plataforma orientada a API integrar la gestión de servicios de mensajería (entregas y recolecciones), la trazabilidad en tiempo real, la evidencia digital de entrega y la comunicación directa entre cliente y mensajero en las operaciones de una empresa multinacional de logística en Colombia durante el segundo semestre de 2026?**
 
-La pregunta y el objetivo general comparten el mismo contenido y difieren solo en el verbo: la pregunta indaga el cómo y el objetivo lo traduce en una acción verificable. Logytech Mobile, empresa multinacional de logística, es la organización de referencia para aplicar el prototipo; en esta etapa este se construye y se modela, y su validación con la operación real se plantea para Trabajo de Grado.
+La pregunta y el objetivo general comparten el mismo contenido y difieren solo en el verbo: la pregunta indaga el cómo y el objetivo lo traduce en una acción verificable. Esa empresa es la organización de referencia para aplicar el prototipo; en esta etapa este se construye y se modela, y su validación con la operación real se plantea para Trabajo de Grado.
 
 ## 3.3 Objetivos
 
-**Objetivo general.** Diseñar y desarrollar un prototipo funcional temprano de una plataforma orientada a API que integre la gestión de servicios de mensajería (entregas y recolecciones), la trazabilidad en tiempo real, la evidencia digital de entrega y el chat directo entre el cliente y el mensajero en las operaciones de Logytech Mobile en Colombia durante el segundo semestre de 2026.
+**Objetivo general.** Diseñar y desarrollar un prototipo funcional temprano de una plataforma orientada a API que integre la gestión de servicios de mensajería (entregas y recolecciones), la trazabilidad en tiempo real, la evidencia digital de entrega y el chat directo entre el cliente y el mensajero en las operaciones de una empresa multinacional de logística en Colombia durante el segundo semestre de 2026.
 
 **Objetivos específicos.**
 
@@ -47,7 +47,7 @@ Los cinco objetivos del planteamiento inicial se condensaron en cuatro al fusion
 
 ## 3.5 Alcance y delimitaciones
 
-Este proyecto, en el marco de la asignatura Proyecto, cubre el diseño inicial y un prototipo funcional temprano. El prototipo implementa y verifica con 72 pruebas automatizadas del backend la autenticación con roles, el ciclo de vida del servicio, la matriz de cobertura y tiempos de entrega, la planificación de recolecciones por el cliente, la evidencia con foto y firma, las novedades, el seguimiento GPS, el chat entre el cliente propietario del servicio y el motorizado asignado, las claves de API y los webhooks firmados, y la geocodificación con una heurística de vecino más cercano. La descripción técnica está en la documentación del proyecto (Anexo A).
+Este proyecto, en el marco de la asignatura Proyecto, cubre el diseño inicial y un prototipo funcional temprano. El prototipo implementa y verifica con 110 pruebas automatizadas del backend la autenticación con roles, el ciclo de vida del servicio, la matriz de cobertura y tiempos de entrega, la planificación de recolecciones por el cliente, la evidencia con foto y firma, las novedades, el seguimiento GPS, el chat entre el cliente propietario del servicio y el motorizado asignado, las claves de API y los webhooks firmados, y la geocodificación con una heurística de vecino más cercano. La descripción técnica está en la documentación del proyecto (Anexo A).
 
 Quedan fuera del alcance el inventario, los pagos en línea y los asistentes conversacionales, retirados en octubre de 2026 y solo retomables como mejora futura opcional. Son simulados los usuarios (administrador, alistador, motorizado y cliente), por lo que no hubo validación con operadores ni clientes reales, y el correo de restablecimiento de contraseña, que en desarrollo se imprime en la consola. Tampoco se verificó el empaquetado nativo para Android, cuya compilación falló por una limitación del entorno de desarrollo. En consecuencia, este trabajo no presenta métricas de mejora, encuestas ni resultados de uso y no afirma que la plataforma reduzca entregas fallidas o costos. La validación empírica, un servidor de correo real, el ruteo con múltiples vehículos y el despliegue a escala corresponden a Trabajo de Grado. El desarrollo contó con asistencia de inteligencia artificial, lo cual se declara en la metodología.
 

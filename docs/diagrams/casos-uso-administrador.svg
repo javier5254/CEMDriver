@@ -26,7 +26,6 @@
     <line x1="120" y1="320" x2="305" y2="230"/>
     <line x1="120" y1="320" x2="305" y2="320"/>
     <line x1="120" y1="320" x2="300" y2="410"/>
-    <line x1="120" y1="320" x2="300" y2="500"/>
   </g>
 
   <!-- ================= USE CASES ================= -->
@@ -38,18 +37,15 @@
     <text x="430" y="225" text-anchor="middle">Configurar matriz</text>
     <text x="430" y="243" text-anchor="middle">de cobertura</text>
 
-    <ellipse cx="430" cy="320" rx="125" ry="37" fill="#E8F2FF" stroke="#007AFF" stroke-width="1.75" filter="url(#shadow)"/>
-    <text x="430" y="326" text-anchor="middle">Gestionar inventario</text>
-
-    <ellipse cx="430" cy="410" rx="130" ry="39" fill="#E8F2FF" stroke="#007AFF" stroke-width="1.75" filter="url(#shadow)"/>
-    <text x="430" y="405" text-anchor="middle">Gestionar API keys</text>
-    <text x="430" y="423" text-anchor="middle">y webhooks</text>
-    <text x="430" y="438" text-anchor="middle" font-size="10.5" font-weight="500" fill="#0051D5">v2</text>
+    <ellipse cx="430" cy="320" rx="130" ry="39" fill="#E8F2FF" stroke="#007AFF" stroke-width="1.75" filter="url(#shadow)"/>
+    <text x="430" y="315" text-anchor="middle">Gestionar API keys</text>
+    <text x="430" y="333" text-anchor="middle">y webhooks</text>
+    <text x="430" y="348" text-anchor="middle" font-size="10.5" font-weight="500" fill="#0051D5">v2</text>
 
     <!-- Shared -->
-    <ellipse cx="430" cy="500" rx="135" ry="39" fill="#F2F2F7" stroke="#C7C7CC" stroke-width="1.75" filter="url(#shadow)"/>
-    <text x="430" y="495" text-anchor="middle" fill="#48484A">Recuperar contrasena</text>
-    <text x="430" y="513" text-anchor="middle" font-size="10.5" font-weight="500" fill="#8E8E93">(compartido &#183; los 4 roles)</text>
+    <ellipse cx="430" cy="410" rx="135" ry="39" fill="#F2F2F7" stroke="#C7C7CC" stroke-width="1.75" filter="url(#shadow)"/>
+    <text x="430" y="405" text-anchor="middle" fill="#48484A">Recuperar contrasena</text>
+    <text x="430" y="423" text-anchor="middle" font-size="10.5" font-weight="500" fill="#8E8E93">(compartido &#183; los 4 roles)</text>
   </g>
 
   <!-- ================= ACTOR ================= -->

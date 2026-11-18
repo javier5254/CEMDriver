@@ -53,7 +53,7 @@ Archivos: `paper/Proyecto_CMEDriver_Entrega1.docx` (10 páginas físicas) y `pap
 
 ## Pendientes para el estudiante
 
-1. Completar el único marcador `[COMPLETAR]` que queda (resaltado en amarillo en el .docx de la Entrega 2): definiciones con página de Sommerville (2005) y Bass et al. (2003), previa consulta de los libros. El 2026-10-13 se completaron el resto: nombre y ciudad de la portada, decisión de no registrar el software, titularidad por definir con Logytech Mobile, participantes por definir con la organización y el alcance del uso de IA (borradores, fuentes, documentación y diagramas, código).
+1. Completar el único marcador `[COMPLETAR]` que queda (resaltado en amarillo en el .docx de la Entrega 2): definiciones con página de Sommerville (2005) y Bass et al. (2003), previa consulta de los libros. El 2026-10-13 se completaron el resto: nombre y ciudad de la portada, decisión de no registrar el software, titularidad por definir con la empresa de referencia, participantes por definir con la organización y el alcance del uso de IA (borradores, fuentes, documentación y diagramas, código).
 2. Docente asesora en portada: Luisa Fernanda Loza Muñetón, según la guía; verificar ortografía del nombre.
 3. Confirmar el nuevo **título provisional** (ya no dice "autogestión conversacional") y, si la Entrega 1 ya se entregó con el chatbot en el objetivo, informar a la docente del ajuste de alcance.
 4. Confirmar el tercer autor de Hernández-Sampieri y restituir los diacríticos de Kuhrmann et al.
@@ -83,3 +83,33 @@ Alcance vigente: ciclo de vida del servicio (entregas y recolecciones), tracking
 - **Marco teórico:** de 11 a 10 páginas (recorte de unas 90 palabras repetidas); sigue con 25 citas únicas. Se unificó el apóstrofo de Al-Qora'n con la lista de referencias.
 - **Formato de tablas (`build.js`):** menos espacio interno en las celdas y bajo cada tabla; figura con ancho máximo de 5,6 pulgadas.
 - Medir páginas: `build/medir_paginas.ps1 -Ruta ..\Proyecto_CMEDriver_Unificado.docx` (usa Word por COM, solo lectura).
+
+## Entrega 3 (2026-11-17)
+
+Documento: `Proyecto_CMEDriver_Final.docx` (copia de revisión: `Proyecto_CMEDriver_Final.pdf`). Medido con Word por COM sobre una copia: 30 páginas físicas; contenido (resumen 1 + Introducción 5 + Marco Teórico 10 + Metodología 4 + Avance de Resultados 4) = **24 páginas**. Respaldo previo: `_respaldo/Final_antes_de_avance.docx`.
+
+| Criterio de la rúbrica | Estado | Evidencia medida |
+|---|---|---|
+| 1. Avance de resultados concreto | Cumple | Figuras 2 a 5 (casos de uso, MER de 12 entidades, mockups, capturas reales), repositorio enlazado, 72 pruebas del backend |
+| 2. Discusión preliminar frente a los objetivos (sección 6 de 3 a 5 páginas) | Cumple | Sección 6: 4 páginas (1.011 palabras), Tabla 8 (objetivo a evidencia) y 6.4 por objetivo y limitaciones; la última página queda al 98 %, por lo que en otro equipo podría pasar a 5 (sigue dentro de la rúbrica) |
+| 3. Coherencia y completitud | Parcial | Cifras coherentes en todo el texto (4 objetivos, 6 apps, 12 entidades, 72 pruebas); inventario, pagos y chatbot solo como alcance retirado; ajustes hechos: portada y contraportada ("Documento final (Entregas 1, 2 y 3)", Noviembre de 2026), 3.6 (sección 6 y Anexo A), organización de referencia anonimizada. Pendientes sin tocar: el encabezado 5.6 dice "Coherencia con la Entrega 1" y la bibliografía de Mendeley tiene dos autores corporativos mal analizados (CCCE y MinTIC) que no coinciden con el texto visible de la cita |
+| 4. Redacción académica y APA | Cumple | Sin primera persona en la sección 6; captions en cursiva con nota; las citas de la sección 6 usan el texto visible de los campos existentes ("n.d." y "&"), consistente con el resto del documento |
+| 5. 20 a 25 fuentes sin huérfanas | Parcial | 35 referencias únicas; 35 de 35 citadas y 0 citas sin referencia; 23 de 35 (65,7 %) son de 2021 a 2026, por debajo del 70 % que pedía la guía de fuentes; 87 campos MENDELEY_CITATION (84 originales + 3 clonados), bibliografía de Mendeley idéntica a la previa |
+| 6. Anexos como documento separado | Cumple | `Anexos_CMEDriver.docx` existe como documento separado (2,1 MB; 119 páginas según los metadatos del archivo, sin medir con Word por su tamaño) |
+
+Anonimización (decisión del estudiante): ninguna mención de la empresa de referencia por su nombre en `document.xml`, encabezado, glosario ni en los md (verificado con búsqueda); 5.2 incluye la frase de confidencialidad. Citas de Mendeley clonadas: 3 de 3 (Brown n.d.; Randerath & Friedrich 2025; OWASP 2023); 0 quedaron como texto. `[COMPLETAR]`: 0.
+
+Pendientes para el estudiante: refrescar Mendeley Cite en Word; revisar el 65,7 % de fuentes recientes frente al 70 % de la guía; abrir el Final en Word y confirmar la paginación; comprobar que Mendeley muestre los autores corporativos de CCCE y MinTIC como en el texto.
+
+`[COMPLETAR]`: 0 en `document.xml` y sin resaltado amarillo residual (verificado con búsqueda). Pendiente opcional para el estudiante: Sommerville (2005) y Bass et al. (2003) son libros de la guía cuyo texto no se consultó; el Marco Teórico lo declara y los usa solo como marco general. Los marcadores de Hernández-Sampieri no aplican (referencia de dos autores correcta, `fuentes/05-validacion-libros.md`).
+
+## Cambios 2026-11-17 (cifras del sistema)
+
+- Pruebas del backend: de 72 a **110** (se agregaron 38 del módulo de indicadores operativos, RF-30) y requisitos funcionales vigentes: de 24 a **25** de 30 registrados. Actualizados en `secciones/03-introduccion.md`, `resumen.md`, `05-metodologia.md`, `06-avance-resultados.md`, `07-cronograma-presupuesto.md` y en `Proyecto_CMEDriver_Final_v3.docx` (respaldo previo: `_respaldo/Final_v3_antes_110.docx`). Las menciones a 72 pruebas en los apartados anteriores de este documento son el estado histórico de esa fecha.
+
+## Cambios 2026-11-18 (cronograma con fechas reales; versión v7)
+
+- `Proyecto_CMEDriver_Final_v7.docx` (copiada a `ENTREGA/Proyecto_CMEDriver_Final.docx` y `.pdf`; respaldos `_respaldo/Final_v6_antes_cronograma.docx` y `_respaldo/ENTREGA_Final_v6.docx`). Se reemplazó solo el cuerpo de la sección 7 (script `build/injertar_cronograma.py`, que sustituye en lugar de insertar). Los 71 campos de Mendeley, la bibliografía (1), los overrides y la sección 8 quedan idénticos a v6; 0 citas de solo año; 0 menciones de la empresa por su nombre.
+- Tabla 9: proyecto arrancó hacia el 20 de agosto de 2026 (dato del estudiante) y llega al 17 de noviembre (Entrega 3). Periodos: Ago 20–31, Sep 1–15, Sep 16–30, Oct 1–15, Oct 16–31, Nov 1–17; filas 1a a 1f completadas (diseño y objetivos, marco y metodología, análisis y diseño, prototipo temprano, 110 pruebas, documentación) y filas 2 a 8 pendientes para Trabajo de Grado en meses relativos M1 a M6, sin meses de calendario (el estudiante no definió el inicio). La numeración 1 a 8 es la que usan los rubros de la Tabla 10.
+- Páginas (Word COM): contenido (resumen y secciones 3 a 8) en 25 páginas; para lograrlo se redujeron al 80 % las figuras de la sección 6. Sección 7 de unas 0,96 páginas (empieza al final de la 25 y termina en la 26).
+- `Anexo_B_Cronograma_Presupuesto_Producto.docx` regenerado con el mismo Gantt horizontal (Tabla B1); presupuesto sin cambios (Tabla B2; total $75.000.000).

@@ -1,0 +1,64 @@
+# Recortes del Marco Teórico (sección 4) para cumplir el límite de 25 páginas de contenido
+
+Generado al aplicar `build/recortar_marco.py` sobre `Proyecto_CMEDriver_Final_v3.docx` (resultado: `Proyecto_CMEDriver_Final_v4.docx`). No se tocaron las tablas, las Actividades 1 y 2 ni la bibliografía. Se eliminaron 16 campos de cita de Mendeley (87 a 71), todos de fuentes que siguen citadas en otro lugar del documento: el conjunto de 35 fuentes únicas citadas es idéntico antes y después (comprobado por id), sin referencias huérfanas. Cada entrada muestra el texto eliminado (o reemplazado).
+
+- **Este capítulo retoma…** (36 palabras menos)
+  - Eliminado: «Integra conceptos clave, enfoques de ingeniería de software de la guía de la asignatura y normativa colombiana, y cada subtítulo cierra explicando su relación con el problema y con los objetivos específicos de la sección 3.3.»
+- **Los dos trabajos discrepan…** (28 palabras menos)
+  - Eliminado: «Queda abierta la pregunta de cómo se materializa esa visibilidad hacia el cliente en las operaciones de la empresa de referencia, que es el objeto de la trazabilidad.»
+- **La evidencia digital es el segundo…** (33 palabras menos)
+  - Eliminado: «Su valor probatorio se discute en 4.8, pues el pool verificado no ofrece estudios de mensajería sobre su efecto operativo.»
+  - Eliminado: «evidencia; falta la arquitectura que permita ofrecer ambas funciones a distintos tipos de usuario.»
+- **La decisión de CMEDriver…** (15 palabras menos)
+  - Eliminado: «Falta ahora la comunicación inmediata entre las partes, que REST por sí mismo no cubre.»
+- **El seguimiento GPS y el chat…** (31 palabras menos)
+  - Eliminado: «De ahí la decisión de mantener un respaldo por consulta periódica cuando la conexión en tiempo real no está disponible: es una medida de resiliencia, no una conclusión de la literatura.»
+- **Sobre las aplicaciones híbridas…** (31 palabras menos)
+  - Eliminado: «A continuación se trata cómo se usa ese canal en las dos funciones con las que el cliente interactúa con la operación: agendar sus recolecciones y comunicarse con el motorizado asignado.»
+- **Sobre la comunicación directa…** (76 palabras menos)
+  - Eliminado: «El más cercano, Gracia Orejuela et al. (2024), usó un chat en línea para comparar protocolos y no mide el efecto de la comunicación sobre la entrega.»
+  - Eliminado: «OWASP API Security Project (2023) incluye entre sus riesgos la autorización rota a nivel de objeto (API1:2023), que aquí equivaldría a leer o escribir mensajes de un servicio ajeno; se retoma en 4.7.»
+  - Eliminado: «4 y conduce a la planificación de rutas, otra función que se resuelve sobre el mismo backend.»
+- **La asignación de servicios a motorizados…** (10 palabras menos)
+  - Eliminado: «naturaleza de estos problemas en cinco aspectos:»
+  - Eliminado: «tiempo, opción de flota,»
+  - Eliminado: «datos de entrada y parámetros estocásticos.»
+- **La geocodificación se apoya…** (8 palabras menos)
+  - Eliminado: «3 y deja pendiente un aspecto transversal: la seguridad.»
+- **La plataforma expone una API…** (13 palabras menos)
+  - Eliminado: «Ambos aplican a una plataforma con cuatro roles, token y claves de API.»
+- **A ellos se suma la autorización…** (38 palabras menos)
+  - Eliminado: «(API1:2023, retomada en 4.5):»
+  - Eliminado: «La fuente es una guía abierta, no un estudio arbitrado, y se asume como criterio de diseño.»
+  - Eliminado: «La seguridad técnica no agota, sin embargo, la exigencia sobre los datos, que impone además un marco legal.»
+- **Los datos que circulan por la plataforma…** (25 palabras menos)
+  - Eliminado: «Se presenta lo que las fuentes oficiales dicen, sin interpretación jurídica propia, y se señalan los puntos que requieren consulta con un profesional del derecho.»
+- **Datos personales.…** (16 palabras menos)
+  - Eliminado: «Su reglamentación (decretos compilados) se deja a la consulta jurídica previa al uso con personas reales.»
+- **Mensajes de datos y firma…** (21 palabras menos)
+  - Eliminado: «Se deja como punto a consultar: confiabilidad del método, vínculo con el firmante, detección de alteraciones y custodia de la evidencia.»
+- **Calidad y requisitos.…** (14 palabras menos)
+  - Eliminado: «Resta explicar con qué enfoques de ingeniería de software se construye todo lo anterior.»
+- **Ágil y Scrum.…** (32 palabras menos)
+  - Eliminado: «Scrum, y la propia guía advierte que alterar su núcleo oculta problemas. En un proyecto de una sola persona sin los roles del marco, los principios son pertinentes y el marco completo no.»
+- **Design Thinking.…** (9 palabras menos)
+  - Eliminado: «La guía lo toma de la d.school de Stanford.»
+- **Arquitectura y modelo C4.…** (7 palabras menos)
+  - Eliminado: «y el zoom progresivo»
+  - Eliminado: «modular a audiencias distintas,»
+- **Especificación de requisitos. La norma…** (29 palabras menos) — párrafo eliminado
+  - Eliminado: «Especificación de requisitos. La norma ISO/IEC/IEEE (2018) se describió en 4.8. En desarrollo incremental, la documentación de requisitos debe mantenerse en paralelo con el diseño para no quedar desactualizada.»
+- **El subtítulo respalda los Objetivos 2 y 4…** (28 palabras menos) — párrafo eliminado
+  - Eliminado: «El subtítulo respalda los Objetivos 2 y 4 y anticipa la justificación de la Metodología: un desarrollo incremental por prototipos con iteraciones de inspiración ágil, sin Scrum completo.»
+- **La teoría revisada converge…** (64 palabras menos)
+  - Eliminado: «logístico (Mohammad et al., 2023); (Restrepo-Betancur et al., 2026),»
+  - Eliminado: «el principio API-first y las reglas de diseño REST (Beaulieu et al., 2022); (Bogner et al., 2023), con el monolito modular para un sistema pequeño (Al-Qora’n & Al-Said Ahmad, 2025) y con WebSocket para»
+  - Eliminado: «comunicación bidireccional (Gracia Orejuela et al., 2024),»
+  - Eliminado: «backend (OWASP API Security Project, 2023).»
+  - Eliminado: «diseño (Randerath & Friedrich, 2025); (Madhwal et al., 2022); (Ley 1581 de 2012, 2012).»
+- **Con la literatura revisada no se resuelven…** (33 palabras menos)
+  - Eliminado: «no se resuelven, y por eso se declaran como vacíos,»
+  - Eliminado: «mensajería: Jazemi et al. (2023) y Pérez y Aybar (2024) aportan solo el contexto y un caso europeo.»
+  - Eliminado: «recolecciones: Souza et al. (2022) aporta solo un caso brasileño.»
+
+Total: 597 palabras menos (el Marco pasa de 4.190 a unas 3.590 palabras: de 10 páginas con la última al 74 % a 9 páginas con la última al 47 %).
