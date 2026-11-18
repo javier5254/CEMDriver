@@ -15,6 +15,13 @@ class IsAlistador(BasePermission):
         return _has_role(request.user, 'ALISTADOR')
 
 
+class IsAdminOAlistador(BasePermission):
+    """Personal de operacion: administrador o alistador (RF-30, indicadores)."""
+
+    def has_permission(self, request, view):
+        return _has_role(request.user, 'ADMIN', 'ALISTADOR')
+
+
 class IsMotorizado(BasePermission):
     def has_permission(self, request, view):
         return _has_role(request.user, 'MOTORIZADO')
