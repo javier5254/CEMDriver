@@ -97,4 +97,4 @@ También hay botones visibles de anterior y siguiente, tema, pantalla completa y
 
 ## Honestidad de los datos
 
-Los indicadores de las láminas 8, 9 y 10 se generaron con `seed_demo` sobre la base de datos del sistema; no son operaciones reales de Logytech Mobile, y las láminas lo dicen en su pie. Los usuarios del prototipo son de prueba, el sistema no está desplegado y no se ha validado con operadores reales.
+Los indicadores de las láminas 8, 9 y 10 se generaron con `seed_demo` sobre la base de datos del sistema; no son operaciones reales de la empresa de referencia, y las láminas lo dicen en su pie. Los usuarios del prototipo son de prueba, el sistema no está desplegado y no se ha validado con operadores reales.
