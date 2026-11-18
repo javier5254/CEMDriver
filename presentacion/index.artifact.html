@@ -426,9 +426,9 @@ a { color: inherit; }
 
 /* ---------- presupuesto ---------- */
 .pres-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 40px; }
-.pres { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 21px; line-height: 1.22; font-variant-numeric: tabular-nums; }
-.pres th { text-align: left; font: 500 15px/1.2 var(--f-mono); letter-spacing: 0.05em; text-transform: uppercase; color: var(--mut); padding: 0 12px 8px; border-bottom: 2.5px solid var(--ink); }
-.pres td { padding: 6px 12px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+.pres { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 19px; line-height: 1.2; font-variant-numeric: tabular-nums; }
+.pres th { text-align: left; font: 500 15px/1.2 var(--f-mono); letter-spacing: 0.05em; text-transform: uppercase; color: var(--mut); padding: 0 12px 6px; border-bottom: 2.5px solid var(--ink); }
+.pres td { padding: 3px 12px; border-bottom: 1px solid var(--line); vertical-align: middle; }
 .pres td.cat { font-weight: 600; border-bottom-color: var(--line-strong); vertical-align: top; padding-top: 5px; }
 .pres .num { text-align: right; white-space: nowrap; }
 .pres th.num { text-align: right; }
@@ -1217,19 +1217,19 @@ a { color: inherit; }
       <section class="slide" id="parada-14" data-titulo="Presupuesto" aria-label="Presupuesto de referencia">
         <div class="cab"><span class="guia"></span><span class="destino"></span></div>
         <div class="titulo-fila">
-          <h2 class="titulo">Presupuesto: <span id="pres-total-t">–</span> en seis meses</h2>
+          <h2 class="titulo">Presupuesto del proyecto: <span id="pres-total-t">–</span></h2>
           <span class="sello disc">Estimación de referencia; valores a confirmar con proveedores</span>
         </div>
         <div class="cuerpo tabla-wrap">
           <table class="pres" id="tabla-pres">
-            <colgroup><col style="width:230px"><col style="width:610px"><col style="width:150px"><col style="width:180px"><col style="width:170px"><col></colgroup>
+            <colgroup><col style="width:215px"><col style="width:665px"><col style="width:135px"><col style="width:160px"><col style="width:205px"><col></colgroup>
             <thead><tr><th>Categoría</th><th>Rubro</th><th class="num">Cantidad</th><th class="num">Valor unitario</th><th class="num">Total (COP)</th><th>Fuente</th></tr></thead>
             <tbody></tbody>
             <tfoot></tfoot>
           </table>
           <p class="hint-scroll">Deslizar la tabla hacia los lados para verla completa.</p>
         </div>
-        <p class="pie">Valores en pesos colombianos (COP), a seis meses. El servidor podría ser aportado por Logytech Mobile, lo que queda por negociar.</p>
+        <p class="pie">Valores en pesos colombianos (COP). Cubre el proyecto completo: el diseño y el prototipo, ya realizados, más seis meses de Trabajo de Grado. Las horas del autor son un aporte valorizado, no un desembolso; el servidor podría ser aportado por Logytech Mobile, lo que queda por negociar.</p>
       </section>
 
       <!-- 15. Producto entregable -->
@@ -1685,10 +1685,11 @@ a { color: inherit; }
     { rubro: 'Mapas y geocodificación: OpenStreetMap y Nominatim', cant: 1, unidad: 'servicio', vu: 0, fte: 'Sin costo, uso bajo' },
     { cat: 'Transporte y campo', rubro: 'Desplazamientos para entrevistas, observación y piloto', cant: 12, unidad: 'viajes', vu: 14000, fte: 'Recursos propios' },
     { cat: 'Comunicaciones', rubro: 'Plan de datos para las pruebas piloto', cant: 6, unidad: 'meses', vu: 50000, fte: 'Recursos propios' },
-    { cat: 'Materiales', rubro: 'Impresión de consentimientos e instrumentos', cant: 60, unidad: 'copias', vu: 300, fte: 'Recursos propios' },
+    { cat: 'Equipos y materiales', rubro: 'Uso de equipo propio (depreciación estimada)', cant: 1, unidad: 'global', vu: 50818, fte: 'Recursos propios' },
+    { rubro: 'Impresión de consentimientos e instrumentos', cant: 60, unidad: 'copias', vu: 300, fte: 'Recursos propios' },
     { rubro: 'Papelería y carpetas', cant: 1, unidad: 'global', vu: 20000, fte: 'Recursos propios' },
     { cat: 'Difusión', rubro: 'Impresión y empaste del informe final', cant: 2, unidad: 'ejemplares', vu: 40000, fte: 'Recursos propios' },
-    { cat: 'Personal', rubro: 'Horas de desarrollo y validación del autor', cant: null, unidad: '', vu: null, fte: 'Aporte en especie, no monetizado' }
+    { cat: 'Personal', rubro: 'Horas de desarrollo y validación del autor (9 roles: analista, arquitecto, diseño UX/UI, backend, frontend, QA, investigador, redactor, gestor)', cant: 445, unidad: 'h', vu: 150000, fte: 'Recursos propios (aporte valorizado del autor)' }
   ];
   var IMPREVISTOS = 0.10;
   var presTotal = null;
