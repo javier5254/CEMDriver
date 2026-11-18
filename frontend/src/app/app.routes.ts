@@ -27,6 +27,7 @@ import { ClienteServiciosListPage } from './features/cliente/servicios-list.page
 import { TrackingPage } from './features/cliente/tracking.page';
 import { PlanificarPage } from './features/cliente/planificar.page';
 import { ChatPage } from './shared/chat.page';
+import { IndicadoresPage } from './features/indicadores/indicadores.page';
 
 export const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'login' },
@@ -43,6 +44,7 @@ export const routes: Routes = [
       title: 'Admin',
       segments: [
         { label: 'Dashboard', path: 'dashboard' },
+        { label: 'Indicadores', path: 'indicadores' },
         { label: 'Usuarios', path: 'usuarios' },
         { label: 'Cobertura', path: 'cobertura' },
         { label: 'API Keys', path: 'api-keys' },
@@ -52,6 +54,7 @@ export const routes: Routes = [
     children: [
       { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
       { path: 'dashboard', component: AdminDashboardPage },
+      { path: 'indicadores', component: IndicadoresPage },
       { path: 'usuarios', component: UsuariosListPage },
       { path: 'usuarios/nuevo', component: UsuarioFormPage },
       { path: 'usuarios/:id/editar', component: UsuarioFormPage },
@@ -75,6 +78,7 @@ export const routes: Routes = [
         { label: 'Nuevo servicio', path: 'servicios/nuevo' },
         { label: 'Nueva ruta', path: 'rutas/nueva' },
         { label: 'Optimizar ruta', path: 'optimizar-ruta' },
+        { label: 'Indicadores', path: 'indicadores' },
       ],
     },
     children: [
@@ -83,6 +87,7 @@ export const routes: Routes = [
       { path: 'servicios/nuevo', component: ServicioFormPage },
       { path: 'rutas/nueva', component: RutaFormPage },
       { path: 'optimizar-ruta', component: OptimizarRutaPage },
+      { path: 'indicadores', component: IndicadoresPage },
     ],
   },
 

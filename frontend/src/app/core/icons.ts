@@ -32,6 +32,7 @@ import {
   timeOutline,
   keyOutline,
   gitNetworkOutline,
+  barChartOutline,
 } from 'ionicons/icons';
 
 export function registerIcons(): void {
@@ -68,5 +69,6 @@ export function registerIcons(): void {
     'time-outline': timeOutline,
     'key-outline': keyOutline,
     'git-network-outline': gitNetworkOutline,
+    'bar-chart-outline': barChartOutline,
   });
 }
