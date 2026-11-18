@@ -1,0 +1,1960 @@
+<title>CMEDriver</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+@import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap");
+
+/* Concepto: cada lámina es una parada de una ruta de entrega. Escenario 16:9 fijo (1920x1080) escalado;
+   un trazo de ruta inferior marca el avance. Audacia: tipografía grande y ruta; el resto, quieto y preciso. */
+:root {
+  --f-display: "Bricolage Grotesque", "Segoe UI Variable Display", "Segoe UI", system-ui, sans-serif;
+  --f-text: "IBM Plex Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --f-mono: "IBM Plex Mono", Consolas, "Cascadia Mono", ui-monospace, monospace;
+
+  --bg: #F2F4F1;
+  --lb: #DDE3DE;
+  --surf: #FFFFFF;
+  --surf2: #E8ECE8;
+  --ink: #0F1B17;
+  --mut: #5B6B64;
+  --line: #D5DBD6;
+  --line-strong: #B4BFB8;
+  --grid: rgba(15, 27, 23, 0.05);
+  --acc: #FF5B14;
+  --acc-txt: #D9460A;
+  --on-acc: #0F1B17;
+  --sec: #0B7A75;
+  --ok: #1E9E5A;
+  --ok-txt: #147040;
+  --warn: #D98A00;
+  --warn-txt: #8A5700;
+  --bad: #D6342C;
+  --bad-txt: #B02820;
+  --c-ent: #00908A;
+  --c-rec: #FF5B14;
+  --on-sec: #FFFFFF;
+  --neutro: #8FA098;
+  --sombra: 0 1px 0 rgba(15, 27, 23, 0.06), 0 22px 44px -22px rgba(15, 27, 23, 0.4);
+  --scrim: rgba(15, 27, 23, 0.58);
+
+  --t-hero: 280px;
+  --t-xxl: 100px;
+  --t-xl: 64px;
+  --t-lg: 40px;
+  --t-md: 28px;
+  --t-sm: 22px;
+  --t-xs: 18px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0C1512; --lb: #060C0A; --surf: #13211C; --surf2: #182A24; --ink: #EAF1ED; --mut: #93A59C;
+    --line: #243630; --line-strong: #35493F; --grid: rgba(234, 241, 237, 0.05);
+    --acc: #FF7A3D; --acc-txt: #FF7A3D; --on-acc: #0C1512; --sec: #3CC4BC;
+    --ok: #3DCB82; --ok-txt: #5BD79A; --warn: #F0A91F; --warn-txt: #F0B63F; --bad: #F26B62; --bad-txt: #FF8A82;
+    --c-ent: #1FA8A0; --c-rec: #E8652F; --neutro: #5B7168; --on-sec: #0C1512;
+    --sombra: 0 1px 0 rgba(0, 0, 0, 0.4), 0 22px 44px -22px rgba(0, 0, 0, 0.8); --scrim: rgba(0, 0, 0, 0.66);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0C1512; --lb: #060C0A; --surf: #13211C; --surf2: #182A24; --ink: #EAF1ED; --mut: #93A59C;
+  --line: #243630; --line-strong: #35493F; --grid: rgba(234, 241, 237, 0.05);
+  --acc: #FF7A3D; --acc-txt: #FF7A3D; --on-acc: #0C1512; --sec: #3CC4BC;
+  --ok: #3DCB82; --ok-txt: #5BD79A; --warn: #F0A91F; --warn-txt: #F0B63F; --bad: #F26B62; --bad-txt: #FF8A82;
+  --c-ent: #1FA8A0; --c-rec: #E8652F; --neutro: #5B7168; --on-sec: #0C1512;
+  --sombra: 0 1px 0 rgba(0, 0, 0, 0.4), 0 22px 44px -22px rgba(0, 0, 0, 0.8); --scrim: rgba(0, 0, 0, 0.66);
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--f-text);
+  font-size: var(--t-md);
+  line-height: 1.4;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+button { font: inherit; color: inherit; }
+a { color: inherit; }
+:focus-visible { outline: 3px solid var(--acc-txt); outline-offset: 3px; }
+.sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+
+/* ---------- escenario ---------- */
+.deck { position: fixed; inset: 0; overflow: hidden; overflow: clip; background: var(--lb); }
+.stage {
+  position: absolute; left: 50%; top: 50%; width: 1920px; height: 1080px; margin: -540px 0 0 -960px;
+  transform: scale(var(--s, 0.7)); transform-origin: 50% 50%;
+  background-color: var(--bg);
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 120px 120px;
+  background-position: 96px 12px;
+  overflow: hidden;
+  overflow: clip;
+}
+.slides { position: absolute; inset: 0; }
+
+.slide {
+  position: absolute; inset: 0; display: flex; flex-direction: column; gap: 30px;
+  padding: 132px 96px 150px;
+  opacity: 0; visibility: hidden; transform: translateX(12px);
+  transition: opacity 0.38s ease, transform 0.38s ease, visibility 0s linear 0.38s;
+}
+[data-dir="atras"] .slide { transform: translateX(-12px); }
+.slide.sale { transform: translateX(-12px); }
+[data-dir="atras"] .slide.sale { transform: translateX(12px); }
+.slide.is-active {
+  opacity: 1; visibility: visible; transform: none;
+  transition: opacity 0.38s ease, transform 0.38s ease, visibility 0s;
+}
+
+.cab {
+  position: absolute; top: 52px; left: 96px; right: 96px; display: flex; justify-content: space-between; gap: 40px;
+  font: 500 var(--t-xs)/1 var(--f-mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--mut);
+}
+.guia::before { content: ""; display: inline-block; width: 12px; height: 12px; background: var(--acc); margin-right: 14px; vertical-align: -1px; }
+
+.titulo {
+  margin: 0; max-width: 1632px; text-wrap: balance;
+  font: 700 var(--t-xl)/1.04 var(--f-display); letter-spacing: -0.022em; font-optical-sizing: auto;
+}
+.cuerpo { flex: 1; min-height: 0; }
+.rot { font: 500 var(--t-xs)/1.25 var(--f-mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--mut); }
+.fuente { margin: 0; font: 400 var(--t-xs)/1.35 var(--f-mono); color: var(--mut); }
+.pie {
+  margin: auto 0 0; padding-top: 12px; border-top: 1px dashed var(--line-strong);
+  font: 400 17px/1.4 var(--f-mono); color: var(--mut);
+}
+.pie code, .nota code { font-family: var(--f-mono); background: var(--surf2); padding: 1px 6px; border-radius: 3px; color: var(--ink); }
+.sello {
+  display: inline-block; flex: none; white-space: nowrap; font: 600 17px/1.35 var(--f-mono); letter-spacing: 0.08em; text-transform: uppercase;
+  padding: 9px 14px; border: 2px solid var(--warn-txt); color: var(--warn-txt);
+}
+.sello.disc { border-style: dashed; }
+.tipo-num { font-variant-numeric: tabular-nums; }
+
+/* ---------- ruta (barra inferior) ---------- */
+.ruta {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 128px; padding: 0 96px 6px; z-index: 5;
+  display: flex; align-items: center; gap: 28px;
+}
+.ruta::before { content: ""; position: absolute; left: 96px; right: 96px; top: 0; border-top: 1px dashed var(--line-strong); }
+.ruta-info { width: 290px; flex: none; display: flex; flex-direction: column; gap: 8px; }
+.ruta-guia { font: 600 17px/1 var(--f-mono); letter-spacing: 0.08em; text-transform: uppercase; }
+.ruta-nombre { font: 500 22px/1.15 var(--f-text); color: var(--mut); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ruta-svg { flex: 1; min-width: 0; height: 96px; overflow: visible; }
+.ruta-ctl { display: flex; align-items: center; gap: 8px; flex: none; }
+.btn-c {
+  width: 42px; height: 42px; display: grid; place-items: center; cursor: pointer;
+  background: transparent; border: 1.5px solid var(--ink); border-radius: 6px; padding: 0;
+  transition: background 0.15s, color 0.15s;
+}
+.btn-c.grande { width: 52px; height: 52px; background: var(--ink); color: var(--bg); }
+.btn-c:hover { background: var(--surf2); }
+.btn-c.grande:hover { background: var(--acc); color: var(--on-acc); border-color: var(--acc); }
+.btn-c svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.btn-c .q { font: 600 20px/1 var(--f-mono); }
+
+.r-base { fill: none; stroke: var(--line-strong); stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; }
+.r-prog { fill: none; stroke: var(--acc); stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; }
+.r-nodo { fill: var(--bg); stroke: var(--line-strong); stroke-width: 2.5; cursor: pointer; }
+.r-nodo.vis { fill: var(--sec); stroke: var(--sec); }
+.r-nodo.act { fill: var(--acc); stroke: var(--bg); stroke-width: 3; }
+.r-num { font: 500 13px/1 var(--f-mono); fill: var(--mut); text-anchor: middle; pointer-events: none; }
+.r-num.act { fill: var(--ink); font-weight: 700; }
+.r-pulso { fill: var(--acc); opacity: 0.4; transform-box: fill-box; transform-origin: center; animation: pulso 2.4s ease-out infinite; }
+.r-mens { fill: var(--acc); stroke: var(--bg); stroke-width: 3; }
+.r-hit { fill: transparent; cursor: pointer; }
+.r-g:focus-visible .r-hit { stroke: var(--acc-txt); stroke-width: 3; }
+.r-g { outline: none; }
+@keyframes pulso { 0% { transform: scale(0.8); opacity: 0.5; } 100% { transform: scale(2.6); opacity: 0; } }
+
+/* ---------- portada ---------- */
+.s-portada { padding-top: 120px; gap: 0; }
+.marca {
+  margin: 0 0 10px -12px; font: 800 var(--t-hero)/0.92 var(--f-display); letter-spacing: -0.045em; white-space: nowrap; font-optical-sizing: auto;
+}
+.marca span { color: var(--acc-txt); }
+.portada-fila { display: flex; align-items: flex-end; flex: 1; min-height: 0; padding-bottom: 6px; }
+.s-portada .ficha { position: absolute; right: 96px; bottom: 158px; width: 640px; }
+.valor { margin: 0 0 30px; font: 600 50px/1.14 var(--f-display); letter-spacing: -0.015em; text-wrap: balance; max-width: 900px; }
+.etiquetas { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 10px; }
+.etiquetas li { font: 500 20px/1 var(--f-mono); letter-spacing: 0.06em; text-transform: uppercase; padding: 10px 14px; border: 1.5px solid var(--ink); border-radius: 3px; }
+.ficha { background: var(--surf); border: 2px solid var(--ink); border-radius: 4px; box-shadow: var(--sombra); }
+.ficha-cab { display: flex; justify-content: space-between; padding: 12px 20px; background: var(--ink); color: var(--bg); font: 600 17px/1 var(--f-mono); letter-spacing: 0.14em; }
+.ficha dl { margin: 0; padding: 4px 20px 0; }
+.ficha dl > div { display: grid; grid-template-columns: 210px 1fr; gap: 14px; padding: 12px 0; border-bottom: 1px dashed var(--line-strong); align-items: baseline; }
+.ficha dt { font: 500 16px/1.25 var(--f-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--mut); }
+.ficha dd { margin: 0; font: 600 24px/1.2 var(--f-text); }
+.ficha .codigo { display: block; width: calc(100% - 40px); height: 58px; margin: 16px 20px 18px; }
+.ficha .codigo rect { fill: var(--ink); }
+
+.portada-ruta { display: block; width: 1040px; height: auto; margin: 52px 0 0 0; }
+.ln-a { stroke: var(--acc); }
+
+/* ---------- problema ---------- */
+.cifras { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0 56px; align-items: start; }
+.cifra { border-top: 3px solid var(--ink); padding-top: 20px; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.cifra-n { margin: 0; font: 800 var(--t-xxl)/0.95 var(--f-display); letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+.cifra-n small { font-size: 0.42em; font-weight: 700; color: var(--acc-txt); letter-spacing: 0; }
+.cifra-t { margin: 0; font-size: var(--t-sm); line-height: 1.38; }
+.cifra-t b { font-weight: 600; }
+.mini { display: grid; gap: 9px; margin-top: 8px; }
+.mb { display: grid; grid-template-columns: 112px 1fr 76px; gap: 10px; align-items: center; font: 500 17px/1 var(--f-mono); }
+.mb .pista { height: 14px; background: var(--line); border-radius: 2px; }
+.mb .pista i { display: block; height: 100%; width: var(--w); background: var(--sec); border-radius: 2px; }
+.mb .pista i.f { background: var(--acc); }
+.mb .v { text-align: right; font-variant-numeric: tabular-nums; }
+.waffle { display: grid; grid-template-columns: repeat(10, 1fr); gap: 4px; width: 190px; margin-top: 6px; }
+.waffle i { aspect-ratio: 1; background: var(--line); border-radius: 50%; }
+.waffle i.on { background: var(--acc); }
+.nota-hip { display: flex; gap: 22px; align-items: center; margin-top: 26px; }
+.nota-hip p { margin: 0; font-size: var(--t-sm); line-height: 1.4; max-width: 1280px; }
+
+/* ---------- hipótesis ---------- */
+.hips { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 0 64px; }
+.hip { border-top: 2px solid var(--line-strong); padding: 16px 0 18px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.hip-top { display: flex; align-items: baseline; gap: 16px; }
+.hip-cod { font: 800 50px/0.9 var(--f-display); color: transparent; -webkit-text-stroke: 2px var(--ink); letter-spacing: -0.02em; }
+.hip-et { font: 500 15px/1 var(--f-mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--warn-txt); }
+.hip h3 { margin: 4px 0 0; font: 700 32px/1.1 var(--f-display); letter-spacing: -0.01em; }
+.hip p { margin: 0; font-size: var(--t-sm); line-height: 1.4; }
+.hip .resp { margin-top: auto; padding-top: 10px; font: 500 18px/1.35 var(--f-mono); color: var(--sec); }
+.hip .resp::before { content: "→ "; }
+
+/* ---------- propuesta ---------- */
+.propuesta { display: grid; grid-template-columns: 640px 1fr; gap: 96px; align-items: start; }
+.objetivo p { margin: 14px 0 0; font-size: 32px; line-height: 1.4; }
+.objetivo p.rot { margin: 0; font-size: var(--t-xs); }
+.capas { display: grid; gap: 18px; }
+.capas .cap-fila { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+.cap { background: var(--surf); border: 2px solid var(--ink); border-radius: 2px; padding: 20px 20px 22px; min-height: 236px; display: flex; flex-direction: column; gap: 8px; }
+.cap b { font: 700 30px/1.1 var(--f-display); }
+.cap span { font-size: 22px; line-height: 1.35; color: var(--mut); }
+.cap-api { background: var(--ink); color: var(--bg); border-radius: 2px; padding: 30px 28px; display: flex; justify-content: space-between; align-items: center; gap: 24px; }
+.cap-api b { font: 700 38px/1.1 var(--f-display); }
+.cap-api span { font: 500 21px/1.4 var(--f-mono); letter-spacing: 0.04em; text-align: right; opacity: 0.85; }
+.roles-fila { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+.rol-chip { font: 600 26px/1 var(--f-text); text-align: center; padding: 20px 10px; border: 1.5px solid var(--ink); border-radius: 999px; background: transparent; }
+.capas .rot { margin: 10px 0 0; }
+
+/* ---------- ciclo ---------- */
+.svg-ciclo { display: block; width: 100%; height: auto; max-height: 100%; }
+.scroll-x { overflow-x: auto; }
+.sv-t { font: 700 30px/1 var(--f-display); fill: var(--ink); letter-spacing: -0.01em; }
+.sv-d { font: 400 20px/1 var(--f-text); fill: var(--mut); }
+.sv-m { font: 500 18px/1 var(--f-mono); fill: var(--mut); letter-spacing: 0.04em; }
+.sv-mi { font: 500 18px/1 var(--f-mono); fill: var(--ink); letter-spacing: 0.04em; }
+.sv-sm { font: 500 16px/1 var(--f-mono); fill: var(--mut); letter-spacing: 0.04em; }
+.ln { fill: none; stroke: var(--ink); stroke-width: 6; stroke-linecap: round; stroke-linejoin: round; }
+.ln-n { fill: none; stroke: var(--warn); stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; }
+.ln-f { fill: none; stroke: var(--line-strong); stroke-width: 2; }
+.ln-d { fill: none; stroke: var(--bad); stroke-width: 4; stroke-linecap: round; }
+.nd { fill: var(--surf); stroke: var(--ink); stroke-width: 5; }
+.nd.ok { fill: var(--ok); stroke: var(--ok); }
+.nd.nv { fill: var(--warn); stroke: var(--warn); }
+.nd.bd { fill: var(--bad); stroke: var(--bad); }
+.mk-i { fill: var(--ink); } .mk-n { fill: var(--warn); } .mk-d { fill: var(--bad); }
+.carril { fill: none; stroke: var(--warn); stroke-width: 2; stroke-dasharray: 8 7; }
+.ic-ok { fill: none; stroke: #fff; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; }
+
+/* ---------- roles ---------- */
+.roles { list-style: none; margin: 0; padding: 0; display: grid; }
+.rol { display: grid; grid-template-columns: 430px 500px 1fr; gap: 40px; align-items: center; padding: 26px 0; border-top: 1.5px solid var(--line-strong); }
+.rol:last-child { border-bottom: 1.5px solid var(--line-strong); }
+.rol-id { display: flex; align-items: center; gap: 22px; }
+.rol-ico { width: 70px; height: 70px; flex: none; display: grid; place-items: center; border: 2px solid var(--ink); border-radius: 50%; background: var(--surf); }
+.rol-ico svg { width: 40px; height: 40px; fill: none; stroke: var(--ink); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.rol h3 { margin: 0; font: 700 44px/1 var(--f-display); letter-spacing: -0.015em; }
+.rol-m { margin: 0; font-size: 28px; line-height: 1.25; }
+.chips { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 10px; }
+.chips li { font: 500 20px/1.15 var(--f-mono); padding: 9px 13px; background: var(--surf); border: 1.5px solid var(--line-strong); border-radius: 3px; }
+
+/* ---------- capturas ---------- */
+.vitrina { display: flex; gap: 56px; align-items: flex-start; }
+.fig { margin: 0; flex: none; }
+.fig figcaption { margin-top: 14px; font-size: 20px; line-height: 1.35; color: var(--mut); }
+.fig figcaption b { color: var(--ink); font-weight: 600; }
+.marco-pc { width: 800px; border: 2px solid var(--ink); border-radius: 12px; background: var(--surf); overflow: hidden; box-shadow: var(--sombra); }
+.marco-pc .barra { height: 38px; display: flex; align-items: center; gap: 8px; padding: 0 14px; border-bottom: 2px solid var(--ink); background: var(--surf2); }
+.marco-pc .barra i { width: 11px; height: 11px; border-radius: 50%; background: var(--line-strong); }
+.marco-pc .barra span { margin-left: 14px; flex: 1; max-width: 360px; padding: 3px 12px; background: var(--surf); border-radius: 999px; font: 400 15px/1.3 var(--f-mono); color: var(--mut); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pantalla { position: relative; aspect-ratio: 16 / 10; background: var(--surf2); overflow: hidden; }
+.pantalla img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top left; }
+.marco-movil { width: 256px; padding: 13px; border: 2px solid var(--ink); border-radius: 38px; background: var(--ink); box-shadow: var(--sombra); }
+.pantalla-m { position: relative; aspect-ratio: 390 / 844; background: var(--surf2); border-radius: 26px; overflow: hidden; }
+.pantalla-m img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top center; }
+.moviles { display: flex; gap: 28px; align-items: flex-start; }
+.moviles .fig { width: 256px; }
+.vitrina > .fig { width: 800px; }
+.captura-pendiente { position: absolute; inset: 0; display: grid; place-content: center; gap: 10px; text-align: center; padding: 16px; color: var(--mut); border: 2px dashed var(--line-strong); font: 500 18px/1.3 var(--f-mono); }
+.captura-pendiente b { font: 700 24px/1.1 var(--f-display); color: var(--ink); }
+
+/* ---------- indicadores ---------- */
+.kpis { display: grid; grid-template-columns: repeat(6, 1fr); gap: 0 26px; }
+.kpi { border-top: 3px solid var(--ink); padding-top: 12px; min-width: 0; }
+.kpi .rot { font-size: 15px; }
+.kpi-n { margin: 6px 0 4px; font: 800 58px/1 var(--f-display); letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+.kpi-n small { font-size: 0.45em; font-weight: 700; color: var(--mut); letter-spacing: 0; margin-left: 4px; }
+.kpi-s { margin: 0; font: 400 16px/1.3 var(--f-mono); color: var(--mut); }
+.graficos { display: grid; grid-template-columns: 780px 480px 1fr; gap: 28px; align-items: start; }
+.graf { min-width: 0; }
+.graf h3 { margin: 0 0 10px; font: 500 17px/1.2 var(--f-mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--mut); }
+.graf svg { display: block; width: 100%; height: auto; }
+.leyenda-g { display: flex; gap: 22px; margin-bottom: 6px; font: 500 17px/1 var(--f-mono); }
+.leyenda-g span { display: inline-flex; align-items: center; gap: 8px; }
+.leyenda-g i { width: 14px; height: 14px; border-radius: 2px; display: inline-block; }
+.lectura { margin: 0; font-size: 24px; line-height: 1.4; max-width: 1560px; }
+.lectura-fila { display: flex; gap: 22px; align-items: baseline; }
+.lectura-fila .rot { flex: none; }
+.g-txt { font: 500 17px/1 var(--f-mono); fill: var(--mut); }
+.g-txt-i { font: 500 18px/1 var(--f-mono); fill: var(--ink); }
+.g-lbl { font: 500 19px/1 var(--f-text); fill: var(--ink); }
+.b-ok { fill: var(--ok); } .b-warn { fill: var(--warn); } .b-bad { fill: var(--bad); } .b-neu { fill: var(--neutro); } .b-ent { fill: var(--c-ent); } .b-rec { fill: var(--c-rec); } .b-trk { fill: var(--line); }
+.g-grid { stroke: var(--line); stroke-width: 1; }
+.g-eje { stroke: var(--line-strong); stroke-width: 1.5; }
+.sin-datos { display: none; border: 2px dashed var(--line-strong); padding: 28px 32px; border-radius: 6px; background: var(--surf); max-width: 1100px; }
+.sin-datos b { display: block; font: 700 34px/1.1 var(--f-display); margin-bottom: 10px; }
+.sin-datos p { margin: 0; font-size: var(--t-sm); line-height: 1.45; color: var(--mut); }
+.sin-datos code { font-family: var(--f-mono); color: var(--ink); background: var(--surf2); padding: 2px 6px; border-radius: 3px; }
+.no-datos .sin-datos { display: block; }
+.no-datos [data-necesita-datos] { display: none !important; }
+
+/* ---------- evidencia ---------- */
+.evi { display: grid; grid-template-columns: 760px 1fr; gap: 80px; align-items: start; }
+.regla { display: flex; align-items: stretch; gap: 12px; margin: 14px 0 34px; }
+.paso { flex: 1; border: 2px solid var(--ink); border-radius: 3px; background: var(--surf); padding: 14px 14px 16px; display: flex; flex-direction: column; gap: 6px; }
+.paso b { font: 700 26px/1.1 var(--f-display); }
+.paso span { font: 500 16px/1.3 var(--f-mono); color: var(--mut); letter-spacing: 0.04em; text-transform: uppercase; }
+.paso.cierre { background: var(--ok); border-color: var(--ok); color: #0B1F14; }
+.paso.cierre span { color: #0B1F14; }
+.mas { align-self: center; font: 600 34px/1 var(--f-mono); color: var(--mut); }
+.gran { margin: 0; font: 800 150px/0.9 var(--f-display); letter-spacing: -0.04em; font-variant-numeric: tabular-nums; }
+.gran small { font-size: 0.4em; color: var(--acc-txt); margin-left: 6px; letter-spacing: 0; }
+.gran-t { margin: 10px 0 0; font-size: 26px; line-height: 1.3; max-width: 640px; }
+.gran-s { margin: 12px 0 0; font: 500 19px/1.4 var(--f-mono); color: var(--mut); }
+.evi-r { display: grid; gap: 30px; }
+.resuelve { margin: 0; padding: 16px 20px; background: var(--surf); border: 1.5px solid var(--line-strong); border-radius: 8px; font-size: 22px; line-height: 1.4; }
+.resuelve b { font-weight: 600; }
+.seg { display: flex; height: 38px; gap: 2px; margin: 10px 0 10px; }
+.seg i { display: block; height: 100%; }
+.seg-l { display: flex; gap: 22px; flex-wrap: wrap; font: 500 17px/1.3 var(--f-mono); }
+.seg-l span { display: inline-flex; align-items: center; gap: 8px; }
+.seg-l i { width: 14px; height: 14px; border-radius: 2px; display: inline-block; }
+
+/* ---------- api ---------- */
+.api { display: grid; grid-template-columns: 1fr 740px; gap: 64px; align-items: start; }
+.api-l { display: grid; gap: 22px; min-width: 0; }
+.api-svg { width: 100%; height: auto; display: block; }
+.ev { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 10px; }
+.ev li { font: 500 20px/1 var(--f-mono); padding: 9px 13px; border: 1.5px solid var(--ink); border-radius: 3px; background: var(--surf); }
+.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0 24px; }
+.stat { border-top: 3px solid var(--ink); padding-top: 10px; }
+.stat .rot { font-size: 15px; }
+.stat-n { margin: 6px 0 2px; font: 800 52px/1 var(--f-display); letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+.stat-s { margin: 0; font: 400 16px/1.3 var(--f-mono); color: var(--mut); }
+.marco-pc.ancho { width: 740px; }
+
+/* ---------- arquitectura ---------- */
+.arq { display: grid; grid-template-columns: 1180px 1fr; gap: 44px; align-items: start; }
+.svg-arq { display: block; width: 100%; height: auto; }
+.tech { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; }
+.tech li { padding: 12px 0; border-top: 1.5px solid var(--line-strong); font-size: 21px; line-height: 1.35; }
+.tech li:last-child { border-bottom: 1.5px solid var(--line-strong); }
+.tech b { display: block; font: 700 26px/1.1 var(--f-display); margin-bottom: 3px; }
+.tech .n { font: 800 26px/1 var(--f-display); color: var(--acc-txt); }
+.bx { fill: var(--surf); stroke: var(--ink); stroke-width: 2.5; }
+.bx-api { fill: var(--surf); stroke: var(--ink); stroke-width: 3; }
+.bx-ext { fill: none; stroke: var(--mut); stroke-width: 2; stroke-dasharray: 7 6; }
+.bx-app { fill: var(--ink); stroke: var(--ink); stroke-width: 2.5; }
+.bx-chip { fill: var(--surf2); stroke: var(--line-strong); stroke-width: 1.5; }
+.bx-user { fill: var(--surf); stroke: var(--ink); stroke-width: 2.5; }
+.ar { fill: none; stroke: var(--ink); stroke-width: 2.5; }
+.ar-s { fill: none; stroke: var(--mut); stroke-width: 2; stroke-dasharray: 7 6; }
+.ar-w { fill: none; stroke: var(--acc-txt); stroke-width: 2.5; }
+.sv-b { font: 700 26px/1 var(--f-display); fill: var(--ink); letter-spacing: -0.01em; }
+.sv-bi { font: 700 26px/1 var(--f-display); fill: var(--bg); letter-spacing: -0.01em; }
+.sv-s { font: 500 17px/1 var(--f-mono); fill: var(--mut); }
+.sv-si { font: 500 17px/1 var(--f-mono); fill: var(--bg); opacity: 0.85; }
+.sv-c { font: 500 17px/1 var(--f-mono); fill: var(--ink); }
+.sv-e { font: 600 20px/1 var(--f-text); fill: var(--ink); }
+.mk-a { fill: var(--ink); } .mk-w { fill: var(--acc-txt); } .mk-s { fill: var(--mut); }
+
+/* ---------- calidad ---------- */
+.cal-cifras { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0 48px; }
+.cal-c { border-top: 3px solid var(--ink); padding-top: 14px; }
+.cal-c b { display: block; font: 800 96px/0.95 var(--f-display); letter-spacing: -0.035em; font-variant-numeric: tabular-nums; }
+.cal-c > span { display: block; margin-top: 8px; font-size: 22px; line-height: 1.3; }
+.cadena { display: flex; margin: 56px 0 40px; }
+.eslabon { flex: 1; position: relative; padding-top: 34px; min-width: 0; }
+.eslabon::before { content: ""; position: absolute; top: 9px; left: 0; right: 0; height: 4px; background: var(--ink); }
+.eslabon:last-child::before { right: 50%; }
+.eslabon::after { content: ""; position: absolute; top: 0; left: 0; width: 22px; height: 22px; border-radius: 50%; background: var(--surf); border: 4px solid var(--ink); }
+.eslabon:last-child::after { background: var(--ok); border-color: var(--ok); }
+.eslabon b { display: block; font: 700 27px/1.1 var(--f-display); }
+.eslabon span { display: block; font: 500 17px/1.3 var(--f-mono); color: var(--mut); margin-top: 3px; }
+.honesto { display: grid; grid-template-columns: 420px 1fr; gap: 56px; align-items: start; margin-top: 0; padding: 22px 28px 24px; border: 2px dashed var(--warn-txt); border-radius: 6px; background: var(--surf); }
+.honesto-n { display: flex; gap: 40px; }
+.honesto-n div b { display: block; font: 800 76px/0.95 var(--f-display); letter-spacing: -0.035em; color: var(--warn-txt); font-variant-numeric: tabular-nums; }
+.honesto-n div span { display: block; margin-top: 6px; font-size: 20px; line-height: 1.3; max-width: 190px; }
+.honesto ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; font-size: 22px; line-height: 1.35; }
+.honesto li { padding-left: 26px; position: relative; }
+.honesto li::before { content: ""; position: absolute; left: 0; top: 0.5em; width: 12px; height: 12px; background: var(--warn); transform: rotate(45deg); }
+.honesto .rot { margin: 0 0 8px; color: var(--warn-txt); }
+
+/* ---------- cronograma ---------- */
+.titulo-fila { display: flex; justify-content: space-between; align-items: flex-start; gap: 48px; }
+.titulo-fila .titulo { max-width: 1240px; }
+.titulo-fila .sello { max-width: 410px; flex: none; margin-top: 6px; white-space: normal; }
+.gantt { display: block; width: 100%; height: auto; }
+.gn-t { font: 600 24px/1 var(--f-text); fill: var(--ink); }
+.gn-d { font: 400 19px/1 var(--f-mono); fill: var(--mut); }
+.gn-h { font: 600 20px/1 var(--f-mono); fill: var(--mut); letter-spacing: 0.08em; text-anchor: middle; }
+.gn-hb { font: 600 18px/1 var(--f-mono); fill: var(--ink); }
+.gb-ok { fill: var(--ok); } .gb-pl { fill: var(--sec); } .gb-cp { fill: var(--acc); }
+.gb-tx { font: 600 19px/1 var(--f-mono); fill: var(--on-sec); }
+.gb-tx.osc { fill: var(--on-acc); }
+.g-col { stroke: var(--line); stroke-width: 1.5; }
+.g-fila { stroke: var(--line); stroke-width: 1; }
+.g-dep { fill: none; stroke: var(--ink); stroke-width: 2.5; stroke-dasharray: 2 6; stroke-linecap: round; }
+.g-dep-m { fill: var(--ink); }
+.g-puerta { fill: var(--surf); stroke: var(--ink); stroke-width: 2.5; }
+
+/* ---------- presupuesto ---------- */
+.pres-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 40px; }
+.pres { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 21px; line-height: 1.22; font-variant-numeric: tabular-nums; }
+.pres th { text-align: left; font: 500 15px/1.2 var(--f-mono); letter-spacing: 0.05em; text-transform: uppercase; color: var(--mut); padding: 0 12px 8px; border-bottom: 2.5px solid var(--ink); }
+.pres td { padding: 6px 12px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+.pres td.cat { font-weight: 600; border-bottom-color: var(--line-strong); vertical-align: top; padding-top: 5px; }
+.pres .num { text-align: right; white-space: nowrap; }
+.pres th.num { text-align: right; }
+.pres td.fte { color: var(--mut); font-size: 18px; }
+.pres tr.cero td.num { color: var(--mut); }
+.pres tfoot td { border-bottom: 1px solid var(--line); padding-top: 5px; padding-bottom: 5px; }
+.pres tfoot tr.total td { border-top: 2.5px solid var(--ink); border-bottom: 0; font: 800 28px/1.1 var(--f-display); padding-top: 9px; background: transparent; }
+.pres tfoot tr.total td.num { color: var(--acc-txt); }
+.pres tfoot td.lbl { font-weight: 600; text-align: right; }
+
+/* ---------- entregable / cierre ---------- */
+.entregable { display: grid; grid-template-columns: 1fr 1fr; gap: 0 80px; }
+.entregable article { border-top: 3px solid var(--ink); padding-top: 16px; }
+.entregable p.rot { margin: 0 0 12px; font-size: var(--t-xs); }
+.entregable p { margin: 0; font-size: 26px; line-height: 1.5; max-width: 820px; hyphens: manual; }
+.estado-ent { display: grid; grid-template-columns: 1fr 1fr; gap: 0 80px; margin-top: 26px; }
+.estado-ent ul { list-style: none; margin: 0; padding: 14px 0 0; border-top: 1.5px solid var(--line-strong); display: flex; flex-wrap: wrap; gap: 8px 22px; font: 500 22px/1.3 var(--f-mono); }
+.estado-ent li { padding-left: 28px; position: relative; }
+.estado-ent .si li::before { content: ""; position: absolute; left: 0; top: 3px; width: 18px; height: 18px; background: var(--ok); border-radius: 3px; }
+.estado-ent .si li::after { content: ""; position: absolute; left: 6px; top: 6px; width: 5px; height: 9px; border: solid #fff; border-width: 0 2.5px 2.5px 0; transform: rotate(45deg); }
+.estado-ent .no li::before { content: ""; position: absolute; left: 0; top: 3px; width: 14px; height: 14px; border: 2px dashed var(--warn-txt); border-radius: 3px; }
+
+.final { display: grid; grid-template-columns: 1fr 780px; gap: 72px; align-items: stretch; height: 100%; }
+.final > div { display: flex; flex-direction: column; min-width: 0; }
+.pedidos { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; counter-reset: pd; }
+.pedidos li { counter-increment: pd; display: grid; grid-template-columns: 74px 1fr; gap: 18px; padding: 30px 0; border-top: 1.5px solid var(--line-strong); font-size: 34px; line-height: 1.25; align-items: start; }
+.pedidos li:last-child { border-bottom: 1.5px solid var(--line-strong); }
+.pedidos li::before { content: counter(pd); font: 800 64px/0.9 var(--f-display); color: var(--acc-txt); }
+.pedidos b { font-weight: 600; }
+.repo { background: var(--surf); border: 2px solid var(--ink); border-radius: 4px; box-shadow: var(--sombra); }
+.repo .ficha-cab { }
+.repo-c { padding: 22px 24px 26px; display: grid; gap: 14px; }
+.url { display: block; font: 500 26px/1.25 var(--f-mono); word-break: break-all; user-select: all; -webkit-user-select: all; padding: 14px 16px; background: var(--surf2); border-radius: 3px; }
+.btn-copiar { justify-self: start; display: inline-flex; align-items: center; gap: 12px; cursor: pointer; padding: 14px 22px; background: var(--ink); color: var(--bg); border: 0; border-radius: 4px; font: 600 22px/1 var(--f-text); }
+.btn-copiar:hover { background: var(--acc); color: var(--on-acc); }
+.btn-copiar svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.copiado { font: 500 19px/1.3 var(--f-mono); color: var(--ok-txt); min-height: 1.3em; margin: 0; }
+.gracias { margin-top: auto; display: grid; gap: 6px; padding-bottom: 6px; }
+.gracias b { font: 800 120px/1 var(--f-display); letter-spacing: -0.03em; }
+.gracias span { font-size: 24px; color: var(--mut); line-height: 1.35; }
+
+/* ---------- ayuda y avisos ---------- */
+.ayuda { position: fixed; inset: 0; z-index: 30; display: grid; place-items: center; background: var(--scrim); }
+.ayuda[hidden] { display: none; }
+.ayuda-p { width: min(680px, calc(100vw - 32px)); max-height: calc(100vh - 32px); overflow: auto; background: var(--surf); color: var(--ink); border: 2px solid var(--ink); border-radius: 8px; padding: 24px 28px 26px; box-shadow: var(--sombra); }
+.ayuda-p h2 { margin: 0 0 14px; font: 700 28px/1.1 var(--f-display); }
+.ayuda-p table { width: 100%; border-collapse: collapse; font-size: 17px; }
+.ayuda-p td { padding: 7px 0; border-top: 1px solid var(--line); vertical-align: top; }
+.ayuda-p td:first-child { white-space: nowrap; padding-right: 20px; }
+.ayuda-p kbd { font: 500 14px/1 var(--f-mono); padding: 3px 7px; border: 1.5px solid var(--ink); border-bottom-width: 3px; border-radius: 4px; background: var(--bg); }
+.ayuda-p .cerrar { margin-top: 16px; padding: 10px 18px; background: var(--ink); color: var(--bg); border: 0; border-radius: 4px; cursor: pointer; font: 600 16px/1 var(--f-text); }
+.aviso { position: fixed; left: 50%; bottom: 20px; z-index: 31; transform: translate(-50%, 12px); opacity: 0; pointer-events: none; padding: 11px 18px; background: var(--ink); color: var(--bg); border-radius: 6px; font: 500 15px/1.3 var(--f-text); transition: opacity 0.2s, transform 0.2s; max-width: calc(100vw - 32px); }
+.aviso.on { opacity: 1; transform: translate(-50%, 0); }
+.barra-movil { display: none; }
+.hint-scroll { display: none; }
+
+/* ---------- movimiento reducido ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .slide, .slide.is-active { transition: none; }
+  .r-pulso { animation: none; opacity: 0.3; }
+  .aviso { transition: none; }
+}
+
+/* ---------- pantallas estrechas: láminas apiladas ---------- */
+@media (max-width: 719.98px) {
+  :root { --t-hero: 18.5vw; --t-xxl: 60px; --t-xl: 32px; --t-lg: 24px; --t-md: 17px; --t-sm: 16px; --t-xs: 12.5px; }
+  html, body { height: auto; }
+  body { overflow-x: hidden; overflow-y: auto; }
+  .deck { position: static; overflow: visible; background: var(--bg); }
+  .stage { position: static; width: auto; height: auto; margin: 0; transform: none; overflow: visible; background-size: 80px 80px; background-position: 0 0; }
+  .slides { position: static; }
+  .slide, [data-dir="atras"] .slide, .slide.sale {
+    position: relative; inset: auto; opacity: 1; visibility: visible; transform: none; transition: none;
+    padding: 28px max(16px, env(safe-area-inset-left, 0px)) 36px max(16px, env(safe-area-inset-right, 0px)); gap: 18px;
+    border-bottom: 1px dashed var(--line-strong);
+  }
+  .cab { position: static; flex-wrap: wrap; gap: 6px 14px; margin-bottom: 4px; }
+  .titulo { max-width: none; letter-spacing: -0.015em; }
+  .ruta { display: none; }
+  .barra-movil {
+    display: flex; position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; justify-content: space-between; align-items: center;
+    padding: 8px max(16px, env(safe-area-inset-right, 0px)) 8px max(16px, env(safe-area-inset-left, 0px)); background: var(--bg); border-bottom: 1px solid var(--line-strong);
+  }
+  .barra-movil b { font: 800 20px/1 var(--f-display); letter-spacing: -0.02em; }
+  .barra-movil b span { color: var(--acc-txt); }
+  .barra-movil .btn-c { width: 38px; height: 38px; }
+  .barra-movil .btn-c svg { width: 20px; height: 20px; }
+  .barra-movil .grupo { display: flex; gap: 8px; }
+
+  .s-portada { padding-top: 28px; }
+  .portada-ruta { display: none; }
+  .marca { margin: 0 0 6px -4px; white-space: normal; letter-spacing: -0.04em; }
+  .portada-fila { display: block; }
+  .s-portada .ficha { position: static; width: auto; margin-top: 20px; }
+  .valor { font-size: 24px; margin-bottom: 18px; }
+  .etiquetas li { font-size: 12px; padding: 7px 9px; }
+  .ficha dl > div { grid-template-columns: 1fr; gap: 2px; padding: 9px 0; }
+  .ficha dd { font-size: 18px; }
+  .ficha dt { font-size: 12px; }
+
+  .cifras, .hips, .propuesta, .evi, .api, .arq, .final, .entregable, .estado-ent, .honesto, .kpis, .stats, .cal-cifras, .graficos { grid-template-columns: minmax(0, 1fr); gap: 20px; }
+  .kpis, .stats, .cal-cifras { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 14px; }
+  .vitrina > .fig { width: 100%; }
+  .final { height: auto; }
+  .final > div { display: block; }
+  .gracias { margin-top: 28px; }
+  .cifra-n { font-size: 56px; }
+  .mb { grid-template-columns: 84px 1fr 62px; font-size: 12px; }
+  .waffle { width: 200px; }
+  .nota-hip { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .nota-hip p { font-size: 15px; }
+  .hip h3 { font-size: 23px; } .hip-top { display: flex; align-items: baseline; gap: 16px; }
+.hip-cod { font-size: 40px; } .hip p { font-size: 16px; } .hip .resp { font-size: 13px; }
+  .capas .cap-fila, .roles-fila { grid-template-columns: 1fr 1fr; }
+  .cap { min-height: 0; } .cap b { font-size: 19px; } .cap span { font-size: 14px; }
+  .cap-api { flex-direction: column; align-items: flex-start; gap: 6px; } .cap-api span { text-align: left; font-size: 13px; } .cap-api b { font-size: 22px; }
+  .rol-chip { font-size: 16px; padding: 12px 6px; }
+  .objetivo p { font-size: 19px; }
+  .rol { grid-template-columns: 1fr; gap: 10px; padding: 16px 0; }
+  .rol h3 { font-size: 28px; } .rol-m { font-size: 18px; } .rol-ico { width: 52px; height: 52px; } .rol-ico svg { width: 30px; height: 30px; }
+  .chips li { font-size: 12.5px; }
+  .vitrina { flex-direction: column; gap: 26px; }
+  .marco-pc, .marco-pc.ancho { width: 100%; }
+  .moviles { gap: 12px; width: 100%; }
+  .moviles .fig, .marco-movil { width: auto; flex: 1; min-width: 0; }
+  .marco-movil { padding: 6px; border-radius: 20px; }
+  .pantalla-m { border-radius: 14px; }
+  .fig figcaption { font-size: 14px; }
+  .graf svg, .svg-ciclo, .svg-arq, .gantt, .api-svg { min-width: 0; }
+  .svg-ciclo { min-width: 760px; } .svg-arq { min-width: 760px; } .gantt { min-width: 820px; }
+  .graf .scroll-x svg { min-width: 520px; }
+  .lectura { font-size: 17px; } .lectura-fila { flex-direction: column; gap: 6px; }
+  .kpi-n { font-size: 38px; } .kpi .rot { min-height: 0; font-size: 11px; } .kpi-s { font-size: 12px; }
+  .regla { flex-wrap: wrap; } .paso b { font-size: 19px; } .paso span { font-size: 12px; }
+  .gran { font-size: 88px; } .gran-t { font-size: 18px; } .gran-s { font-size: 13px; }
+  .resuelve { font-size: 16px; }
+  .stat-n { font-size: 36px; } .stat .rot { min-height: 0; font-size: 11px; } .stat-s { font-size: 12px; }
+  .ev li { font-size: 13px; }
+  .tech li { font-size: 16px; } .tech b { font-size: 20px; }
+  .cal-c b { font-size: 56px; } .cal-c span { font-size: 15px; }
+  .cadena { flex-direction: column; gap: 16px; margin: 14px 0; }
+  .eslabon { padding: 0 0 0 34px; } .eslabon::before { top: 0; bottom: -16px; left: 9px; right: auto; width: 4px; height: auto; } .eslabon:last-child::before { display: none; }
+  .eslabon b { font-size: 20px; } .eslabon span { font-size: 13px; }
+  .honesto { padding: 16px; } .honesto-n div b { font-size: 52px; } .honesto ul { font-size: 16px; }
+  .titulo-fila { flex-direction: column; gap: 12px; } .titulo-fila .sello { max-width: none; }
+  .sello { font-size: 12px; padding: 7px 10px; }
+  .pres-top { flex-direction: column; gap: 10px; }
+  .tabla-wrap { overflow-x: auto; }
+  .pres { table-layout: auto; min-width: 820px; font-size: 15px; }
+  .pres col { width: auto !important; }
+  #g-diario { overflow-x: auto; }
+  #g-diario svg { min-width: 640px; }
+  .hint-scroll { display: block; margin: 6px 0 0; font: 400 12px/1.3 var(--f-mono); color: var(--mut); } .pres th { font-size: 11px; } .pres td.fte { font-size: 13px; } .pres tfoot tr.total td { font-size: 20px; }
+  .entregable p { font-size: 17px; } .estado-ent ul { font-size: 14px; }
+  .pedidos li { grid-template-columns: 44px 1fr; font-size: 19px; padding: 16px 0; } .pedidos li::before { font-size: 40px; }
+  .url { font-size: 15px; } .btn-copiar { font-size: 17px; padding: 12px 16px; } .gracias b { font-size: 46px; } .gracias span { font-size: 16px; }
+  .pie { font-size: 12px; }
+  .sin-datos b { font-size: 24px; } .sin-datos p { font-size: 15px; }
+  .ayuda-p { padding: 18px; }
+}
+
+/* ---------- impresión: una lámina por página ---------- */
+@page { size: 1920px 1080px; margin: 0; }
+@media print {
+  html, body { height: auto; overflow: visible; background: var(--bg); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .deck { position: static; overflow: visible; background: none; }
+  .stage { position: static; width: 1920px; height: auto; margin: 0; transform: none; overflow: visible; background: none; }
+  .slides { position: static; }
+  .slide, [data-dir="atras"] .slide, .slide.sale {
+    position: relative; width: 1920px; height: 1080px; inset: auto; opacity: 1; visibility: visible; transform: none; transition: none;
+    break-after: page; page-break-after: always; overflow: hidden;
+    background-color: var(--bg);
+    background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 120px 120px; background-position: 96px 12px;
+  }
+  .slide:last-child { break-after: auto; page-break-after: auto; }
+  .ruta, .ayuda, .aviso, .barra-movil { display: none !important; }
+}
+</style>
+
+<div class="deck" id="deck">
+  <div class="barra-movil" role="banner">
+    <b>CME<span>Driver</span></b>
+    <div class="grupo">
+      <button type="button" class="btn-c" data-accion="tema" aria-label="Cambiar entre tema claro y oscuro"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 4v16" /><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/></svg></button>
+    </div>
+  </div>
+
+  <div class="stage" id="stage">
+    <main class="slides" id="slides">
+
+      <!-- 1. Portada -->
+      <section class="slide s-portada is-active" id="parada-1" data-titulo="Portada" aria-label="Portada">
+        <div class="cab"><span class="guia"></span><span class="destino"></span></div>
+        <h1 class="marca">CME<span>Driver</span></h1>
+        <svg class="portada-ruta" viewBox="0 0 1100 124" role="img" aria-label="De la bodega a la firma: bodega, alistado, en ruta, entrega y firma">
+          <path class="ln" d="M16 46H1084"/>
+          <path class="ln ln-a" d="M16 46H574"/>
+          <rect class="nd" x="2" y="32" width="28" height="28" rx="4"/>
+          <circle class="nd" cx="295" cy="46" r="14"/>
+          <circle class="nd" cx="574" cy="46" r="22" style="fill:var(--acc);stroke:var(--bg)"/>
+          <circle class="nd" cx="832" cy="46" r="14"/>
+          <circle class="nd ok" cx="1084" cy="46" r="22"/>
+          <path class="ic-ok" d="M1074 46l7 7 13-14"/>
+          <g class="sv-m" style="fill:var(--ink)">
+            <text x="0" y="108">BODEGA</text>
+            <text x="295" y="108" text-anchor="middle">ALISTADO</text>
+            <text x="574" y="108" text-anchor="middle">EN RUTA</text>
+            <text x="832" y="108" text-anchor="middle">ENTREGA</text>
+            <text x="1100" y="108" text-anchor="end">FIRMA</text>
+          </g>
+        </svg>
+        <div class="portada-fila">
+          <div>
+            <p class="valor">De la bodega a la firma, cada entrega y cada recolección en una sola plataforma.</p>
+            <ul class="etiquetas" aria-label="Capacidades">
+              <li>Entregas</li><li>Recolecciones</li><li>Seguimiento</li><li>Evidencia</li><li>API</li>
+            </ul>
+          </div>
+          <aside class="ficha" aria-label="Datos del proyecto">
+            <div class="ficha-cab"><span>GUÍA DE DESPACHO</span><span>CME-2611</span></div>
+            <dl>
+              <div><dt>Proyecto</dt><dd>Plataforma de mensajería orientada a API</dd></div>
+              <div><dt>Autor</dt><dd>Javier Esteban Mora Osorio</dd></div>
+              <div><dt>Programa</dt><dd>Ingeniería de Software, UNINPAHU</dd></div>
+              <div><dt>Docente</dt><dd>Luisa Fernanda Loza Muñetón</dd></div>
+              <div><dt>Organización</dt><dd>Logytech Mobile (de aplicación)</dd></div>
+              <div><dt>Fecha</dt><dd>Noviembre de 2026</dd></div>
+            </dl>
+            <svg class="codigo" viewBox="0 0 600 58" preserveAspectRatio="none" aria-hidden="true"></svg>
+          </aside>
+        </div>
+      </section>
+
+      <!-- 2. El problema -->
+      <section class="slide" id="parada-2" data-titulo="El problema" aria-label="El problema">
+        <div class="cab"><span class="guia"></span><span class="destino"></span></div>
+        <h2 class="titulo">El comercio electrónico crece, y la logística nacional supera en 5 puntos su meta de costo</h2>
+        <div class="cuerpo">
+          <div class="cifras">
+            <article class="cifra">
+              <p class="cifra-n tipo-num">684,6<small> M</small></p>
+              <p class="cifra-t">transacciones de comercio electrónico en Colombia durante 2025, un <b>19,9&nbsp;% más</b> que en 2024. Las ventas sumaron 145,4 billones de pesos.</p>
+              <div class="mini" aria-hidden="true">
+                <div class="mb"><span>2024</span><span class="pista"><i style="--w:83.4%"></i></span><span class="v"></span></div>
+                <div class="mb"><span>2025</span><span class="pista"><i class="f" style="--w:100%"></i></span><span class="v">+19,9&nbsp;%</span></div>
+              </div>
+              <p class="fuente">Cámara Colombiana de Comercio Electrónico, 2025</p>
+            </article>
+            <article class="cifra">
+              <p class="cifra-n tipo-num">86,2<small> M</small></p>
+              <p class="cifra-t">envíos de mensajería expresa en el cuarto trimestre de 2025, con ingresos por 785.786 millones de pesos, un <b>12&nbsp;% más</b>.</p>
+              <div class="mini">
+                <div class="mb" style="grid-template-columns:1fr auto"><span>Ingresos del trimestre</span><span class="v">785.786 M</span></div>
+                <div class="mb" style="grid-template-columns:1fr auto"><span>Variación de los ingresos</span><span class="v">+12&nbsp;%</span></div>
+              </div>
+              <p class="fuente">MinTIC, 2026</p>
+            </article>
+            <article class="cifra">
+              <p class="cifra-n tipo-num">17,9<small> %</small></p>
+              <p class="cifra-t">de las ventas se va en costo logístico nacional, <b>5 puntos por encima</b> de la meta. La carga cae más sobre las empresas pequeñas.</p>
+              <div class="mini" aria-label="Costo logístico como porcentaje de las ventas">
+                <div class="mb"><span>Pequeñas</span><span class="pista"><i class="f" style="--w:97.2%"></i></span><span class="v">24,3&nbsp;%</span></div>
+                <div class="mb"><span>Nacional</span><span class="pista"><i style="--w:71.6%"></i></span><span class="v">17,9&nbsp;%</span></div>
+                <div class="mb"><span>Grandes</span><span class="pista"><i style="--w:48.4%"></i></span><span class="v">12,1&nbsp;%</span></div>
+              </div>
+              <p class="fuente">DNP, 2023</p>
+            </article>
+            <article class="cifra">
+              <p class="cifra-n tipo-num">23,4<small> %</small></p>
+              <p class="cifra-t">de las empresas usa herramientas de rastreo y seguimiento de pedidos.</p>
+              <div>
+                <div class="waffle" data-n="23.4" role="img" aria-label="23 de cada 100 empresas"></div>
+                <p class="fuente" style="margin-top:8px">aprox. 23 de cada 100 empresas</p>
+              </div>
+              <p class="fuente">DNP, 2025</p>
+            </article>
+          </div>
+          <div class="nota-hip">
+            <span class="sello disc">Hipótesis a validar</span>
+            <p>Ninguna de estas fuentes mide la situación de las mensajerías pequeñas. Que su operación diaria presente las brechas de la siguiente lámina es una hipótesis que el proyecto propone validar en campo.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. Lo que pasa hoy -->
+      <section class="slide" id="parada-3" data-titulo="Operación actual" aria-label="Operación actual de un centro de mensajería">
+        <div class="cab"><span class="guia"></span><span class="destino"></span></div>
+        <h2 class="titulo">Seis hipótesis sobre cómo opera hoy un centro de mensajería pequeño</h2>
+        <div class="cuerpo">
+          <ul class="hips">
+            <li class="hip"><div class="hip-top"><span class="hip-cod">P1</span><span class="hip-et">Hipótesis a validar</span></div><h3>Operación repartida</h3><p>Pedidos, asignaciones y cambios circulan por llamadas y mensajes de WhatsApp, sin un registro único.</p><p class="resp">Servicios con estado, ruta y responsable en un solo lugar</p></li>
+            <li class="hip"><div class="hip-top"><span class="hip-cod">P2</span><span class="hip-et">Hipótesis a validar</span></div><h3>Cliente sin visibilidad</h3><p>El cliente pregunta por su envío porque no puede ver en qué punto de la ruta se encuentra.</p><p class="resp">Seguimiento en mapa y chat con el motorizado</p></li>
+            <li class="hip"><div class="hip-top"><span class="hip-cod">P3</span><span class="hip-et">Hipótesis a validar</span></div><h3>Recolecciones sin prueba</h3><p>Sin foto ni firma de forma sistemática, un reclamo se resuelve con la palabra de cada parte.</p><p class="resp">Foto y firma obligatorias al cerrar una recolección</p></li>
+            <li class="hip"><div class="hip-top"><span class="hip-cod">P4</span><span class="hip-et">Hipótesis a validar</span></div><h3>Novedades sin trazabilidad</h3><p>Lo que impidió una entrega, como una dirección errada o un cliente ausente, no queda ligado al servicio.</p><p class="resp">Novedades con tipo, detalle y acción posterior</p></li>
+            <li class="hip"><div class="hip-top"><span class="hip-cod">P5</span><span class="hip-et">Hipótesis a validar</span></div><h3>Sin autoservicio</h3><p>Agendar una recolección exige una llamada, y el centro transcribe cada solicitud.</p><p class="resp">El cliente agenda sus propias recolecciones</p></li>
+            <li class="hip"><div class="hip-top"><span class="hip-cod">P6</span><span class="hip-et">Hipótesis a validar</span></div><h3>Sin integración</h3><p>Las tiendas en línea y otros sistemas no pueden crear ni consultar servicios de forma automática.</p><p class="resp">API con API Key y webhooks firmados</p></li>
+          </ul>
+        </div>
+        <p class="pie">Hipótesis formuladas en el proyecto, sin validar con operadores reales. La flecha indica la capacidad del prototipo que responde a cada una.</p>
+      </section>
+
+      <!-- 4. La propuesta -->
+      <section class="slide" id="parada-4" data-titulo="La propuesta" aria-label="La propuesta">
+        <div class="cab"><span class="guia"></span><span class="destino"></span></div>
+        <h2 class="titulo">Una plataforma reúne servicios, seguimiento, evidencia y chat para cuatro roles</h2>
+        <div class="cuerpo">
+          <div class="propuesta">
+            <div class="objetivo">
+              <p class="rot">Objetivo de investigación, en resumen</p>
+              <p>Integrar, en una plataforma orientada a API, la gestión de entregas y recolecciones, la trazabilidad en tiempo real, la evidencia digital y el chat directo entre cliente y mensajero, y evaluar en campo si esa integración mejora la coordinación y la prueba de la operación.</p>
+            </div>
+            <div class="capas" aria-label="Capas de la plataforma">
+              <div class="cap-fila">
+                <div class="cap"><b>Gestión de servicios</b><span>Entregas y recolecciones con estados, rutas y orden de visita sugerido</span></div>
+                <div class="cap"><b>Trazabilidad en tiempo real</b><span>Posición GPS del motorizado y seguimiento sobre el mapa</span></div>
+                <div class="cap"><b>Evidencia digital</b><span>Foto y firma al cerrar una recolección, y novedades registradas</span></div>
+                <div class="cap"><b>Chat directo</b><span>Conversación por servicio entre el cliente y su motorizado</span></div>
+              </div>
+              <div class="cap-api"><b>API REST y webhooks</b><span>OpenAPI · API Key por integrador<br>eventos firmados con HMAC</span></div>
+              <p class="rot">Cuatro roles de usuario</p>
+              <div class="roles-fila">
+                <span class="rol-chip">Administrador</span><span class="rol-chip">Alistador</span><span class="rol-chip">Motorizado</span><span class="rol-chip">Cliente</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5. Ciclo de vida -->
+      <section class="slide" id="parada-5" data-titulo="Ciclo de vida" aria-label="Ciclo de vida de un servicio">
+        <div class="cab"><span class="guia"></span><span class="destino"></span></div>
+        <h2 class="titulo">Un servicio recorre ocho estados, y una novedad abre un desvío con dos salidas</h2>
+        <div class="cuerpo scroll-x">
+          <svg class="svg-ciclo" viewBox="0 0 1728 540" role="img" aria-labelledby="t5 d5">
+            <title id="t5">Ciclo de vida de un servicio</title>
+            <desc id="d5">Creado, Asignado a ruta, Recibido en centro (solo entregas) y En tránsito conducen a Entregado o Recolectado. Desde En tránsito una novedad lleva a Con novedad, que permite reintentar o devolver el servicio a Devuelto.</desc>
+            <defs>
+              <marker id="fl-i" viewBox="0 0 10 10" refX="7" refY="5" markerUnits="userSpaceOnUse" markerWidth="18" markerHeight="18" orient="auto"><path d="M0 0L10 5L0 10z" class="mk-i"/></marker>
+              <marker id="fl-n" viewBox="0 0 10 10" refX="7" refY="5" markerUnits="userSpaceOnUse" markerWidth="18" markerHeight="18" orient="auto"><path d="M0 0L10 5L0 10z" class="mk-n"/></marker>
+              <marker id="fl-d" viewBox="0 0 10 10" refX="7" refY="5" markerUnits="userSpaceOnUse" markerWidth="18" markerHeight="18" orient="auto"><path d="M0 0L10 5L0 10z" class="mk-d"/></marker>
+            </defs>
+            <g transform="translate(40 -70)">
+            <!-- carril de desvío -->
+            <rect class="carril" x="560" y="410" width="1100" height="176" rx="18"/>
+            <text class="sv-m" x="584" y="444">DESVÍO · NOVEDAD</text>
+            <text class="sv-d" x="584" y="492">Se registra desde cualquier</text>
+            <text class="sv-d" x="584" y="518">estado que aún no esté cerrado.</text>
+
+            <!-- ruta principal -->
+            <path class="ln" d="M100 250H1140Q1170 250 1170 220V180Q1170 150 1200 150H1292" marker-end="url(#fl-i)"/>
+            <path class="ln" d="M1140 250Q1170 250 1170 280V320Q1170 350 1200 350H1292" marker-end="url(#fl-i)"/>
+
+            <!-- nodos principales -->
+            <circle class="nd" cx="100" cy="250" r="18"/>
+            <circle class="nd" cx="400" cy="250" r="18"/>
+            <circle class="nd" cx="700" cy="250" r="18"/>
+            <circle class="nd" cx="1000" cy="250" r="18"/>
+
+            <g text-anchor="middle">
+              <text class="sv-t" x="100" y="136">Creado</text>
+              <text class="sv-d" x="100" y="170">Lo registra el alistador,</text>
+              <text class="sv-d" x="100" y="196">el cliente o un integrador</text>
+
+              <text class="sv-t" x="400" y="136">Asignado a ruta</text>
+              <text class="sv-d" x="400" y="170">El alistador lo agrega a</text>
+              <text class="sv-d" x="400" y="196">la ruta de un motorizado</text>
+
+              <text class="sv-t" x="700" y="136">Recibido en centro</text>
+              <text class="sv-d" x="700" y="170">Solo entregas. Una recolección</text>
+              <text class="sv-d" x="700" y="196">pasa directo a tránsito</text>
+
+              <text class="sv-t" x="1000" y="136">En tránsito</text>
+              <text class="sv-d" x="1000" y="170">El motorizado inicia el</text>
+              <text class="sv-d" x="1000" y="196">recorrido y reporta su GPS</text>
+            </g>
+
+            <!-- cierres -->
+            <circle class="nd ok" cx="1320" cy="150" r="22"/>
+            <path class="ic-ok" d="M1310 150l7 7 13-14"/>
+            <circle class="nd ok" cx="1320" cy="350" r="22"/>
+            <path class="ic-ok" d="M1310 350l7 7 13-14"/>
+            <text class="sv-t" x="1362" y="148">Entregado</text>
+            <text class="sv-d" x="1362" y="178">Cierre de una entrega</text>
+            <text class="sv-t" x="1362" y="340">Recolectado</text>
+            <text class="sv-d" x="1362" y="368">Cierre de una recolección,</text>
+            <text class="sv-d" x="1362" y="392">con foto y firma obligatorias</text>
+
+            <!-- desvío -->
+            <path class="ln-n" d="M985 268V466" marker-end="url(#fl-n)"/>
+            <text class="sv-d" x="962" y="352" text-anchor="end">Registra una</text>
+            <text class="sv-d" x="962" y="378" text-anchor="end">novedad</text>
+            <path class="ln-n" d="M1015 470V280" marker-end="url(#fl-n)"/>
+            <text class="sv-d" x="1040" y="372">Reintentar:</text>
+            <text class="sv-d" x="1040" y="398">vuelve a tránsito</text>
+
+            <rect class="nd nv" x="978" y="470" width="44" height="44" rx="6" transform="rotate(45 1000 492)"/>
+            <text class="sv-t" x="1000" y="574" text-anchor="middle" style="font-size:26px">Con novedad</text>
+
+            <path class="ln-d" d="M1034 492H1316" marker-end="url(#fl-d)"/>
+            <text class="sv-d" x="1176" y="476" text-anchor="middle">Devolver a centro</text>
+            <rect class="nd bd" x="1330" y="472" width="40" height="40" rx="4"/>
+            <text class="sv-t" x="1392" y="490">Devuelto</text>
+            <text class="sv-d" x="1392" y="520">Vuelve al centro y</text>
+            <text class="sv-d" x="1392" y="546">cierra sin éxito</text>
+            </g>
+          </svg>
+        </div>
+        <p class="hint-scroll">Deslizar el diagrama hacia los lados para verlo completo.</p>
+        <p class="pie">Estados y transiciones tal como los implementa el módulo de servicios del backend. Una recolección omite el estado Recibido en centro.</p>
+      </section>
+
+      <!-- 6. Roles -->
+      <section class="slide" id="parada-6" data-titulo="Los cuatro roles" aria-label="Los cuatro roles">
+        <div class="cab"><span class="guia"></span><span class="destino"></span></div>
+        <h2 class="titulo">Cada rol resuelve una parte de la ruta con herramientas propias</h2>
+        <div class="cuerpo">
+          <ul class="roles">
+            <li class="rol">
+              <div class="rol-id"><span class="rol-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6l7-3z"/><path d="M9 12l2 2 4-4"/></svg></span><h3>Administrador</h3></div>
+              <p class="rol-m">Gobierna la plataforma y mide la operación.</p>
+              <ul class="chips"><li>Usuarios y roles</li><li>Cobertura por zonas</li><li>API Keys y webhooks</li><li>Indicadores</li></ul>
+            </li>
+            <li class="rol">
+              <div class="rol-id"><span class="rol-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="4" width="12" height="17" rx="2"/><path d="M9 4V3h6v1M9 10h6M9 14h6M9 18h3"/></svg></span><h3>Alistador</h3></div>
+              <p class="rol-m">Prepara la operación del día en el centro.</p>
+              <ul class="chips"><li>Crea servicios</li><li>Arma rutas</li><li>Sugiere el orden de visita</li></ul>
+            </li>
+            <li class="rol">
+              <div class="rol-id"><span class="rol-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="17" r="2.8"/><circle cx="18" cy="17" r="2.8"/><path d="M8.8 17H13l3-7h2.5M13 10l-1-3H9"/></svg></span><h3>Motorizado</h3></div>
+              <p class="rol-m">Recorre la ruta y deja constancia de cada servicio.</p>
+              <ul class="chips"><li>Recibe e inicia tránsito</li><li>Reporta su GPS</li><li>Foto y firma</li><li>Registra novedades</li></ul>
+            </li>
+            <li class="rol">
+              <div class="rol-id"><span class="rol-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.6"/><path d="M5 20c0-4 3-6 7-6s7 2 7 6"/></svg></span><h3>Cliente</h3></div>
+              <p class="rol-m">Pide sus servicios y los sigue sin llamar.</p>
+              <ul class="chips"><li>Agenda recolecciones</li><li>Sigue el servicio en el mapa</li><li>Chatea con su motorizado</li></ul>
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- 7. Producto en acción -->
+      <section class="slide" id="parada-7" data-titulo="El producto en acción" aria-label="El producto en acción">
+        <div class="cab"><span class="guia"></span><span class="destino"></span></div>
+        <h2 class="titulo">El prototipo en ejecución con datos de prueba</h2>
+        <div class="cuerpo">
+          <div class="vitrina">
+            <figure class="fig">
+              <div class="marco-pc">
+                <div class="barra"><i></i><i></i><i></i><span>CMEDriver · Indicadores</span></div>
+                <div class="pantalla"><img alt="Panel de indicadores del administrador con servicios por día, estados y zonas" src="{{captura:indicadores-admin.png}}"></div>
+              </div>
+              <figcaption><b>Administrador.</b> Panel de indicadores calculado sobre la base de datos.</figcaption>
+            </figure>
+            <div class="moviles">
+              <figure class="fig">
+                <div class="marco-movil"><div class="pantalla-m"><img alt="Vista del motorizado con el detalle de un servicio" src="{{captura:motorizado-servicio.png}}"></div></div>
+                <figcaption><b>Motorizado.</b> Servicio con acciones de ruta.</figcaption>
+              </figure>
+              <figure class="fig">
+                <div class="marco-movil"><div class="pantalla-m"><img alt="Vista del cliente con el seguimiento del servicio sobre el mapa" src="{{captura:cliente-tracking.png}}"></div></div>
+                <figcaption><b>Cliente.</b> Seguimiento del servicio sobre el mapa.</figcaption>
+              </figure>
+              <figure class="fig">
+                <div class="marco-movil"><div class="pantalla-m"><img alt="Vista del cliente con el chat hacia su motorizado" src="{{captura:cliente-chat.png}}"></div></div>
+                <figcaption><b>Cliente.</b> Chat con su motorizado.</figcaption>
+              </figure>
+            </div>
+          </div>
+        </div>
+        <p class="pie">Capturas de la aplicación en ejecución local con usuarios y datos de prueba.</p>
+      </section>
+
+      <!-- 8. Indicadores -->
+      <section class="slide" id="parada-8" data-titulo="Indicadores del sistema" aria-label="Indicadores del sistema">
+        <div class="cab"><span class="guia"></span><span class="destino"></span></div>
+        <h2 class="titulo">Indicadores calculados sobre la base de datos</h2>
+        <div class="cuerpo">
+          <div class="sin-datos" role="status">
+            <b>Sin datos de indicadores</b>
+            <p>La presentación no encontró <code>datos/indicadores.json</code>. Para generarlo, ejecutar <code>python backend/manage.py exportar_indicadores --salida presentacion/datos/indicadores.json</code> y volver a construir con <code>python presentacion/construir.py</code>.</p>
+          </div>
+          <div data-necesita-datos>
+            <div class="kpis" id="kpis"></div>
+            <div class="graficos" style="margin-top:26px">
+              <div class="graf"><h3>Servicios por día</h3><div class="leyenda-g"><span><i style="background:var(--c-ent)"></i><b id="lg-ent" style="font-weight:500">Entregas</b></span><span><i style="background:var(--c-rec)"></i><b id="lg-rec" style="font-weight:500">Recolecciones</b></span></div><div id="g-diario"></div></div>
+              <div class="graf"><h3>Estado de los servicios</h3><div id="g-estados"></div></div>
+              <div class="graf"><h3>Servicios por zona</h3><div class="leyenda-g" style="gap:14px;font-size:15px"><span><i style="background:var(--line-strong)"></i>Total</span><span><i style="background:var(--ok)"></i>Exitosos</span><span><i style="background:var(--warn)"></i>Con novedad</span></div><div id="g-zonas"></div></div>
+            </div>
+            <div class="lectura-fila" style="margin-top:18px"><span class="rot">Lectura</span><p class="lectura" id="lectura"></p></div>
+          </div>
+        </div>
+        <p class="pie">Datos de demostración generados con <code>seed_demo</code> sobre la base de datos del sistema; no son operaciones reales de Logytech Mobile.<span id="gen-en"></span></p>
+      </section>
+
+      <!-- 9. Evidencia y novedades -->
+      <section class="slide" id="parada-9" data-titulo="Evidencia y novedades" aria-label="Evidencia y novedades">
+        <div class="cab"><span class="guia"></span><span class="destino"></span></div>
+        <h2 class="titulo">Sin foto y firma no se cierra una recolección, y cada novedad deja registro</h2>
+        <div class="cuerpo">
+          <div class="evi">
+            <div>
+              <p class="rot">Regla de negocio</p>
+              <div class="regla">
+                <div class="paso"><b>En tránsito</b><span>Recolección</span></div>
+                <span class="mas">+</span>
+                <div class="paso"><b>Foto</b><span>Obligatoria</span></div>
+                <span class="mas">+</span>
+                <div class="paso"><b>Firma</b><span>Obligatoria</span></div>
+                <span class="mas">=</span>
+                <div class="paso cierre"><b>Recolectado</b><span>Servicio cerrado</span></div>
+              </div>
+              <div data-necesita-datos>
+                <p class="gran" id="evi-pct"></p>
+                <p class="gran-t" id="evi-txt"></p>
+                <p class="gran-s" id="evi-horas"></p>
+              </div>
+            </div>
+            <div class="evi-r">
+              <div class="sin-datos" role="status"><b>Sin datos de indicadores</b><p>Generar <code>datos/indicadores.json</code> con <code>exportar_indicadores</code> y reconstruir la presentación.</p></div>
+              <div class="graf" data-necesita-datos><h3>Novedades por tipo</h3><div id="g-tipos"></div></div>
+              <div class="graf" data-necesita-datos><h3>Acción tomada ante la novedad</h3><div id="g-acciones"></div></div>
+              <p class="resuelve"><b>Qué problema ataca.</b> La foto y la firma quedan asociadas al servicio, de modo que un reclamo se revisa contra un registro del sistema. Se espera que reduzca las disputas por recolecciones; ese efecto queda por medir en campo.</p>
+            </div>
+          </div>
+        </div>
+        <p class="pie">Datos de demostración generados con <code>seed_demo</code> sobre la base de datos del sistema; no son operaciones reales de Logytech Mobile.</p>
+      </section>
+
+      <!-- 10. API -->
+      <section class="slide" id="parada-10" data-titulo="API para integradores" aria-label="API para integradores">
+        <div class="cab"><span class="guia"></span><span class="destino"></span></div>
+        <h2 class="titulo">Un tercero crea servicios y recibe eventos sin entrar a la aplicación</h2>
+        <div class="cuerpo">
+          <div class="api">
+            <div class="api-l">
+              <svg class="api-svg" viewBox="0 0 960 236" role="img" aria-labelledby="t10 d10">
+                <title id="t10">Flujo de integración</title>
+                <desc id="d10">El sistema integrador llama a la API de CMEDriver con una API Key. CMEDriver envía webhooks firmados con HMAC al receptor del integrador.</desc>
+                <defs><marker id="fl-a" viewBox="0 0 10 10" refX="7" refY="5" markerUnits="userSpaceOnUse" markerWidth="13" markerHeight="13" orient="auto"><path d="M0 0L10 5L0 10z" class="mk-a"/></marker><marker id="fl-w" viewBox="0 0 10 10" refX="7" refY="5" markerUnits="userSpaceOnUse" markerWidth="13" markerHeight="13" orient="auto"><path d="M0 0L10 5L0 10z" class="mk-w"/></marker></defs>
+                <rect class="bx-ext" x="2" y="30" width="226" height="110" rx="6"/>
+                <text class="sv-e" x="22" y="68" style="font-size:24px">Sistema</text>
+                <text class="sv-e" x="22" y="96" style="font-size:24px">integrador</text>
+                <text class="sv-s" x="22" y="124">tienda o ERP</text>
+                <rect class="bx-app" x="366" y="30" width="226" height="110" rx="6"/>
+                <text class="sv-bi" x="386" y="68">API CMEDriver</text>
+                <text class="sv-si" x="386" y="98">REST y OpenAPI</text>
+                <text class="sv-si" x="386" y="124">JSON sobre HTTPS</text>
+                <rect class="bx-ext" x="730" y="30" width="226" height="110" rx="6"/>
+                <text class="sv-e" x="750" y="68" style="font-size:24px">Receptor</text>
+                <text class="sv-e" x="750" y="96" style="font-size:24px">del integrador</text>
+                <text class="sv-s" x="750" y="124">endpoint propio</text>
+                <path class="ar" d="M232 70H362" marker-end="url(#fl-a)"/>
+                <text class="sv-c" x="297" y="56" text-anchor="middle">X-API-Key</text>
+                <text class="sv-s" x="297" y="96" text-anchor="middle">servicios</text>
+                <path class="ar-w" d="M596 70H726" marker-end="url(#fl-w)"/>
+                <text class="sv-c" x="661" y="56" text-anchor="middle">webhook</text>
+                <text class="sv-s" x="661" y="96" text-anchor="middle">firma HMAC</text>
+                <text class="sv-s" x="0" y="182">Firma: cabecera X-CMEDriver-Signature, HMAC-SHA256 del cuerpo.</text>
+                <text class="sv-s" x="0" y="210">Cada integrador usa su propia API Key y puede desactivarla.</text>
+              </svg>
+              <div>
+                <p class="rot" style="margin-bottom:10px">Eventos que se notifican</p>
+                <ul class="ev"><li>servicio.creado</li><li>servicio.asignado</li><li>servicio.recolectado</li><li>servicio.entregado</li><li>servicio.novedad</li><li>servicio.devuelto</li></ul>
+              </div>
+              <div>
+                <div class="sin-datos" role="status"><b>Sin datos de indicadores</b><p>Las cifras de integración salen de <code>datos/indicadores.json</code>.</p></div>
+                <div class="stats" id="stats-int" data-necesita-datos></div>
+              </div>
+            </div>
+            <figure class="fig">
+              <div class="marco-pc ancho">
+                <div class="barra"><i></i><i></i><i></i><span>CMEDriver · Documentación de la API</span></div>
+                <div class="pantalla"><img alt="Documentación OpenAPI de la API de CMEDriver en Swagger" src="{{captura:swagger.png}}"></div>
+              </div>
+              <figcaption><b>Documentación OpenAPI.</b> Cada endpoint puede consultarse y probarse desde el navegador.</figcaption>
+            </figure>
+          </div>
+        </div>
+        <p class="pie">Cifras de integración: datos de demostración generados con <code>seed_demo</code>; no son operaciones reales de Logytech Mobile.</p>
+      </section>
+
+      <!-- 11. Arquitectura -->
+      <section class="slide" id="parada-11" data-titulo="Arquitectura" aria-label="Arquitectura">
+        <div class="cab"><span class="guia"></span><span class="destino"></span></div>
+        <h2 class="titulo">Arquitectura modular orientada a API, con tiempo real y seis aplicaciones</h2>
+        <div class="cuerpo">
+          <div class="arq">
+            <div class="scroll-x">
+              <svg class="svg-arq" viewBox="0 0 1180 632" role="img" aria-labelledby="t11 d11">
+                <title id="t11">Contenedores de CMEDriver</title>
+                <desc id="d11">Los usuarios acceden a la aplicación Ionic, que consume la API REST y el canal WebSocket. La API usa la base de datos y el almacenamiento de evidencias, y se comunica con Nominatim, un servidor de correo y un receptor de webhooks. Un sistema integrador llama a la API con una API Key.</desc>
+                <defs>
+                  <marker id="ma-i" viewBox="0 0 10 10" refX="7" refY="5" markerUnits="userSpaceOnUse" markerWidth="13" markerHeight="13" orient="auto"><path d="M0 0L10 5L0 10z" class="mk-a"/></marker>
+                  <marker id="ma-w" viewBox="0 0 10 10" refX="7" refY="5" markerUnits="userSpaceOnUse" markerWidth="13" markerHeight="13" orient="auto"><path d="M0 0L10 5L0 10z" class="mk-w"/></marker>
+                  <marker id="ma-s" viewBox="0 0 10 10" refX="7" refY="5" markerUnits="userSpaceOnUse" markerWidth="13" markerHeight="13" orient="auto"><path d="M0 0L10 5L0 10z" class="mk-s"/></marker>
+                </defs>
+                <!-- usuarios -->
+                <rect class="bx-user" x="0" y="170" width="184" height="170" rx="4"/>
+                <text class="sv-b" x="20" y="208">Usuarios</text>
+                <text class="sv-c" x="20" y="242">Administrador</text>
+                <text class="sv-c" x="20" y="268">Alistador</text>
+                <text class="sv-c" x="20" y="294">Motorizado</text>
+                <text class="sv-c" x="20" y="320">Cliente</text>
+                <path class="ar" d="M188 255H246" marker-end="url(#ma-i)"/>
+                <!-- aplicación -->
+                <rect class="bx-app" x="250" y="170" width="240" height="170" rx="4"/>
+                <text class="sv-bi" x="270" y="210">Aplicación Ionic</text>
+                <text class="sv-si" x="270" y="246">Angular · Capacitor</text>
+                <text class="sv-si" x="270" y="272">Leaflet para mapas</text>
+                <text class="sv-si" x="270" y="298">web y móvil</text>
+                <!-- teselas -->
+                <rect class="bx-ext" x="250" y="430" width="240" height="76" rx="4"/>
+                <text class="sv-e" x="270" y="466">Teselas</text><text class="sv-e" x="270" y="492">OpenStreetMap</text>
+                <path class="ar-s" d="M370 344V426" marker-end="url(#ma-s)"/>
+                <text class="sv-s" x="384" y="392">mapa base</text>
+                <!-- app a api -->
+                <path class="ar" d="M494 215H656" marker-end="url(#ma-i)"/>
+                <text class="sv-s" x="575" y="201" text-anchor="middle">HTTPS · JSON</text>
+                <path class="ar-w" d="M494 290H656" marker-end="url(#ma-w)"/>
+                <text class="sv-s" x="575" y="276" text-anchor="middle">WebSocket</text>
+                <!-- api -->
+                <rect class="bx-api" x="660" y="70" width="310" height="350" rx="4"/>
+                <text class="sv-b" x="680" y="110" style="font-size:25px">API REST + tiempo real</text>
+                <text class="sv-s" x="680" y="138">Django REST Framework</text>
+                <rect class="bx-chip" x="680" y="166" width="132" height="42" rx="3"/><text class="sv-c" x="746" y="192" text-anchor="middle" style="font-size:16px">cuentas</text>
+                <rect class="bx-chip" x="822" y="166" width="132" height="42" rx="3"/><text class="sv-c" x="888" y="192" text-anchor="middle" style="font-size:16px">cobertura</text>
+                <rect class="bx-chip" x="680" y="218" width="132" height="42" rx="3"/><text class="sv-c" x="746" y="244" text-anchor="middle" style="font-size:16px">servicios</text>
+                <rect class="bx-chip" x="822" y="218" width="132" height="42" rx="3"/><text class="sv-c" x="888" y="244" text-anchor="middle" style="font-size:16px">seguimiento</text>
+                <rect class="bx-chip" x="680" y="270" width="132" height="42" rx="3"/><text class="sv-c" x="746" y="296" text-anchor="middle" style="font-size:16px">optimización</text>
+                <rect class="bx-chip" x="822" y="270" width="132" height="42" rx="3"/><text class="sv-c" x="888" y="296" text-anchor="middle" style="font-size:16px">integraciones</text>
+                <text class="sv-s" x="680" y="352">Aplicaciones del servidor</text>
+                <text class="sv-s" x="680" y="378">Channels y Daphne</text>
+                <!-- datos -->
+                <path class="bx" d="M670 516v58a70 16 0 0 0 140 0v-58"/>
+                <ellipse class="bx" cx="740" cy="516" rx="70" ry="16"/>
+                <text class="sv-e" x="740" y="548" text-anchor="middle">Base de</text>
+                <text class="sv-e" x="740" y="574" text-anchor="middle">datos</text>
+                <path class="ar" d="M740 424V496" marker-end="url(#ma-i)"/>
+                <rect class="bx" x="830" y="500" width="140" height="88" rx="4"/>
+                <text class="sv-e" x="900" y="540" text-anchor="middle">Evidencias</text>
+                <text class="sv-s" x="900" y="566" text-anchor="middle">foto y firma</text>
+                <path class="ar" d="M900 424V496" marker-end="url(#ma-i)"/>
+                <text class="sv-s" x="670" y="624">SQLite (desarrollo) · PostgreSQL (propuesto)</text>
+                <!-- externos -->
+                <rect class="bx-ext" x="1040" y="20" width="140" height="104" rx="4"/>
+                <text class="sv-e" x="1054" y="54">Sistema</text><text class="sv-e" x="1054" y="80">integrador</text><text class="sv-s" x="1054" y="108">con API Key</text>
+                <path class="ar" d="M1040 72H1006V104H974" marker-end="url(#ma-i)"/>
+                <rect class="bx-ext" x="1040" y="150" width="140" height="104" rx="4"/>
+                <text class="sv-e" x="1054" y="184">Receptor de</text><text class="sv-e" x="1054" y="210">webhooks</text><text class="sv-s" x="1054" y="238">firma HMAC</text>
+                <path class="ar-w" d="M974 202H1036" marker-end="url(#ma-w)"/>
+                <rect class="bx-ext" x="1040" y="282" width="140" height="80" rx="4"/>
+                <text class="sv-e" x="1054" y="316">Nominatim</text><text class="sv-s" x="1054" y="342">direcciones</text>
+                <path class="ar-s" d="M974 322H1036" marker-end="url(#ma-s)"/>
+                <rect class="bx-ext" x="1040" y="384" width="140" height="80" rx="4"/>
+                <text class="sv-e" x="1054" y="418" style="font-size:19px">Correo SMTP</text><text class="sv-s" x="1054" y="444">envío</text>
+                <path class="ar-s" d="M974 404H1036" marker-end="url(#ma-s)"/>
+                <text class="sv-s" x="1040" y="494">En desarrollo,</text><text class="sv-s" x="1040" y="518">el correo sale</text><text class="sv-s" x="1040" y="542">por consola</text>
+                <!-- leyenda -->
+                <rect class="bx-ext" x="0" y="560" width="34" height="20" rx="3"/><text class="sv-s" x="46" y="576">Sistema externo</text>
+                <rect class="bx" x="0" y="594" width="34" height="20" rx="3"/><text class="sv-s" x="46" y="610">Contenedor propio</text>
+              </svg>
+              <p class="hint-scroll">Deslizar el diagrama hacia los lados para verlo completo.</p>
+            </div>
+            <ul class="tech">
+              <li><b><span class="n" data-p="apps">–</span> aplicaciones Django</b>cuentas, cobertura, servicios, seguimiento, optimización e integraciones</li>
+              <li><b><span class="n" data-p="entidades">–</span> entidades de datos</b>modelo relacional con migraciones versionadas</li>
+              <li><b>API REST y tiempo real</b>Django REST Framework, Channels y Daphne para chat y posición</li>
+              <li><b>Aplicación web y móvil</b>Ionic, Angular y Capacitor; mapas con Leaflet y OpenStreetMap</li>
+              <li><b>Persistencia</b>SQLite en desarrollo y PostgreSQL propuesto para producción</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- 12. Calidad -->
+      <section class="slide" id="parada-12" data-titulo="Calidad y verificación" aria-label="Calidad y verificación">
+        <div class="cab"><span class="guia"></span><span class="destino"></span></div>
+        <h2 class="titulo">El backend suma <span data-p="pruebas">–</span> pruebas automatizadas y <span data-p="requisitos_vigentes">–</span> requisitos con trazabilidad documentada</h2>
+        <div class="cuerpo">
+          <div class="cal-cifras">
+            <div class="cal-c"><b data-p="pruebas">–</b><span>pruebas automatizadas del backend</span></div>
+            <div class="cal-c"><b data-p="apps">–</b><span>aplicaciones Django</span></div>
+            <div class="cal-c"><b data-p="entidades">–</b><span>entidades en el modelo de datos</span></div>
+            <div class="cal-c"><b data-p="requisitos_vigentes">–</b><span>requisitos funcionales vigentes, de <span data-p="requisitos_total">–</span> registrados</span></div>
+          </div>
+          <div class="cadena" aria-label="Cadena de trazabilidad">
+            <div class="eslabon"><b>Requisito</b><span>qué debe hacer</span></div>
+            <div class="eslabon"><b>Proceso</b><span>BPMN</span></div>
+            <div class="eslabon"><b>Arquitectura</b><span>C4</span></div>
+            <div class="eslabon"><b>Datos</b><span>MER</span></div>
+            <div class="eslabon"><b>Código</b><span>repositorio</span></div>
+            <div class="eslabon"><b>Prueba</b><span>automatizada</span></div>
+          </div>
+          <div class="honesto">
+            <div>
+              <p class="rot">Lo que todavía falta</p>
+              <div class="honesto-n">
+                <div><b data-p="limitaciones_vigentes">–</b><span>limitaciones vigentes documentadas</span></div>
+                <div><b data-p="limitaciones_altas">–</b><span>de prioridad alta</span></div>
+              </div>
+            </div>
+            <ul>
+              <li>La edición de servicios está abierta a cualquier usuario autenticado por la API.</li>
+              <li>Las evidencias se sirven sin autenticación.</li>
+              <li>No hay despliegue ni integración continua.</li>
+              <li>El correo solo sale por consola.</li>
+              <li>La geocodificación y las rutas tienen alcance limitado.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- 13. Cronograma -->
+      <section class="slide" id="parada-13" data-titulo="Cronograma" aria-label="Cronograma de la siguiente etapa">
+        <div class="cab"><span class="guia"></span><span class="destino"></span></div>
+        <div class="titulo-fila">
+          <h2 class="titulo">Seis meses de Trabajo de Grado, del protocolo de validación a la sustentación</h2>
+          <span class="sello">Propuesta sujeta a autorización de Logytech Mobile</span>
+        </div>
+        <div class="cuerpo scroll-x">
+          <svg class="gantt" viewBox="0 0 1728 618" role="img" aria-labelledby="t13 d13">
+            <title id="t13">Cronograma de seis meses</title>
+            <desc id="d13">Diseño y planificación completado. Meses 1 y 2: protocolo de validación y autorización, e instrumentos. Meses 2 y 3: cierre de brechas críticas. Mes 3: despliegue en entorno de pruebas. Meses 4 y 5: trabajo de campo, que depende de instrumentos validados, autorización y entorno desplegado. Meses 5 y 6: análisis. Mes 6: redacción, entrega y sustentación.</desc>
+            <defs><marker id="fl-g" viewBox="0 0 10 10" refX="8" refY="5" markerUnits="userSpaceOnUse" markerWidth="13" markerHeight="13" orient="auto"><path d="M0 0L10 5L0 10z" class="g-dep-m"/></marker></defs>
+            <line class="g-eje" x1="0" y1="50" x2="1728" y2="50"/>
+            <line class="g-col" x1="650" y1="0" x2="650" y2="562"/>
+            <line class="g-col" x1="780" y1="0" x2="780" y2="562"/>
+            <line class="g-col" x1="938" y1="0" x2="938" y2="562"/>
+            <line class="g-col" x1="1096" y1="0" x2="1096" y2="562"/>
+            <line class="g-col" x1="1254" y1="0" x2="1254" y2="562"/>
+            <line class="g-col" x1="1412" y1="0" x2="1412" y2="562"/>
+            <line class="g-col" x1="1570" y1="0" x2="1570" y2="562"/>
+            <line class="g-col" x1="1726" y1="0" x2="1726" y2="562"/>
+            <line class="g-fila" x1="0" y1="114" x2="1728" y2="114"/>
+            <line class="g-fila" x1="0" y1="178" x2="1728" y2="178"/>
+            <line class="g-fila" x1="0" y1="242" x2="1728" y2="242"/>
+            <line class="g-fila" x1="0" y1="306" x2="1728" y2="306"/>
+            <line class="g-fila" x1="0" y1="370" x2="1728" y2="370"/>
+            <line class="g-fila" x1="0" y1="434" x2="1728" y2="434"/>
+            <line class="g-fila" x1="0" y1="498" x2="1728" y2="498"/>
+            <line class="g-fila" x1="0" y1="562" x2="1728" y2="562"/>
+            <text class="gn-h" x="710" y="32">PREVIO</text>
+            <text class="gn-h" x="859" y="32">M1</text>
+            <text class="gn-h" x="1017" y="32">M2</text>
+            <text class="gn-h" x="1175" y="32">M3</text>
+            <text class="gn-h" x="1333" y="32">M4</text>
+            <text class="gn-h" x="1491" y="32">M5</text>
+            <text class="gn-h" x="1649" y="32">M6</text>
+            <text class="gn-t" x="0" y="79">Diseño y planificación</text><text class="gn-d" x="0" y="104">prototipo, documentación y paper</text>
+            <text class="gn-t" x="0" y="143">Protocolo de validación y autorización</text><text class="gn-d" x="0" y="168">acuerdo con la organización</text>
+            <text class="gn-t" x="0" y="207">Construcción y validación de instrumentos</text><text class="gn-d" x="0" y="232">guion, pauta, cuestionario, lista de chequeo</text>
+            <text class="gn-t" x="0" y="271">Cierre de brechas críticas</text><text class="gn-d" x="0" y="296">control de acceso, cobertura, PostgreSQL</text>
+            <text class="gn-t" x="0" y="335">Despliegue en entorno de pruebas</text><text class="gn-d" x="0" y="360">servidor, dominio, TLS</text>
+            <text class="gn-t" x="0" y="399">Trabajo de campo</text><text class="gn-d" x="0" y="424">entrevistas, observación, prueba piloto</text>
+            <text class="gn-t" x="0" y="463">Análisis de resultados</text><text class="gn-d" x="0" y="488">entrevistas, observación y piloto</text>
+            <text class="gn-t" x="0" y="527">Redacción, ajustes, entrega y sustentación</text><text class="gn-d" x="0" y="552">informe final del Trabajo de Grado</text>
+            <rect x="1262" y="58" width="462" height="176" fill="var(--bg)"/>
+            <text class="gn-hb" x="1274" y="88" style="font-size:22px">COMPUERTA DE INICIO DE CAMPO</text>
+            <text class="gn-d" x="1274" y="122" style="font-size:20px">Para iniciar el trabajo de campo</text>
+            <text class="gn-d" x="1274" y="150" style="font-size:20px">se requieren instrumentos validados,</text>
+            <text class="gn-d" x="1274" y="178" style="font-size:20px">autorización de Logytech Mobile</text>
+            <text class="gn-d" x="1274" y="206" style="font-size:20px">y entorno de pruebas desplegado.</text>
+            <rect class="gb-ok" x="656" y="66" width="108" height="32" rx="5"/><text class="gb-tx osc" x="710" y="88" text-anchor="middle">HECHO</text>
+            <rect class="gb-pl" x="786" y="130" width="304" height="32" rx="5"/><text class="gb-tx" x="938" y="152" text-anchor="middle">M1 a M2</text>
+            <rect class="gb-pl" x="786" y="194" width="304" height="32" rx="5"/><text class="gb-tx" x="938" y="216" text-anchor="middle">M1 a M2</text>
+            <rect class="gb-pl" x="944" y="258" width="304" height="32" rx="5"/><text class="gb-tx" x="1096" y="280" text-anchor="middle">M2 a M3</text>
+            <rect class="gb-pl" x="1102" y="322" width="146" height="32" rx="5"/><text class="gb-tx" x="1175" y="344" text-anchor="middle">M3</text>
+            <rect class="gb-cp" x="1260" y="386" width="304" height="32" rx="5"/><text class="gb-tx osc" x="1412" y="408" text-anchor="middle">M4 a M5</text>
+            <rect class="gb-pl" x="1418" y="450" width="304" height="32" rx="5"/><text class="gb-tx" x="1570" y="472" text-anchor="middle">M5 a M6</text>
+            <rect class="gb-pl" x="1576" y="514" width="146" height="32" rx="5"/><text class="gb-tx" x="1649" y="536" text-anchor="middle">M6</text>
+            <path class="g-dep" d="M1096 146H1254V402H1257" marker-end="url(#fl-g)"/>
+            <path class="g-dep" d="M1096 210H1254"/>
+            <path class="g-dep" d="M1252 338H1254"/>
+            <rect class="gb-ok" x="0" y="584" width="26" height="16" rx="3"/><text class="gn-d" x="38" y="598">Completado</text>
+            <rect class="gb-pl" x="230" y="584" width="26" height="16" rx="3"/><text class="gn-d" x="268" y="598">Planeado</text>
+            <rect class="gb-cp" x="430" y="584" width="26" height="16" rx="3"/><text class="gn-d" x="468" y="598">Trabajo de campo</text>
+            <path class="g-dep" d="M730 592H776" marker-end="url(#fl-g)"/><text class="gn-d" x="790" y="598">Dependencia</text>
+          </svg>
+        </div>
+        <p class="hint-scroll">Deslizar el cronograma hacia los lados para verlo completo.</p>
+      </section>
+
+      <!-- 14. Presupuesto -->
+      <section class="slide" id="parada-14" data-titulo="Presupuesto" aria-label="Presupuesto de referencia">
+        <div class="cab"><span class="guia"></span><span class="destino"></span></div>
+        <div class="titulo-fila">
+          <h2 class="titulo">Presupuesto: <span id="pres-total-t">–</span> en seis meses</h2>
+          <span class="sello disc">Estimación de referencia; valores a confirmar con proveedores</span>
+        </div>
+        <div class="cuerpo tabla-wrap">
+          <table class="pres" id="tabla-pres">
+            <colgroup><col style="width:230px"><col style="width:610px"><col style="width:150px"><col style="width:180px"><col style="width:170px"><col></colgroup>
+            <thead><tr><th>Categoría</th><th>Rubro</th><th class="num">Cantidad</th><th class="num">Valor unitario</th><th class="num">Total (COP)</th><th>Fuente</th></tr></thead>
+            <tbody></tbody>
+            <tfoot></tfoot>
+          </table>
+          <p class="hint-scroll">Deslizar la tabla hacia los lados para verla completa.</p>
+        </div>
+        <p class="pie">Valores en pesos colombianos (COP), a seis meses. El servidor podría ser aportado por Logytech Mobile, lo que queda por negociar.</p>
+      </section>
+
+      <!-- 15. Producto entregable -->
+      <section class="slide" id="parada-15" data-titulo="Producto entregable" aria-label="Producto entregable">
+        <div class="cab"><span class="guia"></span><span class="destino"></span></div>
+        <h2 class="titulo">El entregable: un sistema, su documentación técnica y un protocolo de validación</h2>
+        <div class="cuerpo">
+          <div class="entregable">
+            <article>
+              <p class="rot">Qué es</p>
+              <p>El producto entregable es un sistema de información denominado CMEDriver. Consiste en una plataforma web y móvil, orientada a API, que reúne la gestión de entregas y recolecciones, el seguimiento en tiempo real sobre un mapa, la evidencia digital con foto y firma, el chat entre cliente y motorizado y los indicadores de operación. Incluye la documentación técnica del proyecto, con requisitos, procesos, arquitectura, modelo de datos y plan de pruebas, y un protocolo de validación con sus instrumentos para la siguiente etapa.</p>
+            </article>
+            <article>
+              <p class="rot">A quién va dirigido y para qué sirve</p>
+              <p>El sistema se dirige a centros de mensajería pequeños y medianos y a Logytech Mobile, como organización de aplicación. Sirve para registrar y asignar servicios, seguirlos hasta su cierre, dejar constancia de las recolecciones, atender las novedades y ofrecer a terceros una API con webhooks. Su aporte es un prototipo funcional y una base documentada para evaluar en campo si estas capacidades reducen los problemas de coordinación y de prueba planteados como hipótesis. A la fecha no está desplegado ni se ha validado con operadores reales, sus usuarios son de prueba y el correo se simula por consola.</p>
+            </article>
+          </div>
+          <div class="estado-ent">
+            <ul class="si" aria-label="Incluye"><li>Plataforma web y móvil</li><li>Documentación técnica</li><li>Protocolo de validación</li></ul>
+            <ul class="no" aria-label="Pendiente"><li>Despliegue</li><li>Validación con operadores reales</li><li>Correo real</li></ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- 16. Cierre -->
+      <section class="slide" id="parada-16" data-titulo="Siguiente parada" aria-label="Siguiente parada">
+        <div class="cab"><span class="guia"></span><span class="destino"></span></div>
+        <h2 class="titulo">Siguiente parada: validar CMEDriver en una operación real</h2>
+        <div class="cuerpo">
+          <div class="final">
+            <div>
+              <p class="rot" style="margin-bottom:14px">Tres pedidos concretos a Logytech Mobile</p>
+              <ol class="pedidos">
+                <li><span><b>Autorización</b> para realizar el piloto con su operación.</span></li>
+                <li><span><b>Un entorno de pruebas</b> con servidor, dominio y certificado TLS.</span></li>
+                <li><span><b>Una ventana de tiempo</b> para entrevistas y observación con su personal.</span></li>
+              </ol>
+            </div>
+            <div>
+              <div class="repo">
+                <div class="ficha-cab"><span>REPOSITORIO</span><span>CÓDIGO Y DOCUMENTACIÓN</span></div>
+                <div class="repo-c">
+                  <code class="url" id="url-repo">https://github.com/javier5254/CEMDriver</code>
+                  <button type="button" class="btn-copiar" id="btn-copiar"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg>Copiar enlace</button>
+                  <p class="copiado" id="copiado" role="status"></p>
+                </div>
+              </div>
+              <div class="gracias">
+                <b>Gracias.</b>
+                <span>Javier Esteban Mora Osorio · Ingeniería de Software, UNINPAHU · Noviembre de 2026</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Ruta de entrega -->
+    <footer class="ruta" id="ruta" aria-label="Ruta de la presentación">
+      <div class="ruta-info"><span class="ruta-guia" id="ruta-guia">GUÍA CME · PARADA 01/16</span><span class="ruta-nombre" id="ruta-nombre">Portada</span></div>
+      <svg class="ruta-svg" id="ruta-svg" viewBox="0 0 1100 96" role="group" aria-label="Paradas"></svg>
+      <div class="ruta-ctl">
+        <button type="button" class="btn-c grande" data-accion="anterior" aria-label="Parada anterior"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
+        <button type="button" class="btn-c grande" data-accion="siguiente" aria-label="Parada siguiente"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
+        <button type="button" class="btn-c" data-accion="tema" aria-label="Cambiar entre tema claro y oscuro (T)"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/></svg></button>
+        <button type="button" class="btn-c" data-accion="pantalla" aria-label="Pantalla completa (F)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
+        <button type="button" class="btn-c" data-accion="ayuda" aria-label="Atajos de teclado (?)"><span class="q" aria-hidden="true">?</span></button>
+      </div>
+    </footer>
+  </div>
+
+  <div class="sr-only" id="vivo" aria-live="polite"></div>
+  <div class="aviso" id="aviso" role="status"></div>
+
+  <div class="ayuda" id="ayuda" role="dialog" aria-modal="true" aria-labelledby="ayuda-t" hidden>
+    <div class="ayuda-p">
+      <h2 id="ayuda-t">Atajos de teclado</h2>
+      <table>
+        <tr><td><kbd>→</kbd> <kbd>Espacio</kbd> <kbd>AvPág</kbd></td><td>Parada siguiente</td></tr>
+        <tr><td><kbd>←</kbd> <kbd>RePág</kbd></td><td>Parada anterior</td></tr>
+        <tr><td><kbd>Inicio</kbd> <kbd>Fin</kbd></td><td>Primera y última parada</td></tr>
+        <tr><td><kbd>1</kbd> a <kbd>9</kbd></td><td>Ir a esa parada (dos dígitos seguidos para 10 a 16)</td></tr>
+        <tr><td><kbd>F</kbd></td><td>Pantalla completa</td></tr>
+        <tr><td><kbd>T</kbd></td><td>Tema claro u oscuro</td></tr>
+        <tr><td><kbd>?</kbd></td><td>Mostrar u ocultar esta ayuda</td></tr>
+        <tr><td><kbd>Esc</kbd></td><td>Cerrar la ayuda</td></tr>
+        <tr><td>Deslizar</td><td>En pantallas táctiles, anterior y siguiente</td></tr>
+        <tr><td>Enlace <kbd>#p5</kbd></td><td>Abre directamente la parada 5</td></tr>
+        <tr><td><kbd>Ctrl</kbd> + <kbd>P</kbd></td><td>Imprime una lámina por página</td></tr>
+      </table>
+      <button type="button" class="cerrar" id="ayuda-cerrar">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<script type="application/json" id="datos-indicadores">{{datos:indicadores}}</script>
+<script type="application/json" id="datos-proyecto">{{datos:proyecto}}</script>
+
+<script>
+(function () {
+  'use strict';
+  var D = document;
+  function $(s, r) { return (r || D).querySelector(s); }
+  function $$(s, r) { return Array.prototype.slice.call((r || D).querySelectorAll(s)); }
+
+  /* ------------------------------------------------------------------
+     Datos incrustados por construir.py (indicadores y proyecto)
+  ------------------------------------------------------------------ */
+  function leerJSON(id) {
+    try {
+      var el = D.getElementById(id);
+      if (!el) return null;
+      var t = (el.textContent || '').trim();
+      if (!t || t === 'null' || t.indexOf('{{') === 0) return null;
+      return JSON.parse(t);
+    } catch (e) {
+      console.warn('[CMEDriver] No se pudo leer ' + id + ':', e);
+      return null;
+    }
+  }
+  var IND = leerJSON('datos-indicadores');
+  var PRO = leerJSON('datos-proyecto');
+  if (IND && !(IND.resumen && IND.serie_diaria && IND.por_estado)) {
+    console.warn('[CMEDriver] El JSON de indicadores no cumple el contrato; se muestra el estado "sin datos".');
+    IND = null;
+  }
+  if (!IND) console.warn('[CMEDriver] Sin datos de indicadores: las láminas 8, 9 y 10 muestran el estado "sin datos".');
+
+  /* ------------------------------------------------------------------
+     Utilidades de formato
+  ------------------------------------------------------------------ */
+  function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function miles(n) { return String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, '.'); }
+  function n0(x) { return (x === null || x === undefined || isNaN(x)) ? '–' : miles(x); }
+  function dec(x, d) {
+    if (x === null || x === undefined || isNaN(x)) return '–';
+    // Redondeo decimal (mitad hacia arriba), igual al de la app: 46,05 se muestra como 46,1 y no 46,0
+    var r = Number(Math.round(Number(x) + 'e' + d) + 'e-' + d);
+    return r.toFixed(d).replace('.', ',');
+  }
+  function pct(x) {
+    if (x === null || x === undefined || isNaN(x)) return null;
+    var v = x * 100;
+    return Math.abs(v - Math.round(v)) < 0.05 ? String(Math.round(v)) : v.toFixed(1).replace('.', ',');
+  }
+  function pad(n) { return (n < 10 ? '0' : '') + n; }
+  function dinero(x) { return '$' + miles(x); }
+  function etiquetaTipo(t) {
+    var s = String(t || '').replace(/_/g, ' ').toLowerCase();
+    return s.charAt(0).toUpperCase() + s.slice(1);
+  }
+  function recortar(s, n) { s = String(s); return s.length > n ? s.slice(0, n - 1) + '…' : s; }
+
+  /* ------------------------------------------------------------------
+     Estado general y utilidades de interfaz
+  ------------------------------------------------------------------ */
+  var root = D.documentElement;
+  var deck = $('#deck'), stage = $('#stage');
+  var slides = $$('.slide'), N = slides.length, cur = 0;
+  var reducido = false;
+  try { reducido = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
+  var mqMovil = window.matchMedia('(max-width: 719.98px)');
+  function esMovil() { return mqMovil.matches; }
+
+  var avisoEl = $('#aviso'), avisoT = null;
+  function avisar(msg) {
+    if (!avisoEl) return;
+    avisoEl.textContent = msg;
+    avisoEl.classList.add('on');
+    clearTimeout(avisoT);
+    avisoT = setTimeout(function () { avisoEl.classList.remove('on'); }, 2600);
+  }
+
+  /* ------------------------------------------------------------------
+     Tema claro / oscuro
+  ------------------------------------------------------------------ */
+  function temaActual() {
+    var a = root.getAttribute('data-theme');
+    if (a === 'dark' || a === 'light') return a;
+    try { return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'; } catch (e) { return 'light'; }
+  }
+  try {
+    var guardado = window.localStorage.getItem('cmedriver-tema');
+    if (guardado === 'dark' || guardado === 'light') root.setAttribute('data-theme', guardado);
+  } catch (e) { /* sin almacenamiento: sigue el tema del sistema */ }
+  function alternarTema() {
+    var nuevo = temaActual() === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', nuevo);
+    try { window.localStorage.setItem('cmedriver-tema', nuevo); } catch (e) {}
+    avisar('Tema ' + (nuevo === 'dark' ? 'oscuro' : 'claro'));
+  }
+
+  /* ------------------------------------------------------------------
+     Escala del escenario 1920x1080
+  ------------------------------------------------------------------ */
+  function ajustar() {
+    if (esMovil()) { stage.style.removeProperty('--s'); return; }
+    var w = window.innerWidth || root.clientWidth, h = window.innerHeight || root.clientHeight;
+    stage.style.setProperty('--s', Math.min(w / 1920, h / 1080).toFixed(5));
+  }
+  [deck, stage].forEach(function (el) { el.addEventListener('scroll', function () { el.scrollLeft = 0; el.scrollTop = 0; }); });
+  window.addEventListener('resize', ajustar);
+  if (mqMovil.addEventListener) mqMovil.addEventListener('change', function () { ajustar(); ir(cur, { forzar: true, sinHash: true }); });
+  D.addEventListener('fullscreenchange', ajustar);
+  ajustar();
+
+  /* ------------------------------------------------------------------
+     Rótulos de guía de despacho
+  ------------------------------------------------------------------ */
+  slides.forEach(function (s, i) {
+    var g = $('.guia', s), d = $('.destino', s);
+    if (g) g.textContent = 'Guía CME · Parada ' + pad(i + 1) + '/' + pad(N);
+    if (d) d.textContent = 'Destino · ' + (s.getAttribute('data-titulo') || '');
+  });
+
+  /* ------------------------------------------------------------------
+     Datos del proyecto (proyecto.json)
+  ------------------------------------------------------------------ */
+  if (PRO) {
+    $$('[data-p]').forEach(function (el) {
+      var k = el.getAttribute('data-p');
+      if (PRO[k] !== undefined && PRO[k] !== null) el.textContent = n0(PRO[k]);
+    });
+    var urlEl0 = $('#url-repo');
+    if (urlEl0 && typeof PRO.repositorio === 'string' && PRO.repositorio) urlEl0.textContent = PRO.repositorio;
+  } else {
+    console.warn('[CMEDriver] Sin proyecto.json: las cifras del proyecto muestran un guion.');
+  }
+
+  /* ------------------------------------------------------------------
+     Decorados: código de barras de la ficha y cuadrícula de 100 puntos
+  ------------------------------------------------------------------ */
+  (function () {
+    var svg = $('.codigo');
+    if (svg) {
+      var x = 0, seed = 26112026, out = '';
+      while (x < 600) {
+        seed = (seed * 1103515245 + 12345) & 0x7fffffff;
+        var w = 2 + (seed % 5), gap = 2 + ((seed >> 5) % 4);
+        out += '<rect x="' + x + '" y="0" width="' + w + '" height="58"/>';
+        x += w + gap;
+      }
+      svg.innerHTML = out;
+    }
+    $$('.waffle').forEach(function (wf) {
+      var n = Math.round(parseFloat(wf.getAttribute('data-n')) || 0);
+      for (var i = 0; i < 100; i++) {
+        var el = D.createElement('i');
+        if (i < n) el.className = 'on';
+        wf.appendChild(el);
+      }
+    });
+    $$('.captura-pendiente').forEach(function (c) {
+      console.warn('[CMEDriver] Captura pendiente: ' + (c.getAttribute('data-captura') || ''));
+    });
+  })();
+
+  /* ------------------------------------------------------------------
+     Gráficos SVG propios desde indicadores.json
+  ------------------------------------------------------------------ */
+  function svgWrap(w, h, inner, label) {
+    return '<svg viewBox="0 0 ' + w + ' ' + h + '" role="img" aria-label="' + esc(label) + '">' + inner + '</svg>';
+  }
+  function ticksNice(max, n) {
+    if (!(max > 0)) return [0, 1];
+    var raw = max / n, mag = Math.pow(10, Math.floor(Math.log(raw) / Math.LN10)), norm = raw / mag;
+    var paso = (norm <= 1 ? 1 : norm <= 2 ? 2 : norm <= 5 ? 5 : 10) * mag;
+    var tope = Math.ceil(max / paso) * paso, t = [];
+    for (var v = 0; v <= tope + paso / 1000; v += paso) t.push(Math.round(v * 1000) / 1000);
+    return t;
+  }
+  function fechaCorta(iso) {
+    var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(iso || '');
+    return m ? m[3] + '/' + m[2] : String(iso || '');
+  }
+  var clasePorEstado = { ENTREGADO: 'b-ok', RECOLECTADO: 'b-ok', NOVEDAD: 'b-warn', DEVUELTO: 'b-bad' };
+
+  function kpis() {
+    var r = IND.resumen, e = IND.evidencia || {}, p = IND.periodo || {}, o = IND.operacion || {};
+    var periodo = p.dias ? 'últimos ' + p.dias + ' días' : 'periodo exportado';
+    if (typeof p.zona === 'string' && p.zona && p.zona.toLowerCase() !== 'todas') periodo += ' · ' + p.zona;
+    var te = pct(r.tasa_exito), tn = pct(r.tasa_novedad), pe = pct(e.porcentaje);
+    var items = [
+      { t: 'Servicios del periodo', n: n0(r.servicios_total), u: '', s: periodo },
+      { t: 'Tasa de éxito', n: te === null ? '–' : te, u: te === null ? '' : '%', s: te === null ? 'sin servicios cerrados' : n0(r.cerrados_exitosos) + ' cerrados con éxito' },
+      { t: 'Tasa de novedad', n: tn === null ? '–' : tn, u: tn === null ? '' : '%', s: n0(r.servicios_con_novedad) + ' servicios con novedad' },
+      { t: 'En curso', n: n0(r.en_curso), u: '', s: (o.sin_asignar !== undefined ? n0(o.sin_asignar) + ' sin asignar' : 'servicios abiertos') },
+      { t: 'Evidencia completa', n: pe === null ? '–' : pe, u: pe === null ? '' : '%', s: pe === null ? 'sin recolecciones cerradas' : n0(e.con_evidencia_completa) + ' de ' + n0(e.recolecciones_cerradas) + ' recolecciones' },
+      { t: 'Horas a cierre', n: e.horas_promedio_a_cierre === null || e.horas_promedio_a_cierre === undefined ? '–' : dec(e.horas_promedio_a_cierre, 1), u: e.horas_promedio_a_cierre == null ? '' : 'h', s: 'promedio en recolecciones' }
+    ];
+    $('#kpis').innerHTML = items.map(function (k) {
+      return '<div class="kpi"><div class="rot">' + esc(k.t) + '</div><p class="kpi-n">' + esc(k.n) + (k.u ? '<small>' + k.u + '</small>' : '') + '</p><p class="kpi-s">' + esc(k.s) + '</p></div>';
+    }).join('');
+  }
+
+  function graficoDiario() {
+    var s = IND.serie_diaria || [], host = $('#g-diario');
+    var le = $('#lg-ent'), lr = $('#lg-rec');
+    if (le) le.textContent = 'Entregas (' + n0(IND.resumen.entregas) + ')';
+    if (lr) lr.textContent = 'Recolecciones (' + n0(IND.resumen.recolecciones) + ')';
+    if (!s.length) { host.innerHTML = '<p class="fuente">Sin serie diaria en el periodo.</p>'; return; }
+    var W = 780, H = 280, L = 46, R = 6, T = 10, B = 34, iw = W - L - R, ih = H - T - B;
+    var max = 0;
+    s.forEach(function (d) { max = Math.max(max, (d.entregas || 0) + (d.recolecciones || 0)); });
+    var ticks = ticksNice(max, 4), top = ticks[ticks.length - 1];
+    function y(v) { return T + ih - (v / top) * ih; }
+    var paso = iw / s.length, bw = Math.max(3, paso - Math.max(2, paso * 0.24));
+    var g = '';
+    ticks.forEach(function (t) {
+      g += '<line class="g-grid" x1="' + L + '" x2="' + (W - R) + '" y1="' + y(t).toFixed(1) + '" y2="' + y(t).toFixed(1) + '"/>';
+      g += '<text class="g-txt" x="' + (L - 8) + '" y="' + (y(t) + 6).toFixed(1) + '" text-anchor="end">' + miles(t) + '</text>';
+    });
+    var cada = Math.ceil(s.length / 6);
+    s.forEach(function (d, i) {
+      var e = d.entregas || 0, r = d.recolecciones || 0, x = L + i * paso + (paso - bw) / 2;
+      var tip = fechaCorta(d.fecha) + ': ' + e + ' entregas y ' + r + ' recolecciones';
+      g += '<g><title>' + esc(tip) + '</title>';
+      if (e > 0) g += '<rect class="b-ent" x="' + x.toFixed(1) + '" y="' + y(e).toFixed(1) + '" width="' + bw.toFixed(1) + '" height="' + (y(0) - y(e)).toFixed(1) + '" rx="1.5"/>';
+      if (r > 0) {
+        var yt = y(e + r), ht = (y(e) - yt) - (e > 0 ? 2 : 0);
+        g += '<rect class="b-rec" x="' + x.toFixed(1) + '" y="' + yt.toFixed(1) + '" width="' + bw.toFixed(1) + '" height="' + Math.max(1, ht).toFixed(1) + '" rx="1.5"/>';
+      }
+      g += '</g>';
+      if (i % cada === 0) g += '<text class="g-txt" x="' + (x + bw / 2).toFixed(1) + '" y="' + (H - 10) + '" text-anchor="middle">' + fechaCorta(d.fecha) + '</text>';
+    });
+    g += '<line class="g-eje" x1="' + L + '" x2="' + (W - R) + '" y1="' + y(0) + '" y2="' + y(0) + '"/>';
+    host.innerHTML = svgWrap(W, H, g, 'Servicios por día, entregas y recolecciones apiladas');
+  }
+
+  function graficoEstados() {
+    var est = IND.por_estado || [], host = $('#g-estados');
+    var W = 480, fila = 33, H = est.length * fila + 4, x0 = 194, mx = W - x0 - 54, max = 1;
+    est.forEach(function (e) { max = Math.max(max, e.total || 0); });
+    var g = '';
+    est.forEach(function (e, i) {
+      var cy = i * fila + 16, len = e.total > 0 ? Math.max(3, (e.total / max) * mx) : 0, cls = clasePorEstado[e.estado] || 'b-neu';
+      g += '<g><title>' + esc((e.etiqueta || e.estado) + ': ' + e.total) + '</title>';
+      g += '<text class="g-lbl" x="0" y="' + (cy + 7) + '">' + esc(e.etiqueta || e.estado) + '</text>';
+      g += '<rect class="b-trk" x="' + x0 + '" y="' + (cy - 9) + '" width="' + mx + '" height="18" rx="3" opacity="0.55"/>';
+      if (len) g += '<rect class="' + cls + '" x="' + x0 + '" y="' + (cy - 9) + '" width="' + len.toFixed(1) + '" height="18" rx="3"/>';
+      g += '<text class="g-txt-i" x="' + (x0 + mx + 10) + '" y="' + (cy + 6) + '">' + n0(e.total) + '</text></g>';
+    });
+    host.innerHTML = svgWrap(W, H, g, 'Cantidad de servicios por estado');
+  }
+
+  function graficoZonas() {
+    var z = (IND.por_zona || []).slice().sort(function (a, b) { return (b.total || 0) - (a.total || 0); }), host = $('#g-zonas');
+    if (!z.length) { host.innerHTML = '<p class="fuente">Sin zonas en el periodo.</p>'; return; }
+    var corta = z.slice(0, 6), resto = z.slice(6);
+    if (resto.length) {
+      var o = { zona: 'Otras', total: 0, exitosos: 0, con_novedad: 0 };
+      resto.forEach(function (q) { o.total += q.total || 0; o.exitosos += q.exitosos || 0; o.con_novedad += q.con_novedad || 0; });
+      corta.push(o);
+    }
+    var pref = null;
+    z.forEach(function (q) { var m = /^(.+? - )/.exec(String(q.zona)); var p = m ? m[1] : ''; pref = pref === null ? p : (pref === p ? p : ''); });
+    if (pref) { corta.forEach(function (q) { if (String(q.zona).indexOf(pref) === 0) q.zona = String(q.zona).slice(pref.length); }); }
+    var W = 412, fila = 38, H = corta.length * fila + 4, x0 = 124, mx = W - x0 - 46, max = 1, g = '';
+    corta.forEach(function (q) { max = Math.max(max, q.total || 0); });
+    corta.forEach(function (q, i) {
+      var cy = i * fila + 16, lt = ((q.total || 0) / max) * mx, le = ((q.exitosos || 0) / max) * mx, ln = ((q.con_novedad || 0) / max) * mx;
+      g += '<g><title>' + esc(q.zona + ': ' + q.total + ' servicios, ' + q.exitosos + ' exitosos, ' + q.con_novedad + ' con novedad') + '</title>';
+      g += '<text class="g-lbl" x="0" y="' + (cy + 6) + '" style="font-size:18px">' + esc(recortar(q.zona, 13)) + '</text>';
+      g += '<rect class="b-trk" x="' + x0 + '" y="' + (cy - 9) + '" width="' + Math.max(2, lt).toFixed(1) + '" height="18" rx="3"/>';
+      if (le > 0) g += '<rect class="b-ok" x="' + x0 + '" y="' + (cy - 9) + '" width="' + Math.max(2, le).toFixed(1) + '" height="18" rx="3"/>';
+      if (ln > 0) g += '<rect class="b-warn" x="' + x0 + '" y="' + (cy + 12) + '" width="' + Math.max(2, ln).toFixed(1) + '" height="5" rx="2"/>';
+      g += '<text class="g-txt-i" x="' + (x0 + Math.max(2, lt) + 8).toFixed(1) + '" y="' + (cy + 6) + '">' + n0(q.total) + '</text></g>';
+    });
+    host.innerHTML = svgWrap(W, H, g, 'Servicios por zona, con exitosos y con novedad');
+  }
+
+  function lectura() {
+    var r = IND.resumen, e = IND.evidencia || {}, f = [];
+    var te = pct(r.tasa_exito), tn = pct(r.tasa_novedad), pe = pct(e.porcentaje);
+    if (te !== null) f.push('De cada 100 servicios cerrados, ' + te + ' terminan con éxito.');
+    if (tn !== null) f.push('El ' + tn + ' % de los servicios del periodo registró novedad (' + n0(r.servicios_con_novedad) + ' de ' + n0(r.servicios_total) + ').');
+    if (pe !== null) {
+      var t = 'El ' + pe + ' % de las recolecciones cerradas tiene foto y firma';
+      if (e.horas_promedio_a_cierre !== null && e.horas_promedio_a_cierre !== undefined) t += ', y su cierre toma en promedio ' + dec(e.horas_promedio_a_cierre, 1) + ' horas';
+      f.push(t + '.');
+    }
+    $('#lectura').textContent = f.length ? f.join(' ') : 'El periodo exportado no tiene servicios cerrados suficientes para calcular tasas.';
+    var gen = $('#gen-en');
+    if (gen && IND.generado_en) {
+      var m = /^(\d{4})-(\d{2})-(\d{2})T?(\d{2})?:?(\d{2})?/.exec(IND.generado_en);
+      if (m) gen.textContent = ' Indicadores generados el ' + m[3] + '/' + m[2] + '/' + m[1] + (m[4] ? ' a las ' + m[4] + ':' + (m[5] || '00') : '') + '.';
+    }
+  }
+
+  function evidencia() {
+    var e = IND.evidencia || {}, pe = pct(e.porcentaje);
+    $('#evi-pct').innerHTML = pe === null ? '–' : esc(pe) + '<small>%</small>';
+    $('#evi-txt').textContent = pe === null ? 'El periodo no tiene recolecciones cerradas.' : 'de las recolecciones cerradas tiene evidencia completa, con foto y firma.';
+    var partes = [];
+    if (e.recolecciones_cerradas !== undefined) partes.push(n0(e.con_evidencia_completa) + ' de ' + n0(e.recolecciones_cerradas) + ' recolecciones cerradas');
+    if (e.horas_promedio_a_cierre !== null && e.horas_promedio_a_cierre !== undefined) partes.push('cierre promedio en ' + dec(e.horas_promedio_a_cierre, 1) + ' horas');
+    $('#evi-horas').textContent = partes.join(' · ');
+
+    var nv = IND.novedades || {}, tipos = (nv.por_tipo || []).slice().sort(function (a, b) { return b.total - a.total; }).slice(0, 6);
+    var host = $('#g-tipos');
+    if (!tipos.length) host.innerHTML = '<p class="fuente">Sin novedades en el periodo.</p>';
+    else {
+      var W = 888, fila = 40, H = tipos.length * fila + 2, x0 = 300, mx = W - x0 - 70, max = tipos[0].total || 1, g = '';
+      tipos.forEach(function (t, i) {
+        var cy = i * fila + 20, len = Math.max(3, (t.total / max) * mx);
+        g += '<g><title>' + esc(etiquetaTipo(t.tipo) + ': ' + t.total) + '</title><text class="g-lbl" x="0" y="' + (cy + 7) + '" style="font-size:21px">' + esc(recortar(etiquetaTipo(t.tipo), 26)) + '</text>';
+        g += '<rect class="b-warn" x="' + x0 + '" y="' + (cy - 10) + '" width="' + len.toFixed(1) + '" height="20" rx="3"/>';
+        g += '<text class="g-txt-i" x="' + (x0 + len + 10).toFixed(1) + '" y="' + (cy + 6) + '">' + n0(t.total) + '</text></g>';
+      });
+      host.innerHTML = svgWrap(W, H, g, 'Novedades por tipo');
+    }
+
+    var acc = nv.por_accion || [], ha = $('#g-acciones'), tot = 0;
+    acc.forEach(function (a) { tot += a.total || 0; });
+    if (!tot) { ha.innerHTML = '<p class="fuente">Sin acciones registradas.</p>'; return; }
+    var cols = ['var(--sec)', 'var(--bad)', 'var(--neutro)'];
+    ha.innerHTML = '<div class="seg" role="img" aria-label="Acciones tomadas ante las novedades">' + acc.map(function (a, i) {
+      return '<i style="flex:' + a.total + ';background:' + cols[i % 3] + '" title="' + esc((a.etiqueta || a.accion) + ': ' + a.total) + '"></i>';
+    }).join('') + '</div><div class="seg-l">' + acc.map(function (a, i) {
+      return '<span><i style="background:' + cols[i % 3] + '"></i>' + esc(a.etiqueta || a.accion) + ': ' + n0(a.total) + ' (' + pct(a.total / tot) + ' %)</span>';
+    }).join('') + '</div>';
+  }
+
+  function integraciones() {
+    var it = IND.integraciones || {}, w = it.envios_webhook || {}, tx = pct(w.tasa_exito);
+    var items = [
+      { t: 'API Keys activas', n: n0(it.api_keys_activas), s: 'una por integrador' },
+      { t: 'Webhooks activos', n: n0(it.webhooks_activos), s: 'con firma HMAC' },
+      { t: 'Envíos de webhook', n: n0(w.total), s: n0(w.exitosos) + ' exitosos, ' + n0(w.fallidos) + ' fallidos' },
+      { t: 'Éxito de los envíos', n: tx === null ? '–' : tx + ' %', s: tx === null ? 'sin envíos' : 'sobre el total enviado' }
+    ];
+    $('#stats-int').innerHTML = items.map(function (k) {
+      return '<div class="stat"><div class="rot">' + esc(k.t) + '</div><p class="stat-n">' + esc(k.n) + '</p><p class="stat-s">' + esc(k.s) + '</p></div>';
+    }).join('');
+  }
+
+  if (IND) {
+    try { kpis(); graficoDiario(); graficoEstados(); graficoZonas(); lectura(); evidencia(); integraciones(); }
+    catch (err) { console.error('[CMEDriver] Error al dibujar los indicadores:', err); }
+  } else {
+    ['parada-8', 'parada-9', 'parada-10'].forEach(function (id) { var s = D.getElementById(id); if (s) s.classList.add('no-datos'); });
+  }
+
+  /* ------------------------------------------------------------------
+     Presupuesto de referencia (editable aquí; el total lo calcula el script)
+  ------------------------------------------------------------------ */
+  var PRESUPUESTO = [
+    { cat: 'Servicios tecnológicos', rubro: 'Servidor en la nube, 2 vCPU y 4 GB', cant: 6, unidad: 'meses', vu: 120000, fte: 'Recursos propios; posible aporte de Logytech Mobile (por negociar)' },
+    { rubro: 'Dominio .com.co', cant: 1, unidad: 'año', vu: 75000, fte: 'Recursos propios' },
+    { rubro: 'Correo transaccional, plan gratuito (verificar límites)', cant: 1, unidad: 'plan', vu: 0, fte: 'Sin costo' },
+    { rubro: 'Certificado TLS (Let’s Encrypt)', cant: 1, unidad: 'cert.', vu: 0, fte: 'Sin costo' },
+    { rubro: 'Mapas y geocodificación: OpenStreetMap y Nominatim', cant: 1, unidad: 'servicio', vu: 0, fte: 'Sin costo, uso bajo' },
+    { cat: 'Transporte y campo', rubro: 'Desplazamientos para entrevistas, observación y piloto', cant: 12, unidad: 'viajes', vu: 14000, fte: 'Recursos propios' },
+    { cat: 'Comunicaciones', rubro: 'Plan de datos para las pruebas piloto', cant: 6, unidad: 'meses', vu: 50000, fte: 'Recursos propios' },
+    { cat: 'Materiales', rubro: 'Impresión de consentimientos e instrumentos', cant: 60, unidad: 'copias', vu: 300, fte: 'Recursos propios' },
+    { rubro: 'Papelería y carpetas', cant: 1, unidad: 'global', vu: 20000, fte: 'Recursos propios' },
+    { cat: 'Difusión', rubro: 'Impresión y empaste del informe final', cant: 2, unidad: 'ejemplares', vu: 40000, fte: 'Recursos propios' },
+    { cat: 'Personal', rubro: 'Horas de desarrollo y validación del autor', cant: null, unidad: '', vu: null, fte: 'Aporte en especie, no monetizado' }
+  ];
+  var IMPREVISTOS = 0.10;
+  var presTotal = null;
+  (function () {
+    var tb = $('#tabla-pres tbody'), tf = $('#tabla-pres tfoot');
+    if (!tb || !tf) return;
+    var sub = 0, html = '';
+    PRESUPUESTO.forEach(function (r) { r.total = (r.cant !== null && r.vu !== null) ? r.cant * r.vu : null; if (r.total !== null) sub += r.total; });
+    PRESUPUESTO.forEach(function (r, i) {
+      var span = 1;
+      if (r.cat) { for (var j = i + 1; j < PRESUPUESTO.length && !PRESUPUESTO[j].cat; j++) span++; }
+      html += '<tr' + (r.total === 0 ? ' class="cero"' : '') + '>' + (r.cat ? '<td class="cat" rowspan="' + span + '">' + esc(r.cat) + '</td>' : '') +
+        '<td>' + esc(r.rubro) + '</td>' +
+        '<td class="num">' + (r.cant === null ? '–' : r.cant + ' ' + esc(r.unidad)) + '</td>' +
+        '<td class="num">' + (r.vu === null ? '–' : dinero(r.vu)) + '</td>' +
+        '<td class="num">' + (r.total === null ? '–' : dinero(r.total)) + '</td>' +
+        '<td class="fte">' + esc(r.fte) + '</td></tr>';
+    });
+    var imp = Math.round(sub * IMPREVISTOS);
+    presTotal = sub + imp;
+    tb.innerHTML = html;
+    tf.innerHTML =
+      '<tr><td class="lbl" colspan="4">Subtotal</td><td class="num">' + dinero(sub) + '</td><td></td></tr>' +
+      '<tr><td class="lbl" colspan="4">Imprevistos (' + Math.round(IMPREVISTOS * 100) + ' %)</td><td class="num">' + dinero(imp) + '</td><td></td></tr>' +
+      '<tr class="total"><td class="lbl" colspan="4">TOTAL</td><td class="num">' + dinero(presTotal) + '</td><td class="fte" style="font:500 19px/1.2 var(--f-text);border-top:2.5px solid var(--ink)">Recursos propios</td></tr>';
+    var tt = $('#pres-total-t');
+    if (tt) tt.textContent = dinero(presTotal);
+  })();
+
+  /* ------------------------------------------------------------------
+     Ruta de entrega: trazo inferior con nodos y mensajero
+  ------------------------------------------------------------------ */
+  var rutaSvg = $('#ruta-svg'), rutaLong = [], rutaTotal = 0, rutaProg = null, rutaPath = null, mens = null, nodos = [], nums = [], lenActual = 0, anim = null;
+  var SVGNS = 'http://www.w3.org/2000/svg';
+  function mk(tag, attrs, parent) {
+    var el = D.createElementNS(SVGNS, tag);
+    for (var k in attrs) if (Object.prototype.hasOwnProperty.call(attrs, k)) el.setAttribute(k, attrs[k]);
+    if (parent) parent.appendChild(el);
+    return el;
+  }
+  function construirRuta() {
+    if (!rutaSvg) return;
+    var x0 = 22, x1 = 1078, dx = (x1 - x0) / (N - 1), base = 46, pat = [0, 0, -16, -16, 0, 0, 16, 16], pts = [];
+    for (var i = 0; i < N; i++) pts.push({ x: x0 + i * dx, y: i === 0 || i === N - 1 ? base : base + pat[i % 8] });
+    function tramo(a, b) {
+      if (a.y === b.y) return 'L' + b.x.toFixed(2) + ' ' + b.y;
+      var mid = (a.x + b.x) / 2, s = b.y > a.y ? 1 : -1, r = Math.min(8, Math.abs(b.y - a.y) / 2);
+      return 'L' + (mid - r).toFixed(2) + ' ' + a.y + 'Q' + mid.toFixed(2) + ' ' + a.y + ' ' + mid.toFixed(2) + ' ' + (a.y + s * r) +
+        'V' + (b.y - s * r) + 'Q' + mid.toFixed(2) + ' ' + b.y + ' ' + (mid + r).toFixed(2) + ' ' + b.y + 'L' + b.x.toFixed(2) + ' ' + b.y;
+    }
+    var d = 'M' + pts[0].x + ' ' + pts[0].y, acum = [d];
+    for (var j = 1; j < N; j++) { d += tramo(pts[j - 1], pts[j]); acum.push(d); }
+    rutaPath = mk('path', { d: d, 'class': 'r-base' }, rutaSvg);
+    rutaTotal = rutaPath.getTotalLength();
+    rutaProg = mk('path', { d: d, 'class': 'r-prog' }, rutaSvg);
+    rutaProg.style.strokeDasharray = rutaTotal;
+    rutaProg.style.strokeDashoffset = rutaTotal;
+    rutaLong = acum.map(function (dd) {
+      var t = mk('path', { d: dd }, rutaSvg), l = t.getTotalLength();
+      rutaSvg.removeChild(t);
+      return l;
+    });
+    pts.forEach(function (p, i) {
+      var titulo = slides[i].getAttribute('data-titulo') || '';
+      var g = mk('g', { 'class': 'r-g', tabindex: '0', role: 'button', 'aria-label': 'Ir a la parada ' + (i + 1) + ': ' + titulo, 'data-i': i }, rutaSvg);
+      var tt = mk('title', {}, g); tt.textContent = pad(i + 1) + ' · ' + titulo;
+      mk('circle', { 'class': 'r-hit', cx: p.x, cy: p.y, r: 14 }, g);
+      var nodo = (i === 0) ? mk('rect', { 'class': 'r-nodo', x: p.x - 6, y: p.y - 6, width: 12, height: 12, rx: 2 }, g)
+        : mk('circle', { 'class': 'r-nodo', cx: p.x, cy: p.y, r: i === N - 1 ? 8 : 5 }, g);
+      nodos.push(nodo);
+      var n = mk('text', { 'class': 'r-num', x: p.x, y: 90 }, rutaSvg); n.textContent = pad(i + 1);
+      nums.push(n);
+      g.addEventListener('click', function () { ir(i); });
+      g.addEventListener('keydown', function (ev) { if (ev.key === 'Enter') { ev.preventDefault(); ev.stopPropagation(); ir(i); } });
+    });
+    mens = mk('g', { id: 'r-mens' }, rutaSvg);
+    mk('circle', { 'class': 'r-pulso', r: 8 }, mens);
+    mk('circle', { 'class': 'r-mens', r: 8 }, mens);
+    rutaPts = pts;
+    posicionarMens(0);
+  }
+  var rutaPts = [];
+  function posicionarMens(len) {
+    lenActual = len;
+    var p = rutaPath.getPointAtLength(len);
+    mens.setAttribute('transform', 'translate(' + p.x.toFixed(2) + ' ' + p.y.toFixed(2) + ')');
+    rutaProg.style.strokeDashoffset = rutaTotal - len;
+  }
+  function moverMens(destino) {
+    if (anim) { cancelAnimationFrame(anim); anim = null; }
+    if (reducido) { posicionarMens(destino); return; }
+    var ini = lenActual, dur = Math.min(900, 380 + Math.abs(destino - ini) * 0.9), t0 = null;
+    function paso(t) {
+      if (t0 === null) t0 = t;
+      var k = Math.min(1, (t - t0) / dur), e = k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
+      posicionarMens(ini + (destino - ini) * e);
+      if (k < 1) anim = requestAnimationFrame(paso); else anim = null;
+    }
+    anim = requestAnimationFrame(paso);
+  }
+  function pintarRuta(animar) {
+    nodos.forEach(function (n, i) {
+      n.setAttribute('class', 'r-nodo' + (i < cur ? ' vis' : i === cur ? ' act' : ''));
+      nums[i].setAttribute('class', 'r-num' + (i === cur ? ' act' : ''));
+    });
+    var destino = rutaLong[cur] || 0;
+    if (animar) moverMens(destino); else posicionarMens(destino);
+    var gu = $('#ruta-guia'), nm = $('#ruta-nombre');
+    if (gu) gu.textContent = 'GUÍA CME · PARADA ' + pad(cur + 1) + '/' + pad(N);
+    if (nm) nm.textContent = slides[cur].getAttribute('data-titulo') || '';
+  }
+
+  /* ------------------------------------------------------------------
+     Navegación
+  ------------------------------------------------------------------ */
+  function fijarHash() {
+    var h = '#p' + (cur + 1);
+    try { window.history.replaceState(null, '', h); }
+    catch (e) { try { window.location.hash = h; } catch (e2) { /* sin hash */ } }
+  }
+  function ir(n, o) {
+    o = o || {};
+    n = Math.max(0, Math.min(N - 1, n));
+    if (n === cur && !o.forzar) return;
+    var prev = cur;
+    if (!esMovil() && n !== prev) {
+      stage.setAttribute('data-dir', n > prev ? 'adelante' : 'atras');
+      var antes = slides[prev];
+      antes.classList.remove('is-active');
+      antes.classList.add('sale');
+      setTimeout(function () { antes.classList.remove('sale'); }, 460);
+    }
+    slides.forEach(function (s, i) { if (i !== n) s.classList.remove('is-active'); });
+    slides[n].classList.remove('sale');
+    slides[n].classList.add('is-active');
+    cur = n;
+    pintarRuta(!o.forzar && !esMovil());
+    var vivo = $('#vivo');
+    if (vivo) vivo.textContent = 'Parada ' + (n + 1) + ' de ' + N + ': ' + (slides[n].getAttribute('data-titulo') || '');
+    if (!o.sinHash) fijarHash();
+    if (esMovil() && o.desplazar) { try { slides[n].scrollIntoView({ behavior: reducido ? 'auto' : 'smooth', block: 'start' }); } catch (e) { slides[n].scrollIntoView(); } }
+  }
+  function sig() { ir(cur + 1); }
+  function ant() { ir(cur - 1); }
+  function hashAParada() {
+    var m = /^#p(\d{1,2})$/.exec(window.location.hash || '');
+    return m ? parseInt(m[1], 10) - 1 : null;
+  }
+
+  /* ------------------------------------------------------------------
+     Pantalla completa, ayuda, copiar
+  ------------------------------------------------------------------ */
+  function pantallaCompleta() {
+    var fallo = function () { avisar('El navegador no permitió la pantalla completa en este contexto.'); };
+    try {
+      if (D.fullscreenElement || D.webkitFullscreenElement) { (D.exitFullscreen || D.webkitExitFullscreen).call(D); return; }
+      var el = root, f = el.requestFullscreen || el.webkitRequestFullscreen;
+      if (!f) { fallo(); return; }
+      var p = f.call(el);
+      if (p && p.catch) p.catch(fallo);
+    } catch (e) { fallo(); }
+  }
+  var ayudaEl = $('#ayuda'), foco = null;
+  function ayudaAbierta() { return ayudaEl && !ayudaEl.hidden; }
+  function abrirAyuda() { if (!ayudaEl) return; foco = D.activeElement; ayudaEl.hidden = false; var b = $('#ayuda-cerrar'); if (b) b.focus(); }
+  function cerrarAyuda() { if (!ayudaEl) return; ayudaEl.hidden = true; try { if (foco && foco.focus) foco.focus(); } catch (e) {} }
+  if (ayudaEl) {
+    ayudaEl.addEventListener('click', function (e) { if (e.target === ayudaEl) cerrarAyuda(); });
+    $('#ayuda-cerrar').addEventListener('click', cerrarAyuda);
+  }
+
+  var btnCopiar = $('#btn-copiar'), urlEl = $('#url-repo'), copiadoEl = $('#copiado');
+  function seleccionar(el) { try { var r = D.createRange(); r.selectNodeContents(el); var s = window.getSelection(); s.removeAllRanges(); s.addRange(r); } catch (e) {} }
+  if (btnCopiar && urlEl) {
+    btnCopiar.addEventListener('click', function () {
+      var txt = urlEl.textContent.trim();
+      function ok() { copiadoEl.textContent = 'Enlace copiado.'; }
+      function manual() {
+        seleccionar(urlEl);
+        var hecho = false;
+        try { hecho = D.execCommand && D.execCommand('copy'); } catch (e) {}
+        copiadoEl.textContent = hecho ? 'Enlace copiado.' : 'Enlace seleccionado: usar Ctrl+C para copiarlo.';
+      }
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(ok, manual);
+        else manual();
+      } catch (e) { manual(); }
+    });
+  }
+
+  /* ------------------------------------------------------------------
+     Eventos: botones, teclado, táctil, hash
+  ------------------------------------------------------------------ */
+  D.addEventListener('click', function (e) {
+    var b = e.target.closest ? e.target.closest('[data-accion]') : null;
+    if (!b) return;
+    var a = b.getAttribute('data-accion');
+    if (a === 'anterior') ant();
+    else if (a === 'siguiente') sig();
+    else if (a === 'tema') alternarTema();
+    else if (a === 'pantalla') pantallaCompleta();
+    else if (a === 'ayuda') ayudaAbierta() ? cerrarAyuda() : abrirAyuda();
+    if (e.detail > 0 && b.blur) b.blur();
+  });
+
+  var buf = '', bufT = null;
+  function digito(d) {
+    if (buf === '' && d === '0') return;
+    buf += d;
+    clearTimeout(bufT);
+    var n = parseInt(buf, 10);
+    if (buf.length >= 2 || n * 10 > N) { ir(n - 1); buf = ''; }
+    else bufT = setTimeout(function () { ir(parseInt(buf, 10) - 1); buf = ''; }, 700);
+  }
+  D.addEventListener('keydown', function (e) {
+    if (e.ctrlKey || e.altKey || e.metaKey) return;
+    var t = e.target;
+    if (t && /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)) return;
+    var k = e.key;
+    if (ayudaAbierta()) {
+      if (k === 'Escape' || k === '?') { e.preventDefault(); cerrarAyuda(); }
+      else if (k === 'Tab') { e.preventDefault(); var b = $('#ayuda-cerrar'); if (b) b.focus(); }
+      return;
+    }
+    if (k === '?') { e.preventDefault(); abrirAyuda(); return; }
+    if (k === 't' || k === 'T') { e.preventDefault(); alternarTema(); return; }
+    if (k === 'f' || k === 'F') { e.preventDefault(); pantallaCompleta(); return; }
+    if (esMovil()) return;
+    switch (k) {
+      case 'ArrowRight': case 'PageDown': case ' ': case 'Spacebar': e.preventDefault(); sig(); break;
+      case 'ArrowLeft': case 'PageUp': e.preventDefault(); ant(); break;
+      case 'Home': e.preventDefault(); ir(0); break;
+      case 'End': e.preventDefault(); ir(N - 1); break;
+      default: if (/^[0-9]$/.test(k)) { e.preventDefault(); digito(k); }
+    }
+  });
+
+  var tx = 0, ty = 0, tt = 0;
+  deck.addEventListener('touchstart', function (e) {
+    if (esMovil() || e.touches.length !== 1) return;
+    tx = e.touches[0].clientX; ty = e.touches[0].clientY; tt = Date.now();
+  }, { passive: true });
+  deck.addEventListener('touchend', function (e) {
+    if (esMovil() || !e.changedTouches.length) return;
+    var c = e.changedTouches[0], dx = c.clientX - tx, dy = c.clientY - ty;
+    if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5 && Date.now() - tt < 900) { if (dx < 0) sig(); else ant(); }
+  }, { passive: true });
+
+  window.addEventListener('hashchange', function () {
+    var n = hashAParada();
+    if (n !== null && n >= 0 && n < N && n !== cur) ir(n, { sinHash: true, desplazar: true });
+  });
+
+  /* ------------------------------------------------------------------
+     Arranque
+  ------------------------------------------------------------------ */
+  construirRuta();
+  var inicial = hashAParada();
+  cur = 0;
+  if (inicial !== null && inicial > 0 && inicial < N) {
+    slides[0].classList.remove('is-active');
+    slides[inicial].classList.add('is-active');
+    cur = inicial;
+  }
+  pintarRuta(false);
+  if (esMovil() && cur > 0) { setTimeout(function () { try { slides[cur].scrollIntoView(); } catch (e) {} }, 60); }
+  window.__cmedriver = { ir: ir, total: N, datos: IND, proyecto: PRO, presupuestoTotal: presTotal };
+})();
+</script>

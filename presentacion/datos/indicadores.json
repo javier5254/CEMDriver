@@ -1,0 +1,341 @@
+{
+  "generado_en": "2026-11-17T19:30:03.379615-05:00",
+  "periodo": {
+    "dias": 30,
+    "desde": "2026-10-19",
+    "hasta": "2026-11-17",
+    "zona": null
+  },
+  "resumen": {
+    "servicios_total": 137,
+    "entregas": 87,
+    "recolecciones": 50,
+    "en_curso": 29,
+    "cerrados_exitosos": 101,
+    "devueltos": 7,
+    "tasa_exito": 0.9352,
+    "servicios_con_novedad": 19,
+    "tasa_novedad": 0.1387
+  },
+  "por_estado": [
+    {
+      "estado": "CREADO",
+      "etiqueta": "Creado",
+      "total": 7
+    },
+    {
+      "estado": "ASIGNADO",
+      "etiqueta": "Asignado a ruta",
+      "total": 9
+    },
+    {
+      "estado": "RECIBIDO_CENTRO",
+      "etiqueta": "Recibido en centro",
+      "total": 2
+    },
+    {
+      "estado": "EN_TRANSITO",
+      "etiqueta": "En tránsito",
+      "total": 4
+    },
+    {
+      "estado": "NOVEDAD",
+      "etiqueta": "Con novedad",
+      "total": 7
+    },
+    {
+      "estado": "ENTREGADO",
+      "etiqueta": "Entregado",
+      "total": 67
+    },
+    {
+      "estado": "RECOLECTADO",
+      "etiqueta": "Recolectado",
+      "total": 34
+    },
+    {
+      "estado": "DEVUELTO",
+      "etiqueta": "Devuelto al centro",
+      "total": 7
+    }
+  ],
+  "serie_diaria": [
+    {
+      "fecha": "2026-10-19",
+      "entregas": 3,
+      "recolecciones": 2
+    },
+    {
+      "fecha": "2026-10-20",
+      "entregas": 5,
+      "recolecciones": 0
+    },
+    {
+      "fecha": "2026-10-21",
+      "entregas": 2,
+      "recolecciones": 4
+    },
+    {
+      "fecha": "2026-10-22",
+      "entregas": 4,
+      "recolecciones": 1
+    },
+    {
+      "fecha": "2026-10-23",
+      "entregas": 4,
+      "recolecciones": 1
+    },
+    {
+      "fecha": "2026-10-24",
+      "entregas": 1,
+      "recolecciones": 1
+    },
+    {
+      "fecha": "2026-10-25",
+      "entregas": 0,
+      "recolecciones": 0
+    },
+    {
+      "fecha": "2026-10-26",
+      "entregas": 3,
+      "recolecciones": 2
+    },
+    {
+      "fecha": "2026-10-27",
+      "entregas": 5,
+      "recolecciones": 1
+    },
+    {
+      "fecha": "2026-10-28",
+      "entregas": 4,
+      "recolecciones": 2
+    },
+    {
+      "fecha": "2026-10-29",
+      "entregas": 4,
+      "recolecciones": 2
+    },
+    {
+      "fecha": "2026-10-30",
+      "entregas": 4,
+      "recolecciones": 1
+    },
+    {
+      "fecha": "2026-10-31",
+      "entregas": 2,
+      "recolecciones": 0
+    },
+    {
+      "fecha": "2026-11-01",
+      "entregas": 0,
+      "recolecciones": 0
+    },
+    {
+      "fecha": "2026-11-02",
+      "entregas": 3,
+      "recolecciones": 3
+    },
+    {
+      "fecha": "2026-11-03",
+      "entregas": 2,
+      "recolecciones": 4
+    },
+    {
+      "fecha": "2026-11-04",
+      "entregas": 2,
+      "recolecciones": 5
+    },
+    {
+      "fecha": "2026-11-05",
+      "entregas": 4,
+      "recolecciones": 2
+    },
+    {
+      "fecha": "2026-11-06",
+      "entregas": 4,
+      "recolecciones": 2
+    },
+    {
+      "fecha": "2026-11-07",
+      "entregas": 2,
+      "recolecciones": 0
+    },
+    {
+      "fecha": "2026-11-08",
+      "entregas": 1,
+      "recolecciones": 0
+    },
+    {
+      "fecha": "2026-11-09",
+      "entregas": 3,
+      "recolecciones": 2
+    },
+    {
+      "fecha": "2026-11-10",
+      "entregas": 4,
+      "recolecciones": 1
+    },
+    {
+      "fecha": "2026-11-11",
+      "entregas": 5,
+      "recolecciones": 2
+    },
+    {
+      "fecha": "2026-11-12",
+      "entregas": 2,
+      "recolecciones": 4
+    },
+    {
+      "fecha": "2026-11-13",
+      "entregas": 4,
+      "recolecciones": 2
+    },
+    {
+      "fecha": "2026-11-14",
+      "entregas": 2,
+      "recolecciones": 1
+    },
+    {
+      "fecha": "2026-11-15",
+      "entregas": 1,
+      "recolecciones": 0
+    },
+    {
+      "fecha": "2026-11-16",
+      "entregas": 4,
+      "recolecciones": 2
+    },
+    {
+      "fecha": "2026-11-17",
+      "entregas": 3,
+      "recolecciones": 3
+    }
+  ],
+  "por_zona": [
+    {
+      "zona": "Bogota - Usaquen",
+      "total": 32,
+      "exitosos": 25,
+      "con_novedad": 3
+    },
+    {
+      "zona": "Bogota - Chapinero",
+      "total": 27,
+      "exitosos": 19,
+      "con_novedad": 5
+    },
+    {
+      "zona": "Bogota - Suba",
+      "total": 25,
+      "exitosos": 16,
+      "con_novedad": 6
+    },
+    {
+      "zona": "Bogota - Fontibon",
+      "total": 18,
+      "exitosos": 15,
+      "con_novedad": 1
+    },
+    {
+      "zona": "Bogota - Kennedy",
+      "total": 18,
+      "exitosos": 15,
+      "con_novedad": 2
+    },
+    {
+      "zona": "Bogota - Teusaquillo",
+      "total": 17,
+      "exitosos": 11,
+      "con_novedad": 2
+    }
+  ],
+  "novedades": {
+    "total": 23,
+    "por_tipo": [
+      {
+        "tipo": "Cliente ausente",
+        "total": 9
+      },
+      {
+        "tipo": "Dirección errada",
+        "total": 6
+      },
+      {
+        "tipo": "Acceso restringido",
+        "total": 4
+      },
+      {
+        "tipo": "Paquete dañado",
+        "total": 2
+      },
+      {
+        "tipo": "Rechazo del destinatario",
+        "total": 2
+      }
+    ],
+    "por_accion": [
+      {
+        "accion": "REINTENTAR",
+        "etiqueta": "Reintentar",
+        "total": 16
+      },
+      {
+        "accion": "DEVOLVER_A_CENTRO",
+        "etiqueta": "Devolver a centro",
+        "total": 7
+      }
+    ]
+  },
+  "evidencia": {
+    "recolecciones_cerradas": 34,
+    "con_evidencia_completa": 32,
+    "porcentaje": 0.9412,
+    "horas_promedio_a_cierre": 46.05
+  },
+  "motorizados": [
+    {
+      "id": 63,
+      "nombre": "Andrés Felipe Rojas",
+      "servicios": 59,
+      "cerrados_exitosos": 45,
+      "con_novedad": 9
+    },
+    {
+      "id": 64,
+      "nombre": "Jhon Alexander Gómez",
+      "servicios": 38,
+      "cerrados_exitosos": 32,
+      "con_novedad": 2
+    },
+    {
+      "id": 65,
+      "nombre": "Wilmer Eduardo Cárdenas",
+      "servicios": 21,
+      "cerrados_exitosos": 17,
+      "con_novedad": 4
+    },
+    {
+      "id": 66,
+      "nombre": "Diego Armando Parra",
+      "servicios": 12,
+      "cerrados_exitosos": 7,
+      "con_novedad": 4
+    }
+  ],
+  "operacion": {
+    "rutas": 49,
+    "sin_asignar": 7,
+    "posiciones_gps": 211,
+    "mensajes_chat": 69
+  },
+  "integraciones": {
+    "api_keys_activas": 1,
+    "webhooks_activos": 1,
+    "envios_webhook": {
+      "total": 400,
+      "exitosos": 377,
+      "fallidos": 23,
+      "tasa_exito": 0.9425
+    }
+  }
+}

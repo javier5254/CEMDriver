@@ -1,0 +1,341 @@
+{
+  "generado_en": "2026-11-17T09:30:00",
+  "periodo": {
+    "dias": 30,
+    "desde": "2026-10-19",
+    "hasta": "2026-11-17",
+    "zona": null
+  },
+  "resumen": {
+    "servicios_total": 484,
+    "entregas": 342,
+    "recolecciones": 142,
+    "en_curso": 108,
+    "cerrados_exitosos": 347,
+    "devueltos": 29,
+    "tasa_exito": 0.9229,
+    "servicios_con_novedad": 62,
+    "tasa_novedad": 0.1281
+  },
+  "por_estado": [
+    {
+      "estado": "CREADO",
+      "etiqueta": "Creado",
+      "total": 19
+    },
+    {
+      "estado": "ASIGNADO",
+      "etiqueta": "Asignado a ruta",
+      "total": 24
+    },
+    {
+      "estado": "RECIBIDO_CENTRO",
+      "etiqueta": "Recibido en centro",
+      "total": 14
+    },
+    {
+      "estado": "EN_TRANSITO",
+      "etiqueta": "En tránsito",
+      "total": 27
+    },
+    {
+      "estado": "NOVEDAD",
+      "etiqueta": "Con novedad",
+      "total": 24
+    },
+    {
+      "estado": "ENTREGADO",
+      "etiqueta": "Entregado",
+      "total": 242
+    },
+    {
+      "estado": "RECOLECTADO",
+      "etiqueta": "Recolectado",
+      "total": 105
+    },
+    {
+      "estado": "DEVUELTO",
+      "etiqueta": "Devuelto al centro",
+      "total": 29
+    }
+  ],
+  "serie_diaria": [
+    {
+      "fecha": "2026-10-19",
+      "entregas": 10,
+      "recolecciones": 7
+    },
+    {
+      "fecha": "2026-10-20",
+      "entregas": 10,
+      "recolecciones": 4
+    },
+    {
+      "fecha": "2026-10-21",
+      "entregas": 9,
+      "recolecciones": 5
+    },
+    {
+      "fecha": "2026-10-22",
+      "entregas": 6,
+      "recolecciones": 5
+    },
+    {
+      "fecha": "2026-10-23",
+      "entregas": 19,
+      "recolecciones": 3
+    },
+    {
+      "fecha": "2026-10-24",
+      "entregas": 9,
+      "recolecciones": 2
+    },
+    {
+      "fecha": "2026-10-25",
+      "entregas": 14,
+      "recolecciones": 1
+    },
+    {
+      "fecha": "2026-10-26",
+      "entregas": 16,
+      "recolecciones": 6
+    },
+    {
+      "fecha": "2026-10-27",
+      "entregas": 11,
+      "recolecciones": 7
+    },
+    {
+      "fecha": "2026-10-28",
+      "entregas": 16,
+      "recolecciones": 6
+    },
+    {
+      "fecha": "2026-10-29",
+      "entregas": 11,
+      "recolecciones": 2
+    },
+    {
+      "fecha": "2026-10-30",
+      "entregas": 9,
+      "recolecciones": 7
+    },
+    {
+      "fecha": "2026-10-31",
+      "entregas": 9,
+      "recolecciones": 3
+    },
+    {
+      "fecha": "2026-11-01",
+      "entregas": 7,
+      "recolecciones": 7
+    },
+    {
+      "fecha": "2026-11-02",
+      "entregas": 15,
+      "recolecciones": 5
+    },
+    {
+      "fecha": "2026-11-03",
+      "entregas": 12,
+      "recolecciones": 7
+    },
+    {
+      "fecha": "2026-11-04",
+      "entregas": 13,
+      "recolecciones": 7
+    },
+    {
+      "fecha": "2026-11-05",
+      "entregas": 17,
+      "recolecciones": 6
+    },
+    {
+      "fecha": "2026-11-06",
+      "entregas": 13,
+      "recolecciones": 5
+    },
+    {
+      "fecha": "2026-11-07",
+      "entregas": 2,
+      "recolecciones": 4
+    },
+    {
+      "fecha": "2026-11-08",
+      "entregas": 12,
+      "recolecciones": 2
+    },
+    {
+      "fecha": "2026-11-09",
+      "entregas": 10,
+      "recolecciones": 6
+    },
+    {
+      "fecha": "2026-11-10",
+      "entregas": 9,
+      "recolecciones": 8
+    },
+    {
+      "fecha": "2026-11-11",
+      "entregas": 17,
+      "recolecciones": 0
+    },
+    {
+      "fecha": "2026-11-12",
+      "entregas": 10,
+      "recolecciones": 5
+    },
+    {
+      "fecha": "2026-11-13",
+      "entregas": 20,
+      "recolecciones": 6
+    },
+    {
+      "fecha": "2026-11-14",
+      "entregas": 9,
+      "recolecciones": 2
+    },
+    {
+      "fecha": "2026-11-15",
+      "entregas": 0,
+      "recolecciones": 0
+    },
+    {
+      "fecha": "2026-11-16",
+      "entregas": 13,
+      "recolecciones": 7
+    },
+    {
+      "fecha": "2026-11-17",
+      "entregas": 14,
+      "recolecciones": 7
+    }
+  ],
+  "por_zona": [
+    {
+      "zona": "Chapinero",
+      "total": 130,
+      "exitosos": 82,
+      "con_novedad": 16
+    },
+    {
+      "zona": "Usaquén",
+      "total": 106,
+      "exitosos": 71,
+      "con_novedad": 13
+    },
+    {
+      "zona": "Suba",
+      "total": 87,
+      "exitosos": 65,
+      "con_novedad": 13
+    },
+    {
+      "zona": "Teusaquillo",
+      "total": 67,
+      "exitosos": 50,
+      "con_novedad": 9
+    },
+    {
+      "zona": "Kennedy",
+      "total": 53,
+      "exitosos": 33,
+      "con_novedad": 10
+    },
+    {
+      "zona": "Fontibón",
+      "total": 41,
+      "exitosos": 29,
+      "con_novedad": 7
+    }
+  ],
+  "novedades": {
+    "total": 49,
+    "por_tipo": [
+      {
+        "tipo": "Cliente ausente",
+        "total": 19
+      },
+      {
+        "tipo": "Dirección incorrecta",
+        "total": 14
+      },
+      {
+        "tipo": "Paquete rechazado",
+        "total": 7
+      },
+      {
+        "tipo": "Zona de difícil acceso",
+        "total": 5
+      },
+      {
+        "tipo": "Sin contacto telefónico",
+        "total": 4
+      }
+    ],
+    "por_accion": [
+      {
+        "accion": "REINTENTAR",
+        "etiqueta": "Reintentar",
+        "total": 31
+      },
+      {
+        "accion": "DEVOLVER_A_CENTRO",
+        "etiqueta": "Devolver a centro",
+        "total": 18
+      }
+    ]
+  },
+  "evidencia": {
+    "recolecciones_cerradas": 105,
+    "con_evidencia_completa": 100,
+    "porcentaje": 0.9524,
+    "horas_promedio_a_cierre": 6.4
+  },
+  "motorizados": [
+    {
+      "id": 1,
+      "nombre": "Camilo Rojas",
+      "servicios": 150,
+      "cerrados_exitosos": 111,
+      "con_novedad": 18
+    },
+    {
+      "id": 2,
+      "nombre": "Daniela Pardo",
+      "servicios": 135,
+      "cerrados_exitosos": 99,
+      "con_novedad": 17
+    },
+    {
+      "id": 3,
+      "nombre": "Sergio Linares",
+      "servicios": 111,
+      "cerrados_exitosos": 80,
+      "con_novedad": 6
+    },
+    {
+      "id": 4,
+      "nombre": "Marcela Ortiz",
+      "servicios": 87,
+      "cerrados_exitosos": 66,
+      "con_novedad": 5
+    }
+  ],
+  "operacion": {
+    "rutas": 41,
+    "sin_asignar": 19,
+    "posiciones_gps": 1260,
+    "mensajes_chat": 318
+  },
+  "integraciones": {
+    "api_keys_activas": 2,
+    "webhooks_activos": 3,
+    "envios_webhook": {
+      "total": 726,
+      "exitosos": 682,
+      "fallidos": 44,
+      "tasa_exito": 0.9394
+    }
+  }
+}
